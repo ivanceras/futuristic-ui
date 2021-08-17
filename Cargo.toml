@@ -8,7 +8,7 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
-sauron = { version = "0.40", path = "../../" }
+sauron = "0.40"
 sauron-markdown = "0.40"
 log = "0.4"
 console_log = { version = "0.2", features = ["color"], optional = true }
@@ -35,6 +35,3 @@ with-measure = ["sauron/with-measure"]
 opt-level = "z"
 lto = true
 panic = "abort"
-
-[patch.crates-io]
-sauron  = { path = "../../" }
