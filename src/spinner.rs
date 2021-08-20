@@ -20,8 +20,10 @@ impl<MSG> Spinner<MSG> {
             _phantom: PhantomData,
         }
     }
+}
 
-    pub fn view(&self) -> Node<MSG> {
+impl<MSG> View<MSG> for Spinner<MSG> {
+    fn view(&self) -> Node<MSG> {
         let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
 
         div(
@@ -32,7 +34,9 @@ impl<MSG> Spinner<MSG> {
             ],
         )
     }
+}
 
+impl<MSG> Spinner<MSG> {
     pub fn style(&self) -> Vec<String> {
         let base = crate::Theme::default().controls;
 
