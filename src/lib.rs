@@ -62,51 +62,49 @@ impl Application<Msg> for App {
         match msg {
             Msg::ReAnimateHeader => {
                 if let Some(header_msg) = self.nav_header.update(nav_header::Msg::AnimateIn) {
-                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
+                    Cmd::from_msg(Msg::NavHeaderMsg(header_msg))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::NavHeaderMsg(header_msg) => {
                 if let Some(header_msg) = self.nav_header.update(header_msg) {
-                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
+                    Cmd::from_msg(Msg::NavHeaderMsg(header_msg))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::ReAnimateFrame => {
                 if let Some(frame_msg) = self.frame.update(frame::Msg::AnimateIn) {
-                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
+                    Cmd::from_msg(Msg::FrameMsg(frame_msg))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::FrameMsg(frame_msg) => {
                 if let Some(frame_msg) = self.frame.update(frame_msg) {
-                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
+                    Cmd::from_msg(Msg::FrameMsg(frame_msg))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::BtnMsg(index, btn_msg) => {
                 if let Some(pmsg) = self.button_array[index].update(*btn_msg) {
-                    Cmd::new(move |program| program.dispatch(pmsg.clone()))
+                    Cmd::from_msg(pmsg)
                 } else {
                     Cmd::none()
                 }
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
                 if let Some(pmsg) = self.fui_button.update(*fui_btn_msg) {
-                    Cmd::new(move |program| program.dispatch(pmsg.clone()))
+                    Cmd::from_msg(pmsg)
                 } else {
                     Cmd::none()
                 }
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 if let Some(animate_list_msg) = self.animate_list.update(*animate_list_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
-                    })
+                    Cmd::from_msg(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
                 } else {
                     Cmd::none()
                 }
@@ -115,36 +113,28 @@ impl Application<Msg> for App {
                 if let Some(animate_list_msg) =
                     self.animate_list.update(animate_list::Msg::AnimateIn)
                 {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
-                    })
+                    Cmd::from_msg(Msg::AnimateListMsg(Box::new(animate_list_msg)))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::ParagraphMsg(para_msg) => {
                 if let Some(para_msg) = self.paragraph.update(para_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
-                    })
+                    Cmd::from_msg(Msg::ParagraphMsg(para_msg))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::ImageMsg(img_msg) => {
                 if let Some(img_msg) = self.image.update(img_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::ImageMsg(img_msg.clone()));
-                    })
+                    Cmd::from_msg(Msg::ImageMsg(img_msg))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::ReAnimateParagraph => {
                 if let Some(para_msg) = self.paragraph.update(paragraph::Msg::AnimateIn) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
-                    })
+                    Cmd::from_msg(Msg::ParagraphMsg(para_msg.clone()))
                 } else {
                     Cmd::none()
                 }
