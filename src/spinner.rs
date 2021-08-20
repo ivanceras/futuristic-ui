@@ -21,6 +21,18 @@ impl<MSG> Spinner<MSG> {
         }
     }
 
+    pub fn view(&self) -> Node<MSG> {
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+
+        div(
+            vec![class(COMPONENT_NAME)],
+            vec![
+                div(vec![class_ns("circle circle1")], vec![]),
+                div(vec![class_ns("circle circle2")], vec![]),
+            ],
+        )
+    }
+
     pub fn style(&self) -> Vec<String> {
         let base = crate::Theme::default().controls;
 
@@ -102,17 +114,5 @@ impl<MSG> Spinner<MSG> {
         "#;
 
         vec![base_css.to_string(), animation_css.to_string()]
-    }
-
-    pub fn view(&self) -> Node<MSG> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
-
-        div(
-            vec![class(COMPONENT_NAME)],
-            vec![
-                div(vec![class_ns("circle circle1")], vec![]),
-                div(vec![class_ns("circle circle2")], vec![]),
-            ],
-        )
     }
 }

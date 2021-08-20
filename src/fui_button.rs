@@ -1,22 +1,22 @@
 use crate::sounds;
 use sauron::jss::{jss, jss_ns};
 use sauron::{
+    dom::Event,
     html::attributes,
     html::{attributes::class, div, events::on_click, text},
     prelude::*,
-    Node,
+    Callback, Node,
 };
 use web_sys::HtmlAudioElement;
 
 const COMPONENT_NAME: &str = "fui_button";
 
 #[derive(Clone, Debug)]
-pub enum Msg<PMSG> {
-    Click,
+pub enum Msg {
+    Click(MouseEvent),
     HoverIn,
     HoverOut,
     HighlightEnd,
-    ParamMsg(PMSG),
 }
 
 pub struct FuiButton<PMSG> {
@@ -25,7 +25,7 @@ pub struct FuiButton<PMSG> {
     label: String,
     click: bool,
     hover: bool,
-    event_listeners: Vec<Attribute<Msg<PMSG>>>,
+    click_listeners: Vec<Callback<PMSG>>,
 }
 
 pub struct Options {
@@ -59,19 +59,143 @@ where
             click: false,
             hover: false,
             label: label.to_string(),
-            event_listeners: vec![],
+            click_listeners: vec![],
+        }
+    }
+}
+
+impl<PMSG> Widget<Msg, PMSG> for FuiButton<PMSG>
+where
+    PMSG: 'static,
+{
+    fn update(&mut self, msg: Msg) -> (Vec<Msg>, Vec<PMSG>) {
+        match msg {
+            Msg::Click(event) => {
+                if self.options.sound {
+                    sounds::play(&self.audio);
+                }
+                self.click = true;
+                let pmsg_list = self
+                    .click_listeners
+                    .iter()
+                    .map(|listener| listener.emit(Event::from(event.clone())))
+                    .collect();
+
+                (vec![], pmsg_list)
+            }
+            Msg::HoverIn => {
+                self.hover = true;
+                (vec![], vec![])
+            }
+            Msg::HoverOut => {
+                self.hover = false;
+                (vec![], vec![])
+            }
+            Msg::HighlightEnd => {
+                self.click = false;
+                (vec![], vec![])
+            }
         }
     }
 
+    fn view(&self) -> Node<Msg> {
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+
+        let classes_ns_flag = |class_name_flags| {
+            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
+        };
+
+        div(
+            vec![
+                class(COMPONENT_NAME),
+                classes_ns_flag([
+                    ("clicked", self.click),
+                    ("click_highlights", self.options.click_highlights),
+                    ("expand_corners", self.options.expand_corners),
+                    ("has_hover", self.options.has_hover),
+                    ("hovered", self.hover),
+                    ("skewed", self.options.skewed),
+                    // setting this will also disable the div, therefore will not activate the
+                    // events on it
+                    ("disabled", self.options.disabled),
+                    ("hidden", self.options.hidden),
+                ]),
+                // normally click should be attached to the actual button element
+                on_click(|e| Msg::Click(e)),
+                // the mouseover events are attached here since the hover element z-index is
+                // higher than the actual button, which will cause a janky animation
+                // when the mouse is triggering alt hover in and out, since covered by the hover
+                // layer effect
+                on_mouseover(|_| Msg::HoverIn),
+                on_mouseout(|_| Msg::HoverOut),
+            ],
+            vec![
+                // hover
+                view_if(
+                    self.options.has_hover,
+                    div(vec![class_ns("hover hover-bottom")], vec![]),
+                ),
+                //borders
+                div(vec![class_ns("border border-bottom")], vec![]),
+                div(vec![class_ns("border border-left")], vec![]),
+                div(vec![class_ns("border border-right")], vec![]),
+                div(vec![class_ns("border border-top")], vec![]),
+                div(vec![class_ns("border border-bottom")], vec![]),
+                // corners
+                view_if(
+                    self.options.has_corners,
+                    div(vec![class_ns("corner corner__top-left")], vec![]),
+                ),
+                view_if(
+                    self.options.has_corners,
+                    div(vec![class_ns("corner corner__bottom-left")], vec![]),
+                ),
+                view_if(
+                    self.options.has_corners,
+                    div(vec![class_ns("corner corner__top-right")], vec![]),
+                ),
+                view_if(
+                    self.options.has_corners,
+                    div(vec![class_ns("corner corner__bottom-right")], vec![]),
+                ),
+                div(
+                    vec![],
+                    vec![
+                        div(
+                            vec![class_ns("button_wrap")],
+                            vec![button(
+                                vec![class_ns("button"), disabled(self.options.disabled)],
+                                vec![text(&self.label)],
+                            )],
+                        ),
+                        div(
+                            vec![
+                                class_ns("highlight"),
+                                on_transitionend(|_| Msg::HighlightEnd),
+                            ],
+                            vec![],
+                        ),
+                    ],
+                ),
+            ],
+        )
+    }
+}
+
+impl<PMSG> FuiButton<PMSG>
+where
+    PMSG: 'static,
+{
     pub fn set_options(&mut self, options: Options) {
         self.options = options;
     }
 
-    pub fn add_event_listeners(&mut self, event_listeners: Vec<Attribute<PMSG>>) {
-        for ev in event_listeners {
-            let mapped_ev = ev.map_msg(|pmsg| Msg::ParamMsg(pmsg));
-            self.event_listeners.push(mapped_ev);
-        }
+    pub fn add_click_listener<F>(&mut self, f: F)
+    where
+        F: Fn(Event) -> PMSG + 'static,
+    {
+        let cb = Callback::from(f);
+        self.click_listeners.push(cb);
     }
 
     pub fn style(&self) -> Vec<String> {
@@ -288,119 +412,6 @@ where
         };
 
         vec![base_css, skewed_css, expand_corner_css]
-    }
-
-    pub fn update(&mut self, msg: Msg<PMSG>) -> Option<PMSG> {
-        match msg {
-            Msg::Click => {
-                if self.options.sound {
-                    sounds::play(&self.audio);
-                }
-                self.click = true;
-                None
-            }
-            Msg::HoverIn => {
-                self.hover = true;
-                None
-            }
-            Msg::HoverOut => {
-                self.hover = false;
-                None
-            }
-            Msg::HighlightEnd => {
-                self.click = false;
-                None
-            }
-            Msg::ParamMsg(pmsg) => {
-                // we return a parent msg, this is meant to be executed in the calling
-                // component
-                Some(pmsg)
-            }
-        }
-    }
-
-    pub fn view(&self) -> Node<Msg<PMSG>> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
-
-        let classes_ns_flag = |class_name_flags| {
-            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
-        };
-
-        div(
-            vec![
-                class(COMPONENT_NAME),
-                classes_ns_flag([
-                    ("clicked", self.click),
-                    ("click_highlights", self.options.click_highlights),
-                    ("expand_corners", self.options.expand_corners),
-                    ("has_hover", self.options.has_hover),
-                    ("hovered", self.hover),
-                    ("skewed", self.options.skewed),
-                    // setting this will also disable the div, therefore will not activate the
-                    // events on it
-                    ("disabled", self.options.disabled),
-                    ("hidden", self.options.hidden),
-                ]),
-                // normally click should be attached to the actual button element
-                on_click(|_| Msg::Click),
-                // the mouseover events are attached here since the hover element z-index is
-                // higher than the actual button, which will cause a janky animation
-                // when the mouse is triggering alt hover in and out, since covered by the hover
-                // layer effect
-                on_mouseover(|_| Msg::HoverIn),
-                on_mouseout(|_| Msg::HoverOut),
-            ],
-            vec![
-                // hover
-                view_if(
-                    self.options.has_hover,
-                    div(vec![class_ns("hover hover-bottom")], vec![]),
-                ),
-                //borders
-                div(vec![class_ns("border border-bottom")], vec![]),
-                div(vec![class_ns("border border-left")], vec![]),
-                div(vec![class_ns("border border-right")], vec![]),
-                div(vec![class_ns("border border-top")], vec![]),
-                div(vec![class_ns("border border-bottom")], vec![]),
-                // corners
-                view_if(
-                    self.options.has_corners,
-                    div(vec![class_ns("corner corner__top-left")], vec![]),
-                ),
-                view_if(
-                    self.options.has_corners,
-                    div(vec![class_ns("corner corner__bottom-left")], vec![]),
-                ),
-                view_if(
-                    self.options.has_corners,
-                    div(vec![class_ns("corner corner__top-right")], vec![]),
-                ),
-                view_if(
-                    self.options.has_corners,
-                    div(vec![class_ns("corner corner__bottom-right")], vec![]),
-                ),
-                div(
-                    vec![],
-                    vec![
-                        div(
-                            vec![class_ns("button_wrap")],
-                            vec![button(
-                                vec![class_ns("button"), disabled(self.options.disabled)],
-                                vec![text(&self.label)],
-                            )
-                            .add_attributes(self.event_listeners.clone())],
-                        ),
-                        div(
-                            vec![
-                                class_ns("highlight"),
-                                on_transitionend(|_| Msg::HighlightEnd),
-                            ],
-                            vec![],
-                        ),
-                    ],
-                ),
-            ],
-        )
     }
 }
 

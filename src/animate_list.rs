@@ -1,10 +1,6 @@
 use crate::sounds;
 use sauron::{
-    html::{
-        attributes::class,
-        div,
-        text,
-    },
+    html::{attributes::class, div, text},
     prelude::*,
     Node,
 };
@@ -17,18 +13,18 @@ pub enum Msg {
     NextAnimation(bool, f64, f64),
 }
 
-pub struct AnimateList<MSG> {
+pub struct AnimateList<PMSG> {
     audio: HtmlAudioElement,
-    animated_layer: Option<Node<MSG>>,
-    children: Node<MSG>,
+    animated_layer: Option<Node<PMSG>>,
+    children: Node<PMSG>,
     animating: bool,
 }
 
-impl<MSG> AnimateList<MSG>
+impl<PMSG> AnimateList<PMSG>
 where
-    MSG: Clone,
+    PMSG: Clone,
 {
-    pub fn new_with_content(children: Node<MSG>) -> Self {
+    pub fn new_with_content(children: Node<PMSG>) -> Self {
         AnimateList {
             audio: sounds::preload("sounds/typing.mp3"),
             animating: false,
@@ -36,26 +32,81 @@ where
             children,
         }
     }
+}
 
-    fn children(&self) -> Node<MSG> {
+impl<PMSG> Container<Msg, PMSG> for AnimateList<PMSG>
+where
+    PMSG: Clone,
+{
+    fn update(&mut self, msg: Msg) -> (Vec<Msg>, Vec<PMSG>) {
+        match msg {
+            Msg::AnimateIn => (self.animate_in(), vec![]),
+            Msg::StopAnimation => {
+                self.stop_animation();
+                (vec![], vec![])
+            }
+            Msg::NextAnimation(is_in, start, duration) => {
+                let effects = self.next_animation(is_in, start, duration);
+                (effects, vec![])
+            }
+        }
+    }
+
+    // Note: opacity: 0 on span will have no effect on webkit browser
+    // however, it has an effect on firefox
+    fn view(&self) -> Node<PMSG> {
+        div(
+            vec![],
+            vec![div(
+                vec![
+                    class("animate_list"),
+                    classes_flag([("animating", self.animating)]),
+                ],
+                vec![
+                    div(vec![class("animate_list_children")], vec![self.children()]),
+                    view_if(
+                        self.animating,
+                        div(
+                            vec![class("animated_layer_wrapper")],
+                            vec![div(
+                                vec![class("animated_layer")],
+                                if let Some(animated_layer) = &self.animated_layer {
+                                    vec![animated_layer.clone()]
+                                } else {
+                                    vec![]
+                                },
+                            )],
+                        ),
+                    ),
+                ],
+            )],
+        )
+    }
+}
+
+impl<PMSG> AnimateList<PMSG>
+where
+    PMSG: Clone,
+{
+    fn children(&self) -> Node<PMSG> {
         self.children.clone()
     }
 
-    pub fn animate_in(&mut self) -> Option<Msg> {
+    pub fn animate_in(&mut self) -> Vec<Msg> {
         sounds::play(&self.audio);
         self.start_animation(true)
     }
 
-    fn stop_animation(&mut self) -> Option<Msg> {
+    fn stop_animation(&mut self) -> Vec<Msg> {
         self.animating = false;
-        None
+        vec![]
     }
 
-    fn start_animation(&mut self, is_in: bool) -> Option<Msg> {
+    fn start_animation(&mut self, is_in: bool) -> Vec<Msg> {
         let content_len = Self::node_count_chars(&self.children());
 
         if content_len == 0 {
-            return None;
+            return vec![];
         }
 
         let interval = 1_000.0 / 60.0;
@@ -69,11 +120,11 @@ where
             self.animated_layer = None;
         }
 
-        Some(Msg::NextAnimation(is_in, start, duration))
+        vec![Msg::NextAnimation(is_in, start, duration)]
     }
 
     /// count the number of elements on this node tree
-    fn node_count_chars(node: &Node<MSG>) -> usize {
+    fn node_count_chars(node: &Node<PMSG>) -> usize {
         let mut current_cnt = 0;
         Self::node_count_chars_recursive(node, &mut current_cnt);
         current_cnt
@@ -81,7 +132,7 @@ where
 
     /// recursively count the number of elements on this node tree
     /// 1 count for each character and each element
-    fn node_count_chars_recursive(node: &Node<MSG>, current_cnt: &mut usize) {
+    fn node_count_chars_recursive(node: &Node<PMSG>, current_cnt: &mut usize) {
         match node {
             Node::Element(element) => {
                 for child in element.children.iter() {
@@ -96,7 +147,7 @@ where
 
     /// include the the element from the src to dest
     /// as long as its current_cnt is less than the chars_limit
-    fn include_node(dest: &mut Node<MSG>, src: &Node<MSG>, chars_limit: usize) {
+    fn include_node(dest: &mut Node<PMSG>, src: &Node<PMSG>, chars_limit: usize) {
         let mut current_cnt = 0;
         Self::include_node_recursive(dest, src, chars_limit, &mut current_cnt);
     }
@@ -104,19 +155,15 @@ where
     /// recursively include the element from src to dest
     /// until all of the current_cnt that is lesser than chars_limit is added.
     fn include_node_recursive(
-        dest: &mut Node<MSG>,
-        src: &Node<MSG>,
+        dest: &mut Node<PMSG>,
+        src: &Node<PMSG>,
         chars_limit: usize,
         current_cnt: &mut usize,
     ) {
         match src {
             Node::Element(element) => {
                 if *current_cnt < chars_limit {
-                    let shallow_src = html_element(
-                        element.tag,
-                        element.attrs.clone(),
-                        vec![],
-                    );
+                    let shallow_src = html_element(element.tag, element.attrs.clone(), vec![]);
                     dest.add_children_ref_mut(vec![shallow_src]);
 
                     let last_index = dest
@@ -169,12 +216,7 @@ where
         }
     }
 
-    fn next_animation(
-        &mut self,
-        is_in: bool,
-        start: f64,
-        duration: f64,
-    ) -> Option<Msg> {
+    fn next_animation(&mut self, is_in: bool, start: f64, duration: f64) -> Vec<Msg> {
         let timestamp = crate::dom::now();
 
         let content_len = Self::node_count_chars(&self.children());
@@ -184,10 +226,9 @@ where
             anim_progress = duration - anim_progress;
         }
 
-        let new_length =
-            (anim_progress * content_len as f64 / duration).round() as usize;
+        let new_length = (anim_progress * content_len as f64 / duration).round() as usize;
 
-        let mut dest: Node<MSG> = div(vec![], vec![]);
+        let mut dest: Node<PMSG> = div(vec![], vec![]);
 
         Self::include_node(&mut dest, &self.children(), new_length);
         self.animated_layer = Some(dest);
@@ -199,22 +240,9 @@ where
         };
 
         if continue_animation {
-            Some(Msg::NextAnimation(is_in, start, duration))
+            vec![Msg::NextAnimation(is_in, start, duration)]
         } else {
-            Some(Msg::StopAnimation)
-        }
-    }
-
-    pub fn update(&mut self, msg: Msg) -> Option<Msg> {
-        match msg {
-            Msg::AnimateIn => self.animate_in(),
-            Msg::StopAnimation => {
-                self.stop_animation();
-                None
-            }
-            Msg::NextAnimation(is_in, start, duration) => {
-                self.next_animation(is_in, start, duration)
-            }
+            vec![Msg::StopAnimation]
         }
     }
 
@@ -262,41 +290,5 @@ where
             }
             "#
         .to_string()]
-    }
-
-    // Note: opacity: 0 on span will have no effect on webkit browser
-    // however, it has an effect on firefox
-    pub fn view(&self) -> Node<MSG> {
-        div(
-            vec![],
-            vec![div(
-                vec![
-                    class("animate_list"),
-                    classes_flag([("animating", self.animating)]),
-                ],
-                vec![
-                    div(
-                        vec![class("animate_list_children")],
-                        vec![self.children()],
-                    ),
-                    view_if(
-                        self.animating,
-                        div(
-                            vec![class("animated_layer_wrapper")],
-                            vec![div(
-                                vec![class("animated_layer")],
-                                if let Some(animated_layer) =
-                                    &self.animated_layer
-                                {
-                                    vec![animated_layer.clone()]
-                                } else {
-                                    vec![]
-                                },
-                            )],
-                        ),
-                    ),
-                ],
-            )],
-        )
     }
 }

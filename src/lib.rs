@@ -31,12 +31,12 @@ pub enum Msg {
     ReAnimateHeader,
     ReAnimateParagraph,
     ReAnimateList,
-    BtnMsg(usize, Box<fui_button::Msg<Self>>),
-    FuiButtonMsg(Box<fui_button::Msg<Self>>),
+    BtnMsg(usize, fui_button::Msg),
+    FuiButtonMsg(fui_button::Msg),
     FrameMsg(frame::Msg),
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
-    AnimateListMsg(Box<animate_list::Msg>),
+    AnimateListMsg(animate_list::Msg),
     ImageMsg(image::Msg),
     ReAnimateAll,
     NoOp,
@@ -61,83 +61,127 @@ impl Application<Msg> for App {
     fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
         match msg {
             Msg::ReAnimateHeader => {
-                if let Some(header_msg) = self.nav_header.update(nav_header::Msg::AnimateIn) {
-                    Cmd::from_msg(Msg::NavHeaderMsg(header_msg))
-                } else {
-                    Cmd::none()
-                }
+                let follow_ups = self.nav_header.update(nav_header::Msg::AnimateIn);
+                Cmd::batch_msg(
+                    follow_ups
+                        .into_iter()
+                        .map(|follow_up| Msg::NavHeaderMsg(follow_up))
+                        .collect(),
+                )
             }
             Msg::NavHeaderMsg(header_msg) => {
-                if let Some(header_msg) = self.nav_header.update(header_msg) {
-                    Cmd::from_msg(Msg::NavHeaderMsg(header_msg))
-                } else {
-                    Cmd::none()
-                }
+                let follow_ups = self.nav_header.update(header_msg);
+                Cmd::batch_msg(
+                    follow_ups
+                        .into_iter()
+                        .map(|follow_up| Msg::NavHeaderMsg(follow_up))
+                        .collect(),
+                )
             }
             Msg::ReAnimateFrame => {
-                if let Some(frame_msg) = self.frame.update(frame::Msg::AnimateIn) {
-                    Cmd::from_msg(Msg::FrameMsg(frame_msg))
-                } else {
-                    Cmd::none()
-                }
+                let follow_ups = self.frame.update(frame::Msg::AnimateIn);
+                Cmd::batch_msg(
+                    follow_ups
+                        .into_iter()
+                        .map(|follow_up| Msg::FrameMsg(follow_up))
+                        .collect(),
+                )
             }
             Msg::FrameMsg(frame_msg) => {
-                if let Some(frame_msg) = self.frame.update(frame_msg) {
-                    Cmd::from_msg(Msg::FrameMsg(frame_msg))
-                } else {
-                    Cmd::none()
-                }
+                let follow_ups = self.frame.update(frame_msg);
+                Cmd::batch_msg(
+                    follow_ups
+                        .into_iter()
+                        .map(|follow_up| Msg::FrameMsg(follow_up))
+                        .collect(),
+                )
             }
             Msg::BtnMsg(index, btn_msg) => {
-                if let Some(pmsg) = self.button_array[index].update(*btn_msg) {
-                    Cmd::from_msg(pmsg)
-                } else {
-                    Cmd::none()
-                }
+                let (follow_ups, effects) = self.button_array[index].update(btn_msg);
+                Cmd::batch_msg(
+                    effects
+                        .into_iter()
+                        .chain(
+                            follow_ups
+                                .into_iter()
+                                .map(|follow_up| Msg::BtnMsg(index, follow_up)),
+                        )
+                        .collect(),
+                )
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
-                if let Some(pmsg) = self.fui_button.update(*fui_btn_msg) {
-                    Cmd::from_msg(pmsg)
-                } else {
-                    Cmd::none()
-                }
+                let (follow_ups, effects) = self.fui_button.update(fui_btn_msg);
+                Cmd::batch_msg(
+                    effects
+                        .into_iter()
+                        .chain(
+                            follow_ups
+                                .into_iter()
+                                .map(|follow_up| Msg::FuiButtonMsg(follow_up)),
+                        )
+                        .collect(),
+                )
             }
             Msg::AnimateListMsg(animate_list_msg) => {
-                if let Some(animate_list_msg) = self.animate_list.update(*animate_list_msg) {
-                    Cmd::from_msg(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
-                } else {
-                    Cmd::none()
-                }
+                let (follow_ups, effects) = self.animate_list.update(animate_list_msg);
+                Cmd::batch_msg(
+                    effects
+                        .into_iter()
+                        .chain(
+                            follow_ups
+                                .into_iter()
+                                .map(|follow_up| Msg::AnimateListMsg(follow_up)),
+                        )
+                        .collect(),
+                )
             }
             Msg::ReAnimateList => {
-                if let Some(animate_list_msg) =
-                    self.animate_list.update(animate_list::Msg::AnimateIn)
-                {
-                    Cmd::from_msg(Msg::AnimateListMsg(Box::new(animate_list_msg)))
-                } else {
-                    Cmd::none()
-                }
+                let (follow_ups, effects) = self.animate_list.update(animate_list::Msg::AnimateIn);
+                Cmd::batch_msg(
+                    effects
+                        .into_iter()
+                        .chain(
+                            follow_ups
+                                .into_iter()
+                                .map(|follow_up| Msg::AnimateListMsg(follow_up)),
+                        )
+                        .collect(),
+                )
             }
             Msg::ParagraphMsg(para_msg) => {
-                if let Some(para_msg) = self.paragraph.update(para_msg) {
-                    Cmd::from_msg(Msg::ParagraphMsg(para_msg))
-                } else {
-                    Cmd::none()
-                }
+                let (follow_ups, effects) = self.paragraph.update(para_msg);
+                Cmd::batch_msg(
+                    effects
+                        .into_iter()
+                        .chain(
+                            follow_ups
+                                .into_iter()
+                                .map(|follow_up| Msg::ParagraphMsg(follow_up)),
+                        )
+                        .collect(),
+                )
             }
             Msg::ImageMsg(img_msg) => {
-                if let Some(img_msg) = self.image.update(img_msg) {
-                    Cmd::from_msg(Msg::ImageMsg(img_msg))
-                } else {
-                    Cmd::none()
-                }
+                let follow_ups = self.image.update(img_msg);
+                Cmd::batch_msg(
+                    follow_ups
+                        .into_iter()
+                        .map(|follow_up| Msg::ImageMsg(follow_up))
+                        .collect(),
+                )
             }
             Msg::ReAnimateParagraph => {
-                if let Some(para_msg) = self.paragraph.update(paragraph::Msg::AnimateIn) {
-                    Cmd::from_msg(Msg::ParagraphMsg(para_msg.clone()))
-                } else {
-                    Cmd::none()
-                }
+                let (follow_ups, effects) = self.paragraph.update(paragraph::Msg::AnimateIn);
+                Cmd::batch_msg(
+                    effects
+                        .into_iter()
+                        .chain(
+                            follow_ups
+                                .into_iter()
+                                .map(|follow_up| Msg::ParagraphMsg(follow_up)),
+                        )
+                        .collect(),
+                )
             }
             Msg::ReAnimateAll => Self::reanimate_all(),
             Msg::NoOp => Cmd::none(),
@@ -151,7 +195,7 @@ impl Application<Msg> for App {
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
                 div(vec![style!{"padding":px(20), "position": "relative", "left": percent(50)}], vec![
                     self.fui_button.view().map_msg(|fbtn_msg| {
-                        Msg::FuiButtonMsg(Box::new(fbtn_msg))
+                        Msg::FuiButtonMsg(fbtn_msg)
                     })]
                 ),
                 self.frame
@@ -164,7 +208,7 @@ impl Application<Msg> for App {
                         .enumerate()
                         .map(|(index,btn)|
                             btn.view()
-                                .map_msg(move|btn_msg|Msg::BtnMsg(index, Box::new(btn_msg)))
+                                .map_msg(move|btn_msg|Msg::BtnMsg(index, btn_msg))
                         ).collect::<Vec<_>>()
                     }
                 ),
@@ -325,7 +369,7 @@ impl App {
             .map(|(label, options, msg)| {
                 let mut btn = FuiButton::new_with_label(label);
                 btn.set_options(options);
-                btn.add_event_listeners(vec![on_click(move |_| msg.clone())]);
+                btn.add_click_listener(move |_| msg.clone());
                 btn
             })
             .collect();
@@ -341,7 +385,7 @@ impl App {
         );
 
         let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
-        fui_button.add_event_listeners(vec![on_click(|_| Msg::ReAnimateAll)]);
+        fui_button.add_click_listener(|_| Msg::ReAnimateAll);
         fui_button.set_options(Options::regular());
 
         App {

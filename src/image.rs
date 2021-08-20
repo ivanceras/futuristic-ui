@@ -1,13 +1,7 @@
-use crate::{
-    frame,
-    Frame,
-};
+use crate::{frame, Frame};
 use sauron::{
     html::{
-        attributes::{
-            empty_attr,
-            title,
-        },
+        attributes::{empty_attr, title},
         div,
     },
     prelude::*,
@@ -41,14 +35,19 @@ impl Image {
             )),
         }
     }
+}
 
-    pub fn update(&mut self, msg: Msg) -> Option<Msg> {
+impl Component<Msg> for Image {
+    fn update(&mut self, msg: Msg) -> Vec<Msg> {
         match msg {
-            Msg::FrameMsg(fmsg) => self.frame.update(fmsg).map(Msg::FrameMsg),
+            Msg::FrameMsg(fmsg) => {
+                let follow_ups = self.frame.update(fmsg);
+                follow_ups.into_iter().map(Msg::FrameMsg).collect()
+            }
         }
     }
 
-    pub fn view(&self) -> Node<Msg> {
+    fn view(&self) -> Node<Msg> {
         div(
             vec![class(COMPONENT_NAME)],
             vec![self.frame.view().map_msg(Msg::FrameMsg)],

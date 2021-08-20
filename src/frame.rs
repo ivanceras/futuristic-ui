@@ -34,8 +34,10 @@ impl Frame {
             content,
         }
     }
+}
 
-    pub fn update(&mut self, msg: Msg) -> Option<Msg> {
+impl Component<Msg> for Frame {
+    fn update(&mut self, msg: Msg) -> Vec<Msg> {
         match msg {
             Msg::AnimateIn => {
                 self.hide = true;
@@ -43,35 +45,69 @@ impl Frame {
             }
             Msg::StopAnimation => {
                 self.hide = false;
-                None
+                vec![]
             }
             Msg::HoverIn => {
                 self.hover = true;
-                None
+                vec![]
             }
             Msg::HoverOut => {
                 self.hover = false;
-                None
+                vec![]
             }
             Msg::NextAnimation(start, duration) => self.next_animation(start, duration),
         }
     }
 
-    fn start_animation(&mut self) -> Option<Msg> {
+    fn view(&self) -> Node<Msg> {
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+
+        let classes_ns_flag = |class_name_flags| {
+            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
+        };
+
+        div(
+            vec![
+                class(COMPONENT_NAME),
+                classes_ns_flag([
+                    ("hide", self.hide),
+                    ("expand_corners", true),
+                    ("hovered", self.hover),
+                ]),
+                on_mouseover(|_| Msg::HoverIn),
+                on_mouseout(|_| Msg::HoverOut),
+            ],
+            vec![
+                div(vec![class_ns("border border-left")], vec![]),
+                div(vec![class_ns("border border-right")], vec![]),
+                div(vec![class_ns("border border-top")], vec![]),
+                div(vec![class_ns("border border-bottom")], vec![]),
+                div(vec![class_ns("corner corner__top-left")], vec![]),
+                div(vec![class_ns("corner corner__bottom-left")], vec![]),
+                div(vec![class_ns("corner corner__top-right")], vec![]),
+                div(vec![class_ns("corner corner__bottom-right")], vec![]),
+                div(vec![class_ns("content")], vec![self.content.clone()]),
+            ],
+        )
+    }
+}
+
+impl Frame {
+    fn start_animation(&mut self) -> Vec<Msg> {
         let duration = 200.0;
         let start = crate::dom::now();
         sounds::play(&self.audio);
-        Some(Msg::NextAnimation(start, duration))
+        vec![Msg::NextAnimation(start, duration)]
     }
 
-    fn next_animation(&mut self, start: f64, duration: f64) -> Option<Msg> {
+    fn next_animation(&mut self, start: f64, duration: f64) -> Vec<Msg> {
         let timestamp = crate::dom::now();
         let elapsed = timestamp - start;
         let continue_animation = elapsed < duration;
         if continue_animation {
-            Some(Msg::NextAnimation(start, duration))
+            vec![Msg::NextAnimation(start, duration)]
         } else {
-            Some(Msg::StopAnimation)
+            vec![Msg::StopAnimation]
         }
     }
 
@@ -228,37 +264,5 @@ impl Frame {
         };
 
         vec![css, expand_corner_css]
-    }
-
-    pub fn view(&self) -> Node<Msg> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
-
-        let classes_ns_flag = |class_name_flags| {
-            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
-        };
-
-        div(
-            vec![
-                class(COMPONENT_NAME),
-                classes_ns_flag([
-                    ("hide", self.hide),
-                    ("expand_corners", true),
-                    ("hovered", self.hover),
-                ]),
-                on_mouseover(|_| Msg::HoverIn),
-                on_mouseout(|_| Msg::HoverOut),
-            ],
-            vec![
-                div(vec![class_ns("border border-left")], vec![]),
-                div(vec![class_ns("border border-right")], vec![]),
-                div(vec![class_ns("border border-top")], vec![]),
-                div(vec![class_ns("border border-bottom")], vec![]),
-                div(vec![class_ns("corner corner__top-left")], vec![]),
-                div(vec![class_ns("corner corner__bottom-left")], vec![]),
-                div(vec![class_ns("corner corner__top-right")], vec![]),
-                div(vec![class_ns("corner corner__bottom-right")], vec![]),
-                div(vec![class_ns("content")], vec![self.content.clone()]),
-            ],
-        )
     }
 }

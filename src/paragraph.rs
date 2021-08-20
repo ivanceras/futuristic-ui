@@ -8,38 +8,45 @@ pub enum Msg {
 }
 
 /// accepts a markdown and animate the content
-pub struct Paragraph<MSG> {
-    animated_list: AnimateList<MSG>,
+pub struct Paragraph<PMSG> {
+    animated_list: AnimateList<PMSG>,
 }
 
-impl<MSG> Paragraph<MSG>
+impl<PMSG> Paragraph<PMSG>
 where
-    MSG: Clone,
+    PMSG: Clone,
 {
     pub fn new_with_markdown(md: &str) -> Self {
         Paragraph {
-            animated_list: AnimateList::new_with_content(
-                sauron_markdown::markdown(md),
-            ),
+            animated_list: AnimateList::new_with_content(sauron_markdown::markdown(md)),
         }
     }
+}
 
-    pub fn update(&mut self, msg: Msg) -> Option<Msg> {
+impl<PMSG> Container<Msg, PMSG> for Paragraph<PMSG>
+where
+    PMSG: Clone,
+{
+    fn update(&mut self, msg: Msg) -> (Vec<Msg>, Vec<PMSG>) {
         match msg {
             Msg::AnimateIn => {
-                let amsg =
-                    self.animated_list.update(animate_list::Msg::AnimateIn);
-
-                amsg.map(Msg::AnimateListMsg)
+                let (follow_ups, effects) = self.animated_list.update(animate_list::Msg::AnimateIn);
+                (
+                    follow_ups.into_iter().map(Msg::AnimateListMsg).collect(),
+                    effects,
+                )
             }
             Msg::AnimateListMsg(amsg) => {
-                self.animated_list.update(amsg).map(Msg::AnimateListMsg)
+                let (follow_ups, effects) = self.animated_list.update(amsg);
+                (
+                    follow_ups.into_iter().map(Msg::AnimateListMsg).collect(),
+                    effects,
+                )
             }
         }
     }
 
-    #[allow(unused)]
-    pub fn view(&self) -> Node<MSG> {
+    fn view(&self) -> Node<PMSG> {
         p(vec![], vec![self.animated_list.view()])
     }
 }
