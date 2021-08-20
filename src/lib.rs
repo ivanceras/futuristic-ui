@@ -193,40 +193,38 @@ impl Application<Msg> for App {
             vec![class("container")],
             vec![
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
-                div(vec![style!{"padding":px(20), "position": "relative", "left": percent(50)}], vec![
-                    self.fui_button.view().map_msg(|fbtn_msg| {
-                        Msg::FuiButtonMsg(fbtn_msg)
-                    })]
+                div(
+                    vec![style! {"padding":px(20), "position": "relative", "left": percent(50)}],
+                    vec![self
+                        .fui_button
+                        .view()
+                        .map_msg(|fbtn_msg| Msg::FuiButtonMsg(fbtn_msg))],
                 ),
                 self.frame
                     .view()
                     .map_msg(|frame_msg| Msg::FrameMsg(frame_msg)),
-
-                div(vec![class("futuristic-buttons-array")],{
+                div(vec![class("futuristic-buttons-array")], {
                     self.button_array
                         .iter()
                         .enumerate()
-                        .map(|(index,btn)|
+                        .map(|(index, btn)| {
                             btn.view()
-                                .map_msg(move|btn_msg|Msg::BtnMsg(index, btn_msg))
-                        ).collect::<Vec<_>>()
-                    }
-                ),
+                                .map_msg(move |btn_msg| Msg::BtnMsg(index, btn_msg))
+                        })
+                        .collect::<Vec<_>>()
+                }),
                 self.paragraph.view(),
-                p(
-                    vec![],
-                    vec![self.animate_list.view()],
-                ),
+                p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
                 self.image.view().map_msg(Msg::ImageMsg),
                 footer(
                     vec![],
                     vec![a(
-                        vec![href("https://github.com/ivanceras/sauron/tree/master/examples/futuristic-ui/")],
+                        vec![href("https://github.com/ivanceras/futuristic-ui/")],
                         vec![text("code")],
                     )],
-                )
-            ]
+                ),
+            ],
         )
     }
 
