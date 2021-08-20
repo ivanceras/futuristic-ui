@@ -103,7 +103,7 @@ where
     }
 
     fn start_animation(&mut self, is_in: bool) -> Vec<Msg> {
-        let content_len = Self::node_count_chars(&self.children());
+        let content_len = self.children().node_count();
 
         if content_len == 0 {
             return vec![];
@@ -121,28 +121,6 @@ where
         }
 
         vec![Msg::NextAnimation(is_in, start, duration)]
-    }
-
-    /// count the number of elements on this node tree
-    fn node_count_chars(node: &Node<PMSG>) -> usize {
-        let mut current_cnt = 0;
-        Self::node_count_chars_recursive(node, &mut current_cnt);
-        current_cnt
-    }
-
-    /// recursively count the number of elements on this node tree
-    /// 1 count for each character and each element
-    fn node_count_chars_recursive(node: &Node<PMSG>, current_cnt: &mut usize) {
-        match node {
-            Node::Element(element) => {
-                for child in element.children.iter() {
-                    Self::node_count_chars_recursive(child, current_cnt);
-                }
-            }
-            Node::Text(txt) => {
-                *current_cnt += txt.text.len();
-            }
-        }
     }
 
     /// include the the element from the src to dest
@@ -219,7 +197,7 @@ where
     fn next_animation(&mut self, is_in: bool, start: f64, duration: f64) -> Vec<Msg> {
         let timestamp = crate::dom::now();
 
-        let content_len = Self::node_count_chars(&self.children());
+        let content_len = self.children().node_count();
 
         let mut anim_progress = (timestamp - start).max(0.0);
         if !is_in {

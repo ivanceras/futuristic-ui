@@ -1,4 +1,4 @@
-use sauron::jss::{jss, jss_ns};
+use sauron::jss::jss_ns;
 use sauron::{
     html::attributes,
     html::{attributes::class, div},
@@ -117,6 +117,6 @@ impl<MSG> Spinner<MSG> {
             }
         "#;
 
-        vec![base_css.to_string(), animation_css.to_string()]
+        vec![base_css, animation_css.to_string()]
     }
 }

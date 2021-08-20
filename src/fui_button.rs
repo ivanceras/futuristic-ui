@@ -1,5 +1,5 @@
 use crate::sounds;
-use sauron::jss::{jss, jss_ns};
+use sauron::jss::jss_ns;
 use sauron::{
     dom::Event,
     html::attributes,
@@ -121,7 +121,7 @@ where
                     ("hidden", self.options.hidden),
                 ]),
                 // normally click should be attached to the actual button element
-                on_click(|e| Msg::Click(e)),
+                on_click(Msg::Click),
                 // the mouseover events are attached here since the hover element z-index is
                 // higher than the actual button, which will cause a janky animation
                 // when the mouse is triggering alt hover in and out, since covered by the hover
@@ -418,6 +418,7 @@ where
 impl Options {
     /// bare minimum button
     /// no sound
+    #[allow(unused)]
     pub fn bare() -> Self {
         Options {
             sound: false,
@@ -432,6 +433,7 @@ impl Options {
     }
 
     /// full effect, skewed
+    #[allow(unused)]
     pub fn full() -> Self {
         Options {
             sound: true,
@@ -446,6 +448,7 @@ impl Options {
     }
 
     /// regular futuristic button
+    #[allow(unused)]
     pub fn regular() -> Self {
         Options {
             sound: true,
@@ -461,6 +464,7 @@ impl Options {
 
     /// just like regular but muted
     /// sound off
+    #[allow(unused)]
     pub fn muted() -> Self {
         Options {
             sound: false,
@@ -475,6 +479,7 @@ impl Options {
     }
 
     /// no corners, no hover
+    #[allow(unused)]
     pub fn simple() -> Self {
         Options {
             sound: true,
@@ -489,6 +494,7 @@ impl Options {
     }
 
     ///does not interact
+    #[allow(unused)]
     pub fn disabled() -> Self {
         Options {
             sound: false,

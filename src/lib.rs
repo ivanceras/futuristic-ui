@@ -1,4 +1,4 @@
-//#![deny(warnings)]
+#![deny(warnings)]
 #![recursion_limit = "256"]
 use animate_list::AnimateList;
 use frame::Frame;
@@ -6,9 +6,9 @@ use fui_button::{FuiButton, Options};
 use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
-use sauron::jss::{jss, jss_ns};
+use sauron::jss::jss;
 use sauron::{
-    html::{attributes::class, div, events::on_click, text},
+    html::{attributes::class, div, text},
     prelude::*,
     Application, Cmd, Node, Program,
 };
@@ -62,39 +62,19 @@ impl Application<Msg> for App {
         match msg {
             Msg::ReAnimateHeader => {
                 let follow_ups = self.nav_header.update(nav_header::Msg::AnimateIn);
-                Cmd::batch_msg(
-                    follow_ups
-                        .into_iter()
-                        .map(|follow_up| Msg::NavHeaderMsg(follow_up))
-                        .collect(),
-                )
+                Cmd::batch_msg(follow_ups.into_iter().map(Msg::NavHeaderMsg).collect())
             }
             Msg::NavHeaderMsg(header_msg) => {
                 let follow_ups = self.nav_header.update(header_msg);
-                Cmd::batch_msg(
-                    follow_ups
-                        .into_iter()
-                        .map(|follow_up| Msg::NavHeaderMsg(follow_up))
-                        .collect(),
-                )
+                Cmd::batch_msg(follow_ups.into_iter().map(Msg::NavHeaderMsg).collect())
             }
             Msg::ReAnimateFrame => {
                 let follow_ups = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::batch_msg(
-                    follow_ups
-                        .into_iter()
-                        .map(|follow_up| Msg::FrameMsg(follow_up))
-                        .collect(),
-                )
+                Cmd::batch_msg(follow_ups.into_iter().map(Msg::FrameMsg).collect())
             }
             Msg::FrameMsg(frame_msg) => {
                 let follow_ups = self.frame.update(frame_msg);
-                Cmd::batch_msg(
-                    follow_ups
-                        .into_iter()
-                        .map(|follow_up| Msg::FrameMsg(follow_up))
-                        .collect(),
-                )
+                Cmd::batch_msg(follow_ups.into_iter().map(Msg::FrameMsg).collect())
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let (follow_ups, effects) = self.button_array[index].update(btn_msg);
@@ -114,11 +94,7 @@ impl Application<Msg> for App {
                 Cmd::batch_msg(
                     effects
                         .into_iter()
-                        .chain(
-                            follow_ups
-                                .into_iter()
-                                .map(|follow_up| Msg::FuiButtonMsg(follow_up)),
-                        )
+                        .chain(follow_ups.into_iter().map(Msg::FuiButtonMsg))
                         .collect(),
                 )
             }
@@ -127,11 +103,7 @@ impl Application<Msg> for App {
                 Cmd::batch_msg(
                     effects
                         .into_iter()
-                        .chain(
-                            follow_ups
-                                .into_iter()
-                                .map(|follow_up| Msg::AnimateListMsg(follow_up)),
-                        )
+                        .chain(follow_ups.into_iter().map(Msg::AnimateListMsg))
                         .collect(),
                 )
             }
@@ -140,11 +112,7 @@ impl Application<Msg> for App {
                 Cmd::batch_msg(
                     effects
                         .into_iter()
-                        .chain(
-                            follow_ups
-                                .into_iter()
-                                .map(|follow_up| Msg::AnimateListMsg(follow_up)),
-                        )
+                        .chain(follow_ups.into_iter().map(Msg::AnimateListMsg))
                         .collect(),
                 )
             }
@@ -153,33 +121,20 @@ impl Application<Msg> for App {
                 Cmd::batch_msg(
                     effects
                         .into_iter()
-                        .chain(
-                            follow_ups
-                                .into_iter()
-                                .map(|follow_up| Msg::ParagraphMsg(follow_up)),
-                        )
+                        .chain(follow_ups.into_iter().map(Msg::ParagraphMsg))
                         .collect(),
                 )
             }
             Msg::ImageMsg(img_msg) => {
                 let follow_ups = self.image.update(img_msg);
-                Cmd::batch_msg(
-                    follow_ups
-                        .into_iter()
-                        .map(|follow_up| Msg::ImageMsg(follow_up))
-                        .collect(),
-                )
+                Cmd::batch_msg(follow_ups.into_iter().map(Msg::ImageMsg).collect())
             }
             Msg::ReAnimateParagraph => {
                 let (follow_ups, effects) = self.paragraph.update(paragraph::Msg::AnimateIn);
                 Cmd::batch_msg(
                     effects
                         .into_iter()
-                        .chain(
-                            follow_ups
-                                .into_iter()
-                                .map(|follow_up| Msg::ParagraphMsg(follow_up)),
-                        )
+                        .chain(follow_ups.into_iter().map(Msg::ParagraphMsg))
                         .collect(),
                 )
             }
@@ -195,14 +150,9 @@ impl Application<Msg> for App {
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
                 div(
                     vec![style! {"padding":px(20), "position": "relative", "left": percent(50)}],
-                    vec![self
-                        .fui_button
-                        .view()
-                        .map_msg(|fbtn_msg| Msg::FuiButtonMsg(fbtn_msg))],
+                    vec![self.fui_button.view().map_msg(Msg::FuiButtonMsg)],
                 ),
-                self.frame
-                    .view()
-                    .map_msg(|frame_msg| Msg::FrameMsg(frame_msg)),
+                self.frame.view().map_msg(Msg::FrameMsg),
                 div(vec![class("futuristic-buttons-array")], {
                     self.button_array
                         .iter()
@@ -231,12 +181,9 @@ impl Application<Msg> for App {
     fn style(&self) -> Vec<String> {
         let base = crate::Theme::default();
 
-        let controls_button_text_color = base.controls.button_text_color.to_owned();
         let controls_content_background_color = base.controls.content_background_color.to_owned();
         let controls_button_text_color = base.controls.button_text_color.to_owned();
-        let accent_shadow = base.accent_shadow.to_owned();
         let secondary_color = base.secondary_color.to_owned();
-        let accent_color = base.accent_color.to_owned();
 
         let accent_shadow = base.accent_shadow.to_owned();
         let accent_color = base.accent_color.to_owned();
@@ -244,20 +191,20 @@ impl Application<Msg> for App {
         let primary_font = base.primary_font.to_owned();
         let secondary_font = base.secondary_font.to_owned();
         let controls_border_color = base.controls.border_color.to_owned();
-        let background_color = base.background_color.to_owned();
+        let background_color = base.background_color;
 
         let body_css = jss! {
 
             "button": {
                 "color": controls_button_text_color.clone(),
-                "border": format!("1px solid {}",controls_border_color.clone()),
+                "border": format!("1px solid {}",controls_border_color),
                 "z-index": 2,
                 "display": "inline-block",
                 "padding": "10px 20px",
                 "outline": "none",
                 "position": "relative",
                 "font-size": "15.75px",
-                "background-color": controls_content_background_color.clone(),
+                "background-color": controls_content_background_color,
                 "line-height": 1,
                 "user-select": "none",
                 "vertical-align": "middle",
@@ -268,10 +215,10 @@ impl Application<Msg> for App {
             },
 
             "a": {
-                "color": controls_button_text_color.clone(),
+                "color": controls_button_text_color,
                 "cursor": "pointer",
                 "transition": "color 250ms ease-out",
-                "text-shadow": format!("0 0 4px {}", accent_shadow.clone()),
+                "text-shadow": format!("0 0 4px {}", accent_shadow),
                 "text-decoration": "none",
             },
 
@@ -288,15 +235,15 @@ impl Application<Msg> for App {
             },
 
             "thead": {
-                "color": accent_color.clone(),
+                "color": accent_color,
                 "text-align": "left",
-                "font-family": secondary_font.clone(),
+                "font-family": secondary_font,
                 "font-weight": "bold",
                 "white-space": "nowrap",
             },
 
             "tr": {
-                "border-bottom": format!("1px solid {}", controls_border_color.clone()),
+                "border-bottom": format!("1px solid {}", controls_border_color),
             },
 
              "td": {
@@ -310,7 +257,7 @@ impl Application<Msg> for App {
                 "color": secondary_color.clone(),
                 "font-size": "21px",
                 "line-height": "1.5",
-                "font-family": primary_font.clone(),
+                "font-family": primary_font,
                 "margin": "auto",
                 "background-color": background_color.clone(),
                 "max-width": "50em",
@@ -318,9 +265,9 @@ impl Application<Msg> for App {
             },
 
             ".container ::selection": {
-                "color": background_color.clone(),
+                "color": background_color,
                 "text-shadow": "none",
-                "background-color": secondary_color.clone(),
+                "background-color": secondary_color,
             },
 
             ".futuristic-buttons-array": {
@@ -342,8 +289,8 @@ impl Application<Msg> for App {
     }
 }
 
-impl App {
-    pub fn new() -> Self {
+impl Default for App {
+    fn default() -> Self {
         let button_options = vec![
             ("ReAnimate All", Options::regular(), Msg::ReAnimateAll),
             (
@@ -397,7 +344,9 @@ impl App {
             image: Image::new("img/space.jpg", Some("Space as seen from space")),
         }
     }
+}
 
+impl App {
     fn animate_list_content() -> Node<Msg> {
         let long_txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque purus faucibus urna venenatis, a elementum diam laoreet. Fusce eget enim justo. Pellentesque cursus metus elit, ut porttitor eros iaculis sit amet. Quisque varius felis id turpis iaculis, et viverra enim pulvinar. Curabitur vel lacus interdum, molestie purus ut, pretium nibh. Mauris commodo dolor magna, eget dignissim mauris semper vitae. Ut viverra nec ex quis semper. Sed sit amet tincidunt mauris. Mauris in imperdiet ipsum. Praesent pretium tortor ut felis posuere, sed lacinia nunc pretium. Morbi et felis nec neque accumsan tincidunt. In hac habitasse platea dictumst. Nulla sit amet elit sed purus posuere placerat ut quis metus. Etiam mattis interdum dui at ornare. Nunc sit amet venenatis lorem, sed eleifend mauris. Pellentesque eros sem, fermentum vel lacus at, congue rhoncus elit. ";
         div(
@@ -410,7 +359,7 @@ impl App {
                     a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
                     img(vec![styles([("width","600px"),("height", "auto"),("display","block")]),src("img/space.jpg")], vec![]),
                 ]),
-                li(vec![], vec![text(long_txt.clone())]),
+                li(vec![], vec![text(long_txt)]),
                 li(vec![], vec![text("List 2")]),
                 ul(
                     vec![],
@@ -478,5 +427,5 @@ pub fn main() {
     let app_container = sauron::document()
         .get_element_by_id("app_container")
         .expect("must have the app_container in index.html");
-    Program::replace_mount(App::new(), &app_container);
+    Program::replace_mount(App::default(), &app_container);
 }

@@ -1,5 +1,5 @@
 use crate::sounds;
-use sauron::jss::{jss, jss_ns};
+use sauron::jss::jss_ns;
 use sauron::{
     html::attributes,
     html::{attributes::class, div, text},
@@ -164,7 +164,7 @@ impl NavHeader {
 
             ".link_content": {
                 "transform": "skewX(-45deg)",
-                "border-color": base.controls.corner_color.clone(),
+                "border-color": base.controls.corner_color,
                 "border-style": "solid",
                 "border-width": "2px 0 0 16px",
                 "position": "relative",

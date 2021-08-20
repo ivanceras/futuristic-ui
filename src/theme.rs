@@ -1,9 +1,4 @@
-use css_colors::{
-    percent,
-    rgba,
-    Color,
-    RGBA,
-};
+use css_colors::{percent, rgba, Color, RGBA};
 
 #[derive(PartialEq, Debug)]
 pub struct Theme {
@@ -39,38 +34,34 @@ pub struct Controls {
 
 impl Theme {
     // base theme using a bluish base color #029dbb
+    #[allow(unused)]
     fn bondi_blue_on_dark() -> Self {
         let primary = rgba(2, 157, 187, 1.0); // main theme
         let background = rgba(0, 0, 0, 1.0);
         Self::calculate_theme(primary, background, false)
     }
 
+    #[allow(unused)]
     fn white_on_dark() -> Self {
         let primary = rgba(255, 255, 255, 1.0);
         let background = rgba(0, 0, 0, 1.0);
         Self::calculate_theme(primary, background, false)
     }
 
+    #[allow(unused)]
     fn green_on_black() -> Self {
         let primary = rgba(0, 255, 0, 1.0);
         let background = rgba(0, 0, 0, 1.0);
         Self::calculate_theme(primary, background, false)
     }
 
+    #[allow(unused)]
     fn black_on_white() -> Self {
-        Self::calculate_theme(
-            rgba(0, 0, 0, 1.0),
-            rgba(255, 255, 255, 1.0),
-            true,
-        )
+        Self::calculate_theme(rgba(0, 0, 0, 1.0), rgba(255, 255, 255, 1.0), true)
     }
 
     /// light: if background is light and foreground is dark
-    pub fn calculate_theme(
-        foreground: RGBA,
-        background: RGBA,
-        light: bool,
-    ) -> Self {
+    pub fn calculate_theme(foreground: RGBA, background: RGBA, light: bool) -> Self {
         let primary = foreground;
         let accent = if light {
             primary.shade(percent(30))
@@ -143,15 +134,9 @@ impl Default for Theme {
 
 #[cfg(test)]
 mod test {
-    
+
     use css_color::Rgba;
-    use css_colors::{
-        percent,
-        rgb,
-        rgba,
-        Color,
-        RGBA,
-    };
+    use css_colors::{percent, rgb, rgba, Color, RGBA};
 
     /// convert from color to colors version
     fn convert_to_real_rgba(color: Rgba) -> RGBA {
@@ -218,10 +203,7 @@ mod test {
             c.tint(percent(20)),
             c.mix(rgba(255, 255, 255, 1.0), percent(20))
         );
-        assert_eq!(
-            c.shade(percent(20)),
-            c.mix(rgba(0, 0, 0, 1.0), percent(20))
-        );
+        assert_eq!(c.shade(percent(20)), c.mix(rgba(0, 0, 0, 1.0), percent(20)));
     }
 
     #[test]
