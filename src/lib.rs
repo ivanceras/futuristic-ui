@@ -53,129 +53,6 @@ pub struct App {
     image: Image,
 }
 
-impl App {
-    pub fn new() -> Self {
-        let button_options = vec![
-            ("ReAnimate All", Options::regular(), Msg::ReAnimateAll),
-            (
-                "Animate Paragraph",
-                Options::regular(),
-                Msg::ReAnimateParagraph,
-            ),
-            ("Animate List", Options::full(), Msg::ReAnimateList),
-            (
-                "Animate Frame",
-                Options::simple().skewed(true),
-                Msg::ReAnimateFrame,
-            ),
-            ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
-            ("Click", Options::regular(), Msg::NoOp),
-            ("Disabled", Options::disabled(), Msg::NoOp),
-            ("Muted", Options::muted(), Msg::NoOp),
-        ];
-        let button_array: Vec<FuiButton<Msg>> = button_options
-            .into_iter()
-            .map(|(label, options, msg)| {
-                let mut btn = FuiButton::new_with_label(label);
-                btn.set_options(options);
-                btn.add_event_listeners(vec![on_click(move |_| msg.clone())]);
-                btn
-            })
-            .collect();
-
-        let paragraph_content = "This is an experimental demo showcasing usage of [Sauron](https://github.com/ivanceras/sauron). \
-                    Application lifecycle to work alongside\
-                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.\
-                    Sauron is a light-weight web framework designed to have you write least amount of code possible.";
-
-        let frame_content = div(
-            vec![styles([("padding", "20px 40px"), ("font-size", "32px")])],
-            vec![text("Retro Futuristic UI in rust")],
-        );
-
-        let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
-        fui_button.add_event_listeners(vec![on_click(|_| Msg::ReAnimateAll)]);
-        fui_button.set_options(Options::regular());
-
-        App {
-            frame: Frame::new_with_content(frame_content),
-            nav_header: NavHeader::new_with_content("Navigation Header"),
-            paragraph: Paragraph::new_with_markdown(paragraph_content),
-            button_array,
-            fui_button,
-            spinner: Spinner::new(),
-            animate_list: AnimateList::new_with_content(Self::animate_list_content()),
-            image: Image::new("img/space.jpg", Some("Space as seen from space")),
-        }
-    }
-
-    fn animate_list_content() -> Node<Msg> {
-        let long_txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque purus faucibus urna venenatis, a elementum diam laoreet. Fusce eget enim justo. Pellentesque cursus metus elit, ut porttitor eros iaculis sit amet. Quisque varius felis id turpis iaculis, et viverra enim pulvinar. Curabitur vel lacus interdum, molestie purus ut, pretium nibh. Mauris commodo dolor magna, eget dignissim mauris semper vitae. Ut viverra nec ex quis semper. Sed sit amet tincidunt mauris. Mauris in imperdiet ipsum. Praesent pretium tortor ut felis posuere, sed lacinia nunc pretium. Morbi et felis nec neque accumsan tincidunt. In hac habitasse platea dictumst. Nulla sit amet elit sed purus posuere placerat ut quis metus. Etiam mattis interdum dui at ornare. Nunc sit amet venenatis lorem, sed eleifend mauris. Pellentesque eros sem, fermentum vel lacus at, congue rhoncus elit. ";
-        div(
-            vec![],
-            vec![
-                p(vec![], vec![
-                    text("This is an experimental demo showcasing usage of sauron[0] Application lifecycle to work alongside
-                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.
-                    Sauron is a light-weight web framework designed to have you write least amount of code possible."),
-                    a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
-                    img(vec![styles([("width","600px"),("height", "auto"),("display","block")]),src("img/space.jpg")], vec![]),
-                ]),
-                li(vec![], vec![text(long_txt.clone())]),
-                li(vec![], vec![text("List 2")]),
-                ul(
-                    vec![],
-                    vec![
-                        li(vec![], vec![text("SubList 3")]),
-                        li(vec![], vec![text("Not too long txt here... trying to see if it is correctly animated")]),
-                    ],
-                ),
-                div(vec![],vec![
-                    table(vec![],vec![
-                        thead(vec![],vec![
-                            tr(vec![],vec![
-                                th(vec![],vec![text("Prop name")]),
-                                th(vec![],vec![text("Type")]),
-                                th(vec![],vec![text("Default")]),
-                                th(vec![],vec![text("Description")]),
-                            ]),
-                        ]),
-                        tbody(vec![],vec![
-                            tr(vec![],vec![
-                                td(vec![],vec![text("name")]),
-                                td(vec![],vec![text("string")]),
-                                td(vec![],vec![text("''")]),
-                                td(vec![],vec![text("The base name of the component")]),
-                            ]),
-                            tr(vec![],vec![
-                                td(vec![],vec![text("age")]),
-                                td(vec![],vec![text("number")]),
-                                td(vec![],vec![text("0")]),
-                                td(vec![],vec![text("The age of the component")]),
-                            ]),
-                            tr(vec![],vec![
-                                td(vec![],vec![text("married")]),
-                                td(vec![],vec![text("bool")]),
-                                td(vec![],vec![text("false")]),
-                                td(vec![],vec![text("If the component is married")]),
-                            ]),
-                        ]),
-                    ]),
-                ])
-            ],
-        )
-    }
-
-    fn reanimate_all() -> Cmd<Self, Msg> {
-        Cmd::new(|program| {
-            program.dispatch(Msg::ReAnimateFrame);
-            program.dispatch(Msg::ReAnimateHeader);
-            program.dispatch(Msg::ReAnimateParagraph);
-            program.dispatch(Msg::ReAnimateList);
-        })
-    }
-}
-
 impl Application<Msg> for App {
     fn init(&mut self, _: Program<Self, Msg>) -> Cmd<Self, Msg> {
         Self::reanimate_all()
@@ -430,6 +307,129 @@ impl Application<Msg> for App {
             self.animate_list.style().join("\n"),
             self.spinner.style().join("\n"),
         ]
+    }
+}
+
+impl App {
+    pub fn new() -> Self {
+        let button_options = vec![
+            ("ReAnimate All", Options::regular(), Msg::ReAnimateAll),
+            (
+                "Animate Paragraph",
+                Options::regular(),
+                Msg::ReAnimateParagraph,
+            ),
+            ("Animate List", Options::full(), Msg::ReAnimateList),
+            (
+                "Animate Frame",
+                Options::simple().skewed(true),
+                Msg::ReAnimateFrame,
+            ),
+            ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
+            ("Click", Options::regular(), Msg::NoOp),
+            ("Disabled", Options::disabled(), Msg::NoOp),
+            ("Muted", Options::muted(), Msg::NoOp),
+        ];
+        let button_array: Vec<FuiButton<Msg>> = button_options
+            .into_iter()
+            .map(|(label, options, msg)| {
+                let mut btn = FuiButton::new_with_label(label);
+                btn.set_options(options);
+                btn.add_event_listeners(vec![on_click(move |_| msg.clone())]);
+                btn
+            })
+            .collect();
+
+        let paragraph_content = "This is an experimental demo showcasing usage of [Sauron](https://github.com/ivanceras/sauron). \
+                    Application lifecycle to work alongside\
+                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.\
+                    Sauron is a light-weight web framework designed to have you write least amount of code possible.";
+
+        let frame_content = div(
+            vec![styles([("padding", "20px 40px"), ("font-size", "32px")])],
+            vec![text("Retro Futuristic UI in rust")],
+        );
+
+        let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
+        fui_button.add_event_listeners(vec![on_click(|_| Msg::ReAnimateAll)]);
+        fui_button.set_options(Options::regular());
+
+        App {
+            frame: Frame::new_with_content(frame_content),
+            nav_header: NavHeader::new_with_content("Navigation Header"),
+            paragraph: Paragraph::new_with_markdown(paragraph_content),
+            button_array,
+            fui_button,
+            spinner: Spinner::new(),
+            animate_list: AnimateList::new_with_content(Self::animate_list_content()),
+            image: Image::new("img/space.jpg", Some("Space as seen from space")),
+        }
+    }
+
+    fn animate_list_content() -> Node<Msg> {
+        let long_txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque purus faucibus urna venenatis, a elementum diam laoreet. Fusce eget enim justo. Pellentesque cursus metus elit, ut porttitor eros iaculis sit amet. Quisque varius felis id turpis iaculis, et viverra enim pulvinar. Curabitur vel lacus interdum, molestie purus ut, pretium nibh. Mauris commodo dolor magna, eget dignissim mauris semper vitae. Ut viverra nec ex quis semper. Sed sit amet tincidunt mauris. Mauris in imperdiet ipsum. Praesent pretium tortor ut felis posuere, sed lacinia nunc pretium. Morbi et felis nec neque accumsan tincidunt. In hac habitasse platea dictumst. Nulla sit amet elit sed purus posuere placerat ut quis metus. Etiam mattis interdum dui at ornare. Nunc sit amet venenatis lorem, sed eleifend mauris. Pellentesque eros sem, fermentum vel lacus at, congue rhoncus elit. ";
+        div(
+            vec![],
+            vec![
+                p(vec![], vec![
+                    text("This is an experimental demo showcasing usage of sauron[0] Application lifecycle to work alongside
+                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.
+                    Sauron is a light-weight web framework designed to have you write least amount of code possible."),
+                    a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
+                    img(vec![styles([("width","600px"),("height", "auto"),("display","block")]),src("img/space.jpg")], vec![]),
+                ]),
+                li(vec![], vec![text(long_txt.clone())]),
+                li(vec![], vec![text("List 2")]),
+                ul(
+                    vec![],
+                    vec![
+                        li(vec![], vec![text("SubList 3")]),
+                        li(vec![], vec![text("Not too long txt here... trying to see if it is correctly animated")]),
+                    ],
+                ),
+                div(vec![],vec![
+                    table(vec![],vec![
+                        thead(vec![],vec![
+                            tr(vec![],vec![
+                                th(vec![],vec![text("Prop name")]),
+                                th(vec![],vec![text("Type")]),
+                                th(vec![],vec![text("Default")]),
+                                th(vec![],vec![text("Description")]),
+                            ]),
+                        ]),
+                        tbody(vec![],vec![
+                            tr(vec![],vec![
+                                td(vec![],vec![text("name")]),
+                                td(vec![],vec![text("string")]),
+                                td(vec![],vec![text("''")]),
+                                td(vec![],vec![text("The base name of the component")]),
+                            ]),
+                            tr(vec![],vec![
+                                td(vec![],vec![text("age")]),
+                                td(vec![],vec![text("number")]),
+                                td(vec![],vec![text("0")]),
+                                td(vec![],vec![text("The age of the component")]),
+                            ]),
+                            tr(vec![],vec![
+                                td(vec![],vec![text("married")]),
+                                td(vec![],vec![text("bool")]),
+                                td(vec![],vec![text("false")]),
+                                td(vec![],vec![text("If the component is married")]),
+                            ]),
+                        ]),
+                    ]),
+                ])
+            ],
+        )
+    }
+
+    fn reanimate_all() -> Cmd<Self, Msg> {
+        Cmd::new(|program| {
+            program.dispatch(Msg::ReAnimateFrame);
+            program.dispatch(Msg::ReAnimateHeader);
+            program.dispatch(Msg::ReAnimateParagraph);
+            program.dispatch(Msg::ReAnimateList);
+        })
     }
 }
 
