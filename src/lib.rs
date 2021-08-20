@@ -181,6 +181,144 @@ impl Application<Msg> for App {
         Self::reanimate_all()
     }
 
+    fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
+        match msg {
+            Msg::ReAnimateHeader => {
+                if let Some(header_msg) = self.nav_header.update(nav_header::Msg::AnimateIn) {
+                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::NavHeaderMsg(header_msg) => {
+                if let Some(header_msg) = self.nav_header.update(header_msg) {
+                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::ReAnimateFrame => {
+                if let Some(frame_msg) = self.frame.update(frame::Msg::AnimateIn) {
+                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::FrameMsg(frame_msg) => {
+                if let Some(frame_msg) = self.frame.update(frame_msg) {
+                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::BtnMsg(index, btn_msg) => {
+                if let Some(pmsg) = self.button_array[index].update(*btn_msg) {
+                    Cmd::new(move |program| program.dispatch(pmsg.clone()))
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::FuiButtonMsg(fui_btn_msg) => {
+                if let Some(pmsg) = self.fui_button.update(*fui_btn_msg) {
+                    Cmd::new(move |program| program.dispatch(pmsg.clone()))
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::AnimateListMsg(animate_list_msg) => {
+                if let Some(animate_list_msg) = self.animate_list.update(*animate_list_msg) {
+                    Cmd::new(move |program| {
+                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
+                    })
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::ReAnimateList => {
+                if let Some(animate_list_msg) =
+                    self.animate_list.update(animate_list::Msg::AnimateIn)
+                {
+                    Cmd::new(move |program| {
+                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
+                    })
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::ParagraphMsg(para_msg) => {
+                if let Some(para_msg) = self.paragraph.update(para_msg) {
+                    Cmd::new(move |program| {
+                        program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
+                    })
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::ImageMsg(img_msg) => {
+                if let Some(img_msg) = self.image.update(img_msg) {
+                    Cmd::new(move |program| {
+                        program.dispatch(Msg::ImageMsg(img_msg.clone()));
+                    })
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::ReAnimateParagraph => {
+                if let Some(para_msg) = self.paragraph.update(paragraph::Msg::AnimateIn) {
+                    Cmd::new(move |program| {
+                        program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
+                    })
+                } else {
+                    Cmd::none()
+                }
+            }
+            Msg::ReAnimateAll => Self::reanimate_all(),
+            Msg::NoOp => Cmd::none(),
+        }
+    }
+
+    fn view(&self) -> Node<Msg> {
+        div(
+            vec![class("container")],
+            vec![
+                self.nav_header.view().map_msg(Msg::NavHeaderMsg),
+                div(vec![style!{"padding":px(20), "position": "relative", "left": percent(50)}], vec![
+                    self.fui_button.view().map_msg(|fbtn_msg| {
+                        Msg::FuiButtonMsg(Box::new(fbtn_msg))
+                    })]
+                ),
+                self.frame
+                    .view()
+                    .map_msg(|frame_msg| Msg::FrameMsg(frame_msg)),
+
+                div(vec![class("futuristic-buttons-array")],{
+                    self.button_array
+                        .iter()
+                        .enumerate()
+                        .map(|(index,btn)|
+                            btn.view()
+                                .map_msg(move|btn_msg|Msg::BtnMsg(index, Box::new(btn_msg)))
+                        ).collect::<Vec<_>>()
+                    }
+                ),
+                self.paragraph.view(),
+                p(
+                    vec![],
+                    vec![self.animate_list.view()],
+                ),
+                self.spinner.view(),
+                self.image.view().map_msg(Msg::ImageMsg),
+                footer(
+                    vec![],
+                    vec![a(
+                        vec![href("https://github.com/ivanceras/sauron/tree/master/examples/futuristic-ui/")],
+                        vec![text("code")],
+                    )],
+                )
+            ]
+        )
+    }
+
     fn style(&self) -> Vec<String> {
         let base = crate::Theme::default();
 
@@ -292,144 +430,6 @@ impl Application<Msg> for App {
             self.animate_list.style().join("\n"),
             self.spinner.style().join("\n"),
         ]
-    }
-
-    fn view(&self) -> Node<Msg> {
-        div(
-            vec![class("container")],
-            vec![
-                self.nav_header.view().map_msg(Msg::NavHeaderMsg),
-                div(vec![style!{"padding":px(20), "position": "relative", "left": percent(50)}], vec![
-                    self.fui_button.view().map_msg(|fbtn_msg| {
-                        Msg::FuiButtonMsg(Box::new(fbtn_msg))
-                    })]
-                ),
-                self.frame
-                    .view()
-                    .map_msg(|frame_msg| Msg::FrameMsg(frame_msg)),
-
-                div(vec![class("futuristic-buttons-array")],{
-                    self.button_array
-                        .iter()
-                        .enumerate()
-                        .map(|(index,btn)|
-                            btn.view()
-                                .map_msg(move|btn_msg|Msg::BtnMsg(index, Box::new(btn_msg)))
-                        ).collect::<Vec<_>>()
-                    }
-                ),
-                self.paragraph.view(),
-                p(
-                    vec![],
-                    vec![self.animate_list.view()],
-                ),
-                self.spinner.view(),
-                self.image.view().map_msg(Msg::ImageMsg),
-                footer(
-                    vec![],
-                    vec![a(
-                        vec![href("https://github.com/ivanceras/sauron/tree/master/examples/futuristic-ui/")],
-                        vec![text("code")],
-                    )],
-                )
-            ]
-        )
-    }
-
-    fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
-        match msg {
-            Msg::ReAnimateHeader => {
-                if let Some(header_msg) = self.nav_header.update(nav_header::Msg::AnimateIn) {
-                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::NavHeaderMsg(header_msg) => {
-                if let Some(header_msg) = self.nav_header.update(header_msg) {
-                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::ReAnimateFrame => {
-                if let Some(frame_msg) = self.frame.update(frame::Msg::AnimateIn) {
-                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::FrameMsg(frame_msg) => {
-                if let Some(frame_msg) = self.frame.update(frame_msg) {
-                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::BtnMsg(index, btn_msg) => {
-                if let Some(pmsg) = self.button_array[index].update(*btn_msg) {
-                    Cmd::new(move |program| program.dispatch(pmsg.clone()))
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::FuiButtonMsg(fui_btn_msg) => {
-                if let Some(pmsg) = self.fui_button.update(*fui_btn_msg) {
-                    Cmd::new(move |program| program.dispatch(pmsg.clone()))
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::AnimateListMsg(animate_list_msg) => {
-                if let Some(animate_list_msg) = self.animate_list.update(*animate_list_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
-                    })
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::ReAnimateList => {
-                if let Some(animate_list_msg) =
-                    self.animate_list.update(animate_list::Msg::AnimateIn)
-                {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
-                    })
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::ParagraphMsg(para_msg) => {
-                if let Some(para_msg) = self.paragraph.update(para_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
-                    })
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::ImageMsg(img_msg) => {
-                if let Some(img_msg) = self.image.update(img_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::ImageMsg(img_msg.clone()));
-                    })
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::ReAnimateParagraph => {
-                if let Some(para_msg) = self.paragraph.update(paragraph::Msg::AnimateIn) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
-                    })
-                } else {
-                    Cmd::none()
-                }
-            }
-            Msg::ReAnimateAll => Self::reanimate_all(),
-            Msg::NoOp => Cmd::none(),
-        }
     }
 }
 
