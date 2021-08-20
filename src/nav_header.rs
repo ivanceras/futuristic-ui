@@ -1,10 +1,8 @@
 use crate::sounds;
+use sauron::jss::{jss, jss_ns};
 use sauron::{
-    html::{
-        attributes::class,
-        div,
-        text,
-    },
+    html::attributes,
+    html::{attributes::class, div, text},
     prelude::*,
     Node,
 };
@@ -48,9 +46,7 @@ impl NavHeader {
                 self.hide = false;
                 None
             }
-            Msg::NextAnimation(start, duration) => {
-                self.next_animation(start, duration)
-            }
+            Msg::NextAnimation(start, duration) => self.next_animation(start, duration),
         }
     }
 
@@ -74,14 +70,14 @@ impl NavHeader {
 
     pub fn style(&self) -> Vec<String> {
         let base = crate::Theme::default();
-        let css = jss_ns!(COMPONENT_NAME, {
+        let css = jss_ns! {COMPONENT_NAME,
             ".": {
                 "display": "block",
                 "padding": "1px",
                 "position": "relative",
                 "opacity": 1,
-                "color": base.secondary_color,
-                "font-family": base.primary_font,
+                "color": base.secondary_color.clone(),
+                "font-family": base.primary_font.clone(),
             },
 
             ".content_and_relief": {
@@ -99,7 +95,7 @@ impl NavHeader {
             },
 
             ".border": {
-                "border-color": base.controls.corner_color,
+                "border-color": base.controls.corner_color.clone(),
                 "box-shadow": format!("0 0 4px {}",base.controls.border_shadow),
                 "z-index": 1,
                 "opacity": 1,
@@ -123,15 +119,15 @@ impl NavHeader {
             },
 
             ".text-anim": {
-                "color": base.accent_color,
+                "color": base.accent_color.clone(),
                 "transition": "color 250ms ease-out",
-                "font-family": base.secondary_font,
+                "font-family": base.secondary_font.clone(),
                 "text-shadow": format!("0 0 4px {}",base.accent_shadow),
             },
 
             ".link_content": {
                 "transform": "skewX(-45deg)",
-                "border-color": base.controls.corner_color,
+                "border-color": base.controls.corner_color.clone(),
                 "border-style": "solid",
                 "border-width": "2px 0 0 16px",
                 "position": "relative",
@@ -148,17 +144,16 @@ impl NavHeader {
                 "white-space": "nowrap",
             }
 
-        });
+        };
 
         vec![css]
     }
 
     pub fn view(&self) -> Node<Msg> {
-        let class_ns =
-            |class_names| jss::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
 
         let classes_ns_flag = |class_name_flags| {
-            jss::classes_namespaced_flag(COMPONENT_NAME, class_name_flags)
+            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
         };
         header(
             vec![
@@ -179,10 +174,7 @@ impl NavHeader {
                         vec![class_ns("link_content")],
                         vec![div(
                             vec![class_ns("link")],
-                            vec![a(
-                                vec![href("#readmore")],
-                                vec![text("Read more..")],
-                            )],
+                            vec![a(vec![href("#readmore")], vec![text("Read more..")])],
                         )],
                     ),
                 ],

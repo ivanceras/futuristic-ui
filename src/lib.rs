@@ -6,10 +6,11 @@ use fui_button::{FuiButton, Options};
 use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
+use sauron::jss::{jss, jss_ns};
 use sauron::{
     html::{attributes::class, div, events::on_click, text},
     prelude::*,
-    Cmd, Component, Node, Program,
+    Application, Cmd, Node, Program,
 };
 use spinner::Spinner;
 use theme::Theme;
@@ -83,7 +84,7 @@ impl App {
             .collect();
 
         let paragraph_content = "This is an experimental demo showcasing usage of [Sauron](https://github.com/ivanceras/sauron). \
-                    Component lifecycle to work alongside\
+                    Application lifecycle to work alongside\
                     css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.\
                     Sauron is a light-weight web framework designed to have you write least amount of code possible.";
 
@@ -103,13 +104,8 @@ impl App {
             button_array,
             fui_button,
             spinner: Spinner::new(),
-            animate_list: AnimateList::new_with_content(
-                Self::animate_list_content(),
-            ),
-            image: Image::new(
-                "img/space.jpg",
-                Some("Space as seen from space"),
-            ),
+            animate_list: AnimateList::new_with_content(Self::animate_list_content()),
+            image: Image::new("img/space.jpg", Some("Space as seen from space")),
         }
     }
 
@@ -119,7 +115,7 @@ impl App {
             vec![],
             vec![
                 p(vec![], vec![
-                    text("This is an experimental demo showcasing usage of sauron[0] Component lifecycle to work alongside
+                    text("This is an experimental demo showcasing usage of sauron[0] Application lifecycle to work alongside
                     css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.
                     Sauron is a light-weight web framework designed to have you write least amount of code possible."),
                     a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
@@ -180,26 +176,41 @@ impl App {
     }
 }
 
-impl Component<Msg> for App {
-    fn init(&self) -> Cmd<Self, Msg> {
+impl Application<Msg> for App {
+    fn init(&mut self, _: Program<Self, Msg>) -> Cmd<Self, Msg> {
         Self::reanimate_all()
     }
 
     fn style(&self) -> Vec<String> {
         let base = crate::Theme::default();
 
-        let body_css = jss!({
+        let controls_button_text_color = base.controls.button_text_color.to_owned();
+        let controls_content_background_color = base.controls.content_background_color.to_owned();
+        let controls_button_text_color = base.controls.button_text_color.to_owned();
+        let accent_shadow = base.accent_shadow.to_owned();
+        let secondary_color = base.secondary_color.to_owned();
+        let accent_color = base.accent_color.to_owned();
+
+        let accent_shadow = base.accent_shadow.to_owned();
+        let accent_color = base.accent_color.to_owned();
+
+        let primary_font = base.primary_font.to_owned();
+        let secondary_font = base.secondary_font.to_owned();
+        let controls_border_color = base.controls.border_color.to_owned();
+        let background_color = base.background_color.to_owned();
+
+        let body_css = jss! {
 
             "button": {
-                "color": base.controls.button_text_color,
-                "border": format!("1px solid {}",base.controls.border_color),
+                "color": controls_button_text_color.clone(),
+                "border": format!("1px solid {}",controls_border_color.clone()),
                 "z-index": 2,
                 "display": "inline-block",
                 "padding": "10px 20px",
                 "outline": "none",
                 "position": "relative",
                 "font-size": "15.75px",
-                "background-color": base.controls.content_background_color,
+                "background-color": controls_content_background_color.clone(),
                 "line-height": 1,
                 "user-select": "none",
                 "vertical-align": "middle",
@@ -210,59 +221,59 @@ impl Component<Msg> for App {
             },
 
             "a": {
-                "color": base.controls.button_text_color,
+                "color": controls_button_text_color.clone(),
                 "cursor": "pointer",
                 "transition": "color 250ms ease-out",
-                "text-shadow": format!("0 0 4px {}", base.accent_shadow),
+                "text-shadow": format!("0 0 4px {}", accent_shadow.clone()),
                 "text-decoration": "none",
             },
 
             "a ::selection": {
                 "color": "#021114",
                 "text-shadow": "none",
-                "background-color": base.secondary_color,
+                "background-color": secondary_color.clone(),
             },
 
             "table": {
                 "width": "100%",
                 "border-collapse": "collapse",
-                "color": base.secondary_color,
+                "color": secondary_color.clone(),
             },
 
             "thead": {
-                "color": base.accent_color,
+                "color": accent_color.clone(),
                 "text-align": "left",
-                "font-family": base.secondary_font,
+                "font-family": secondary_font.clone(),
                 "font-weight": "bold",
                 "white-space": "nowrap",
             },
 
             "tr": {
-                "border-bottom": format!("1px solid {}", base.controls.border_color),
+                "border-bottom": format!("1px solid {}", controls_border_color.clone()),
             },
 
              "td": {
                 "padding": "5px",
                 "vertical-align": "top",
             },
-        });
+        };
 
-        let container_css = jss!({
+        let container_css = jss! {
             ".container": {
-                "color": base.secondary_color,
+                "color": secondary_color.clone(),
                 "font-size": "21px",
                 "line-height": "1.5",
-                "font-family": base.primary_font,
+                "font-family": primary_font.clone(),
                 "margin": "auto",
-                "background-color": base.background_color,
+                "background-color": background_color.clone(),
                 "max-width": "50em",
                 "padding": "10px",
             },
 
             ".container ::selection": {
-                "color": base.background_color,
+                "color": background_color.clone(),
                 "text-shadow": "none",
-                "background-color": base.secondary_color,
+                "background-color": secondary_color.clone(),
             },
 
             ".futuristic-buttons-array": {
@@ -270,7 +281,7 @@ impl Component<Msg> for App {
                 "flex-wrap": "wrap",
                 "margin": "20px 10px",
             }
-        });
+        };
 
         vec![
             body_css,
@@ -328,41 +339,29 @@ impl Component<Msg> for App {
     fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
         match msg {
             Msg::ReAnimateHeader => {
-                if let Some(header_msg) =
-                    self.nav_header.update(nav_header::Msg::AnimateIn)
-                {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::NavHeaderMsg(header_msg.clone()))
-                    })
+                if let Some(header_msg) = self.nav_header.update(nav_header::Msg::AnimateIn) {
+                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::NavHeaderMsg(header_msg) => {
                 if let Some(header_msg) = self.nav_header.update(header_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::NavHeaderMsg(header_msg.clone()))
-                    })
+                    Cmd::new(move |program| program.dispatch(Msg::NavHeaderMsg(header_msg.clone())))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::ReAnimateFrame => {
-                if let Some(frame_msg) =
-                    self.frame.update(frame::Msg::AnimateIn)
-                {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::FrameMsg(frame_msg.clone()))
-                    })
+                if let Some(frame_msg) = self.frame.update(frame::Msg::AnimateIn) {
+                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
                 } else {
                     Cmd::none()
                 }
             }
             Msg::FrameMsg(frame_msg) => {
                 if let Some(frame_msg) = self.frame.update(frame_msg) {
-                    Cmd::new(move |program| {
-                        program.dispatch(Msg::FrameMsg(frame_msg.clone()))
-                    })
+                    Cmd::new(move |program| program.dispatch(Msg::FrameMsg(frame_msg.clone())))
                 } else {
                     Cmd::none()
                 }
@@ -382,13 +381,9 @@ impl Component<Msg> for App {
                 }
             }
             Msg::AnimateListMsg(animate_list_msg) => {
-                if let Some(animate_list_msg) =
-                    self.animate_list.update(*animate_list_msg)
-                {
+                if let Some(animate_list_msg) = self.animate_list.update(*animate_list_msg) {
                     Cmd::new(move |program| {
-                        program.dispatch(Msg::AnimateListMsg(Box::new(
-                            animate_list_msg.clone(),
-                        )))
+                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
                     })
                 } else {
                     Cmd::none()
@@ -399,9 +394,7 @@ impl Component<Msg> for App {
                     self.animate_list.update(animate_list::Msg::AnimateIn)
                 {
                     Cmd::new(move |program| {
-                        program.dispatch(Msg::AnimateListMsg(Box::new(
-                            animate_list_msg.clone(),
-                        )))
+                        program.dispatch(Msg::AnimateListMsg(Box::new(animate_list_msg.clone())))
                     })
                 } else {
                     Cmd::none()
@@ -426,9 +419,7 @@ impl Component<Msg> for App {
                 }
             }
             Msg::ReAnimateParagraph => {
-                if let Some(para_msg) =
-                    self.paragraph.update(paragraph::Msg::AnimateIn)
-                {
+                if let Some(para_msg) = self.paragraph.update(paragraph::Msg::AnimateIn) {
                     Cmd::new(move |program| {
                         program.dispatch(Msg::ParagraphMsg(para_msg.clone()));
                     })

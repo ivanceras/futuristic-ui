@@ -1,12 +1,8 @@
 use crate::sounds;
+use sauron::jss::{jss, jss_ns};
 use sauron::{
-    html::{
-        attributes::class,
-        div,
-        events::on_click,
-        text,
-    },
-    jss,
+    html::attributes,
+    html::{attributes::class, div, events::on_click, text},
     prelude::*,
     Node,
 };
@@ -71,10 +67,7 @@ where
         self.options = options;
     }
 
-    pub fn add_event_listeners(
-        &mut self,
-        event_listeners: Vec<Attribute<PMSG>>,
-    ) {
+    pub fn add_event_listeners(&mut self, event_listeners: Vec<Attribute<PMSG>>) {
         for ev in event_listeners {
             let mapped_ev = ev.map_msg(|pmsg| Msg::ParamMsg(pmsg));
             self.event_listeners.push(mapped_ev);
@@ -84,7 +77,7 @@ where
     pub fn style(&self) -> Vec<String> {
         let base = crate::Theme::default().controls;
 
-        let base_css = jss_ns!(COMPONENT_NAME, {
+        let base_css = jss_ns! {COMPONENT_NAME,
 
             // the ROOT component style
             ".": {
@@ -248,9 +241,9 @@ where
                 "opacity": 1,
             },
 
-        });
+        };
 
-        let skewed_css = jss_ns!(COMPONENT_NAME, {
+        let skewed_css = jss_ns! {COMPONENT_NAME,
             ".skewed": {
                 "transform": "skewX(-45deg)",
                 "transform-origin": "bottom left",
@@ -260,7 +253,7 @@ where
                 "transform": "skewX(45deg)",
             },
 
-        });
+        };
 
         // if expand_corners is enabled
         // the fui_button corners will EXPAND when hovered.
@@ -272,7 +265,7 @@ where
         //  - `.class1,.class2 child` means either if either class1 or class2 is specified in the
         // parent, the properties will be applied to this child element
         //
-        let expand_corner_css = jss_ns! (COMPONENT_NAME, {
+        let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
                 "left": "-6px",
                 "top": "-6px",
@@ -292,7 +285,7 @@ where
                 "right": "-6px",
                 "bottom": "-6px",
             },
-        });
+        };
 
         vec![base_css, skewed_css, expand_corner_css]
     }
@@ -327,11 +320,10 @@ where
     }
 
     pub fn view(&self) -> Node<Msg<PMSG>> {
-        let class_ns =
-            |class_names| jss::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
 
         let classes_ns_flag = |class_name_flags| {
-            jss::classes_namespaced_flag(COMPONENT_NAME, class_name_flags)
+            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
         };
 
         div(
@@ -393,10 +385,7 @@ where
                         div(
                             vec![class_ns("button_wrap")],
                             vec![button(
-                                vec![
-                                    class_ns("button"),
-                                    disabled(self.options.disabled),
-                                ],
+                                vec![class_ns("button"), disabled(self.options.disabled)],
                                 vec![text(&self.label)],
                             )
                             .add_attributes(self.event_listeners.clone())],

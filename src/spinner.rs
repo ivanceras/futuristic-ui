@@ -1,8 +1,7 @@
+use sauron::jss::{jss, jss_ns};
 use sauron::{
-    html::{
-        attributes::class,
-        div,
-    },
+    html::attributes,
+    html::{attributes::class, div},
     prelude::*,
     Node,
 };
@@ -25,7 +24,7 @@ impl<MSG> Spinner<MSG> {
     pub fn style(&self) -> Vec<String> {
         let base = crate::Theme::default().controls;
 
-        let base_css = jss_ns!(COMPONENT_NAME, {
+        let base_css = jss_ns! {COMPONENT_NAME,
             ".": {
                 "top": 0,
                 "left": 0,
@@ -71,7 +70,7 @@ impl<MSG> Spinner<MSG> {
                 "margin-left": "-15px",
             },
 
-        });
+        };
 
         let animation_css = r#"
             @keyframes spinner-loading-circle1 {
@@ -106,8 +105,7 @@ impl<MSG> Spinner<MSG> {
     }
 
     pub fn view(&self) -> Node<MSG> {
-        let class_ns =
-            |class_names| jss::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
 
         div(
             vec![class(COMPONENT_NAME)],

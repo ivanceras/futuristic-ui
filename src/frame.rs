@@ -1,9 +1,8 @@
 use crate::sounds;
+use sauron::jss::{jss, jss_ns};
 use sauron::{
-    html::{
-        attributes::class,
-        div,
-    },
+    html::attributes,
+    html::{attributes::class, div},
     prelude::*,
     Node,
 };
@@ -54,9 +53,7 @@ impl Frame {
                 self.hover = false;
                 None
             }
-            Msg::NextAnimation(start, duration) => {
-                self.next_animation(start, duration)
-            }
+            Msg::NextAnimation(start, duration) => self.next_animation(start, duration),
         }
     }
 
@@ -81,7 +78,7 @@ impl Frame {
     pub fn style(&self) -> Vec<String> {
         let base = crate::Theme::default().controls;
 
-        let css = jss_ns!(COMPONENT_NAME,{
+        let css = jss_ns! {COMPONENT_NAME,
             // the ROOT component style
             ".": {
                 "display": "block",
@@ -196,7 +193,7 @@ impl Frame {
                 "background-color": "transparent",
             },
 
-        });
+        };
 
         // if expand_corners is enabled
         // the fui_button corners will EXPAND when hovered.
@@ -208,7 +205,7 @@ impl Frame {
         //  - `.class1,.class2 child` means either if either class1 or class2 is specified in the
         // parent, the properties will be applied to this child element
         //
-        let expand_corner_css = jss_ns! (COMPONENT_NAME, {
+        let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
                 "left": "-8px",
                 "top": "-8px",
@@ -228,17 +225,16 @@ impl Frame {
                 "right": "-8px",
                 "bottom": "-8px",
             },
-        });
+        };
 
         vec![css, expand_corner_css]
     }
 
     pub fn view(&self) -> Node<Msg> {
-        let class_ns =
-            |class_names| jss::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
 
         let classes_ns_flag = |class_name_flags| {
-            jss::classes_namespaced_flag(COMPONENT_NAME, class_name_flags)
+            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
         };
 
         div(
