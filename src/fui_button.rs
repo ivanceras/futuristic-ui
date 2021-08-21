@@ -1,13 +1,15 @@
 use crate::sounds;
 use sauron::jss::jss_ns;
 use sauron::{
-    dom::Event,
     html::attributes,
-    html::{attributes::class, div, events::on_click, text},
+    html::{
+        attributes::class, attributes::Callback, div, events::on_click, text,
+    },
     prelude::*,
-    Callback, Node,
+    Node,
 };
 use web_sys::HtmlAudioElement;
+use web_sys::MouseEvent;
 
 const COMPONENT_NAME: &str = "fui_button";
 
@@ -25,7 +27,7 @@ pub struct FuiButton<PMSG> {
     label: String,
     click: bool,
     hover: bool,
-    click_listeners: Vec<Callback<PMSG>>,
+    click_listeners: Vec<Callback<MouseEvent, PMSG>>,
 }
 
 pub struct Options {
@@ -70,7 +72,7 @@ where
 {
     fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
-            Msg::Click(event) => {
+            Msg::Click(mouse_event) => {
                 if self.options.sound {
                     sounds::play(&self.audio);
                 }
@@ -78,7 +80,7 @@ where
                 let pmsg_list = self
                     .click_listeners
                     .iter()
-                    .map(|listener| listener.emit(Event::from(event.clone())))
+                    .map(|listener| listener.emit(mouse_event.clone()))
                     .collect();
                 Effects::with_effects(pmsg_list)
             }
@@ -98,10 +100,15 @@ where
     }
 
     fn view(&self) -> Node<Msg> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
 
         let classes_ns_flag = |class_name_flags| {
-            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
+            attributes::classes_flag_namespaced(
+                COMPONENT_NAME,
+                class_name_flags,
+            )
         };
 
         div(
@@ -163,7 +170,10 @@ where
                         div(
                             vec![class_ns("button_wrap")],
                             vec![button(
-                                vec![class_ns("button"), disabled(self.options.disabled)],
+                                vec![
+                                    class_ns("button"),
+                                    disabled(self.options.disabled),
+                                ],
                                 vec![text(&self.label)],
                             )],
                         ),
@@ -191,7 +201,7 @@ where
 
     pub fn add_click_listener<F>(&mut self, f: F)
     where
-        F: Fn(Event) -> PMSG + 'static,
+        F: Fn(MouseEvent) -> PMSG + 'static,
     {
         let cb = Callback::from(f);
         self.click_listeners.push(cb);

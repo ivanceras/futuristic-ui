@@ -54,14 +54,15 @@ pub struct App {
 }
 
 impl Application<Msg> for App {
-    fn init(&mut self, _: Program<Self, Msg>) -> Cmd<Self, Msg> {
+    fn init(&mut self) -> Cmd<Self, Msg> {
         Self::reanimate_all()
     }
 
     fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
         match msg {
             Msg::ReAnimateHeader => {
-                let effects = self.nav_header.update(nav_header::Msg::AnimateIn);
+                let effects =
+                    self.nav_header.update(nav_header::Msg::AnimateIn);
                 Cmd::from(effects.map_msg(Msg::NavHeaderMsg))
             }
             Msg::NavHeaderMsg(header_msg) => {
@@ -78,7 +79,9 @@ impl Application<Msg> for App {
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let effects = self.button_array[index].update(btn_msg);
-                Cmd::map_msg(effects, move |follow_up| Msg::BtnMsg(index, follow_up))
+                Cmd::map_msg(effects, move |follow_up| {
+                    Msg::BtnMsg(index, follow_up)
+                })
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
                 let effects = self.fui_button.update(fui_btn_msg);
@@ -89,7 +92,8 @@ impl Application<Msg> for App {
                 Cmd::map_msg(effects, Msg::AnimateListMsg)
             }
             Msg::ReAnimateList => {
-                let effects = self.animate_list.update(animate_list::Msg::AnimateIn);
+                let effects =
+                    self.animate_list.update(animate_list::Msg::AnimateIn);
                 Cmd::map_msg(effects, Msg::AnimateListMsg)
             }
             Msg::ParagraphMsg(para_msg) => {
@@ -115,7 +119,9 @@ impl Application<Msg> for App {
             vec![
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
                 div(
-                    vec![style! {"padding":px(20), "position": "relative", "left": percent(50)}],
+                    vec![
+                        style! {"padding":px(20), "position": "relative", "left": percent(50)},
+                    ],
                     vec![self.fui_button.view().map_msg(Msg::FuiButtonMsg)],
                 ),
                 self.frame.view().map_msg(Msg::FrameMsg),
@@ -124,8 +130,9 @@ impl Application<Msg> for App {
                         .iter()
                         .enumerate()
                         .map(|(index, btn)| {
-                            btn.view()
-                                .map_msg(move |btn_msg| Msg::BtnMsg(index, btn_msg))
+                            btn.view().map_msg(move |btn_msg| {
+                                Msg::BtnMsg(index, btn_msg)
+                            })
                         })
                         .collect::<Vec<_>>()
                 }),
@@ -136,7 +143,9 @@ impl Application<Msg> for App {
                 footer(
                     vec![],
                     vec![a(
-                        vec![href("https://github.com/ivanceras/futuristic-ui/")],
+                        vec![href(
+                            "https://github.com/ivanceras/futuristic-ui/",
+                        )],
                         vec![text("code")],
                     )],
                 ),
@@ -147,8 +156,10 @@ impl Application<Msg> for App {
     fn style(&self) -> Vec<String> {
         let base = crate::Theme::default();
 
-        let controls_content_background_color = base.controls.content_background_color.to_owned();
-        let controls_button_text_color = base.controls.button_text_color.to_owned();
+        let controls_content_background_color =
+            base.controls.content_background_color.to_owned();
+        let controls_button_text_color =
+            base.controls.button_text_color.to_owned();
         let secondary_color = base.secondary_color.to_owned();
 
         let accent_shadow = base.accent_shadow.to_owned();
@@ -306,8 +317,13 @@ impl Default for App {
             button_array,
             fui_button,
             spinner: Spinner::new(),
-            animate_list: AnimateList::new_with_content(Self::animate_list_content()),
-            image: Image::new("img/space.jpg", Some("Space as seen from space")),
+            animate_list: AnimateList::new_with_content(
+                Self::animate_list_content(),
+            ),
+            image: Image::new(
+                "img/space.jpg",
+                Some("Space as seen from space"),
+            ),
         }
     }
 }
