@@ -62,19 +62,19 @@ impl Application<Msg> for App {
         match msg {
             Msg::ReAnimateHeader => {
                 let follow_ups = self.nav_header.update(nav_header::Msg::AnimateIn);
-                Cmd::batch_msg(follow_ups.into_iter().map(Msg::NavHeaderMsg).collect())
+                Cmd::batch_map(follow_ups, Msg::NavHeaderMsg)
             }
             Msg::NavHeaderMsg(header_msg) => {
                 let follow_ups = self.nav_header.update(header_msg);
-                Cmd::batch_msg(follow_ups.into_iter().map(Msg::NavHeaderMsg).collect())
+                Cmd::batch_map(follow_ups, Msg::NavHeaderMsg)
             }
             Msg::ReAnimateFrame => {
                 let follow_ups = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::batch_msg(follow_ups.into_iter().map(Msg::FrameMsg).collect())
+                Cmd::batch_map(follow_ups, Msg::FrameMsg)
             }
             Msg::FrameMsg(frame_msg) => {
                 let follow_ups = self.frame.update(frame_msg);
-                Cmd::batch_msg(follow_ups.into_iter().map(Msg::FrameMsg).collect())
+                Cmd::batch_map(follow_ups, Msg::FrameMsg)
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let (follow_ups, effects) = self.button_array[index].update(btn_msg);
@@ -127,7 +127,7 @@ impl Application<Msg> for App {
             }
             Msg::ImageMsg(img_msg) => {
                 let follow_ups = self.image.update(img_msg);
-                Cmd::batch_msg(follow_ups.into_iter().map(Msg::ImageMsg).collect())
+                Cmd::batch_map(follow_ups, Msg::ImageMsg)
             }
             Msg::ReAnimateParagraph => {
                 let (follow_ups, effects) = self.paragraph.update(paragraph::Msg::AnimateIn);
