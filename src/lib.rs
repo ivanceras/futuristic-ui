@@ -62,22 +62,26 @@ impl Application<Msg> for App {
         match msg {
             Msg::ReAnimateHeader => {
                 let follow_ups = self.nav_header.update(nav_header::Msg::AnimateIn);
-                Cmd::batch_map(follow_ups, Msg::NavHeaderMsg)
+                Cmd::map_msgs(follow_ups, Msg::NavHeaderMsg)
             }
             Msg::NavHeaderMsg(header_msg) => {
                 let follow_ups = self.nav_header.update(header_msg);
-                Cmd::batch_map(follow_ups, Msg::NavHeaderMsg)
+                Cmd::map_msgs(follow_ups, Msg::NavHeaderMsg)
             }
             Msg::ReAnimateFrame => {
                 let follow_ups = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::batch_map(follow_ups, Msg::FrameMsg)
+                Cmd::map_msgs(follow_ups, Msg::FrameMsg)
             }
             Msg::FrameMsg(frame_msg) => {
                 let follow_ups = self.frame.update(frame_msg);
-                Cmd::batch_map(follow_ups, Msg::FrameMsg)
+                Cmd::map_msgs(follow_ups, Msg::FrameMsg)
             }
             Msg::BtnMsg(index, btn_msg) => {
-                let (follow_ups, effects) = self.button_array[index].update(btn_msg);
+                let Effects {
+                    follow_ups,
+                    effects,
+                } = self.button_array[index].update(btn_msg);
+
                 Cmd::batch_msg(
                     effects
                         .into_iter()
@@ -90,7 +94,11 @@ impl Application<Msg> for App {
                 )
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
-                let (follow_ups, effects) = self.fui_button.update(fui_btn_msg);
+                let Effects {
+                    effects,
+                    follow_ups,
+                } = self.fui_button.update(fui_btn_msg);
+
                 Cmd::batch_msg(
                     effects
                         .into_iter()
@@ -99,44 +107,24 @@ impl Application<Msg> for App {
                 )
             }
             Msg::AnimateListMsg(animate_list_msg) => {
-                let (follow_ups, effects) = self.animate_list.update(animate_list_msg);
-                Cmd::batch_msg(
-                    effects
-                        .into_iter()
-                        .chain(follow_ups.into_iter().map(Msg::AnimateListMsg))
-                        .collect(),
-                )
+                let effects = self.animate_list.update(animate_list_msg);
+                Cmd::map_effects(effects, Msg::AnimateListMsg)
             }
             Msg::ReAnimateList => {
-                let (follow_ups, effects) = self.animate_list.update(animate_list::Msg::AnimateIn);
-                Cmd::batch_msg(
-                    effects
-                        .into_iter()
-                        .chain(follow_ups.into_iter().map(Msg::AnimateListMsg))
-                        .collect(),
-                )
+                let effects = self.animate_list.update(animate_list::Msg::AnimateIn);
+                Cmd::map_effects(effects, Msg::AnimateListMsg)
             }
             Msg::ParagraphMsg(para_msg) => {
-                let (follow_ups, effects) = self.paragraph.update(para_msg);
-                Cmd::batch_msg(
-                    effects
-                        .into_iter()
-                        .chain(follow_ups.into_iter().map(Msg::ParagraphMsg))
-                        .collect(),
-                )
+                let effects = self.paragraph.update(para_msg);
+                Cmd::map_effects(effects, Msg::ParagraphMsg)
             }
             Msg::ImageMsg(img_msg) => {
                 let follow_ups = self.image.update(img_msg);
-                Cmd::batch_map(follow_ups, Msg::ImageMsg)
+                Cmd::map_msgs(follow_ups, Msg::ImageMsg)
             }
             Msg::ReAnimateParagraph => {
-                let (follow_ups, effects) = self.paragraph.update(paragraph::Msg::AnimateIn);
-                Cmd::batch_msg(
-                    effects
-                        .into_iter()
-                        .chain(follow_ups.into_iter().map(Msg::ParagraphMsg))
-                        .collect(),
-                )
+                let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
+                Cmd::map_effects(effects, Msg::ParagraphMsg)
             }
             Msg::ReAnimateAll => Self::reanimate_all(),
             Msg::NoOp => Cmd::none(),

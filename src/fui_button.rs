@@ -68,7 +68,7 @@ impl<PMSG> Widget<Msg, PMSG> for FuiButton<PMSG>
 where
     PMSG: 'static,
 {
-    fn update(&mut self, msg: Msg) -> (Vec<Msg>, Vec<PMSG>) {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
             Msg::Click(event) => {
                 if self.options.sound {
@@ -80,20 +80,19 @@ where
                     .iter()
                     .map(|listener| listener.emit(Event::from(event.clone())))
                     .collect();
-
-                (vec![], pmsg_list)
+                Effects::with_effects(pmsg_list)
             }
             Msg::HoverIn => {
                 self.hover = true;
-                (vec![], vec![])
+                Effects::none()
             }
             Msg::HoverOut => {
                 self.hover = false;
-                (vec![], vec![])
+                Effects::none()
             }
             Msg::HighlightEnd => {
                 self.click = false;
-                (vec![], vec![])
+                Effects::none()
             }
         }
     }

@@ -27,21 +27,15 @@ impl<PMSG> Container<Msg, PMSG> for Paragraph<PMSG>
 where
     PMSG: Clone,
 {
-    fn update(&mut self, msg: Msg) -> (Vec<Msg>, Vec<PMSG>) {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
             Msg::AnimateIn => {
-                let (follow_ups, effects) = self.animated_list.update(animate_list::Msg::AnimateIn);
-                (
-                    follow_ups.into_iter().map(Msg::AnimateListMsg).collect(),
-                    effects,
-                )
+                let effects = self.animated_list.update(animate_list::Msg::AnimateIn);
+                effects.map_follow_ups(Msg::AnimateListMsg)
             }
             Msg::AnimateListMsg(amsg) => {
-                let (follow_ups, effects) = self.animated_list.update(amsg);
-                (
-                    follow_ups.into_iter().map(Msg::AnimateListMsg).collect(),
-                    effects,
-                )
+                let effects = self.animated_list.update(amsg);
+                effects.map_follow_ups(Msg::AnimateListMsg)
             }
         }
     }

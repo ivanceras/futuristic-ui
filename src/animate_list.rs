@@ -38,16 +38,16 @@ impl<PMSG> Container<Msg, PMSG> for AnimateList<PMSG>
 where
     PMSG: Clone,
 {
-    fn update(&mut self, msg: Msg) -> (Vec<Msg>, Vec<PMSG>) {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
-            Msg::AnimateIn => (self.animate_in(), vec![]),
+            Msg::AnimateIn => Effects::with_follow_ups(self.animate_in()),
             Msg::StopAnimation => {
                 self.stop_animation();
-                (vec![], vec![])
+                Effects::none()
             }
             Msg::NextAnimation(is_in, start, duration) => {
-                let effects = self.next_animation(is_in, start, duration);
-                (effects, vec![])
+                let follow_ups = self.next_animation(is_in, start, duration);
+                Effects::with_follow_ups(follow_ups)
             }
         }
     }
