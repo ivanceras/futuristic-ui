@@ -36,7 +36,7 @@ impl Frame {
     }
 }
 
-impl Component<Msg> for Frame {
+impl Component<Msg, ()> for Frame {
     fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
             Msg::AnimateIn => {

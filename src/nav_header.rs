@@ -33,7 +33,7 @@ impl NavHeader {
     }
 }
 
-impl Component<Msg> for NavHeader {
+impl Component<Msg, ()> for NavHeader {
     fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
             Msg::AnimateIn => {

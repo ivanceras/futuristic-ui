@@ -64,7 +64,7 @@ where
     }
 }
 
-impl<PMSG> Widget<Msg, PMSG> for FuiButton<PMSG>
+impl<PMSG> Component<Msg, PMSG> for FuiButton<PMSG>
 where
     PMSG: 'static,
 {

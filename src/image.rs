@@ -37,7 +37,7 @@ impl Image {
     }
 }
 
-impl Component<Msg> for Image {
+impl Component<Msg, ()> for Image {
     fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
             Msg::FrameMsg(fmsg) => {
