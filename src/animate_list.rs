@@ -1,6 +1,7 @@
 use crate::sounds;
 use sauron::{
     html::{attributes::class, div, text},
+    jss::jss,
     prelude::*,
     Node,
 };
@@ -232,21 +233,21 @@ where
             },
 
             ".animated_layer_wrapper": {
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: 0,
-              overflow: "hidden",
-              display: "inline-block",
-              opacity: 0,
+                position: "absolute",
+                left: 0,
+                right: 0,
+                top: 0,
+                overflow: "hidden",
+                display: "inline-block",
+                opacity: 0,
             },
 
             ".blink": {
-              position: "relative",
-              width: 0,
-              height: 0,
-              display: "inline-block",
-              animation: "animate_list_blink-anim 250ms step-end infinite",
+                position: "relative",
+                width: 0,
+                height: 0,
+                display: "inline-block",
+                animation: "animate_list_blink-anim 250ms step-end infinite",
             },
 
             ".animating .animate_list_children": {
@@ -258,13 +259,13 @@ where
             },
 
             "@keyframes animate_list_blink-anim": {
-              "0%, 100%": {
-                color: "transparent",
-              }
+                "0%, 100%": {
+                  color: "transparent",
+                },
 
-              "50%": {
-                color: "inherit",
-              }
+                "50%": {
+                  color: "inherit",
+                },
             },
         }]
     }
