@@ -108,15 +108,15 @@ impl Application<Msg> for App {
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
-                Cmd::map_effects(effects, Msg::AnimateListMsg)
+                Cmd::map_follow_ups(effects, Msg::AnimateListMsg)
             }
             Msg::ReAnimateList => {
                 let effects = self.animate_list.update(animate_list::Msg::AnimateIn);
-                Cmd::map_effects(effects, Msg::AnimateListMsg)
+                Cmd::map_follow_ups(effects, Msg::AnimateListMsg)
             }
             Msg::ParagraphMsg(para_msg) => {
                 let effects = self.paragraph.update(para_msg);
-                Cmd::map_effects(effects, Msg::ParagraphMsg)
+                Cmd::map_follow_ups(effects, Msg::ParagraphMsg)
             }
             Msg::ImageMsg(img_msg) => {
                 let follow_ups = self.image.update(img_msg);
@@ -124,7 +124,7 @@ impl Application<Msg> for App {
             }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
-                Cmd::map_effects(effects, Msg::ParagraphMsg)
+                Cmd::map_follow_ups(effects, Msg::ParagraphMsg)
             }
             Msg::ReAnimateAll => Self::reanimate_all(),
             Msg::NoOp => Cmd::none(),
