@@ -77,34 +77,12 @@ impl Application<Msg> for App {
                 Cmd::from(effects.map_msg(Msg::FrameMsg))
             }
             Msg::BtnMsg(index, btn_msg) => {
-                let Effects {
-                    follow_ups,
-                    effects,
-                } = self.button_array[index].update(btn_msg);
-
-                Cmd::batch_msg(
-                    effects
-                        .into_iter()
-                        .chain(
-                            follow_ups
-                                .into_iter()
-                                .map(|follow_up| Msg::BtnMsg(index, follow_up)),
-                        )
-                        .collect(),
-                )
+                let effects = self.button_array[index].update(btn_msg);
+                Cmd::map_msg(effects, move |follow_up| Msg::BtnMsg(index, follow_up))
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
-                let Effects {
-                    effects,
-                    follow_ups,
-                } = self.fui_button.update(fui_btn_msg);
-
-                Cmd::batch_msg(
-                    effects
-                        .into_iter()
-                        .chain(follow_ups.into_iter().map(Msg::FuiButtonMsg))
-                        .collect(),
-                )
+                let effects = self.fui_button.update(fui_btn_msg);
+                Cmd::map_msg(effects, Msg::FuiButtonMsg)
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
