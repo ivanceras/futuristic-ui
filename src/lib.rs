@@ -371,12 +371,12 @@ impl App {
     }
 
     fn reanimate_all() -> Cmd<Self, Msg> {
-        Cmd::new(|program| {
-            program.dispatch(Msg::ReAnimateFrame);
-            program.dispatch(Msg::ReAnimateHeader);
-            program.dispatch(Msg::ReAnimateParagraph);
-            program.dispatch(Msg::ReAnimateList);
-        })
+        Cmd::from(Effects::with_follow_ups(vec![
+            Msg::ReAnimateFrame,
+            Msg::ReAnimateHeader,
+            Msg::ReAnimateParagraph,
+            Msg::ReAnimateList,
+        ]))
     }
 }
 
