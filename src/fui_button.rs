@@ -204,176 +204,176 @@ where
 
             // the ROOT component style
             ".": {
-                "display": "inline-block",
-                "padding": "1px",
-                "position": "relative",
-                "margin": "4px 4px"
+                display: "inline-block",
+                padding: "1px",
+                position: "relative",
+                margin: "4px 4px"
             },
 
             ".hidden" : {
-                "visibility": "hidden",
+                visibility: "hidden",
             },
 
             // HOVER at the lower  part of the button
             ".hover": {
-                "border-color": base.hover_color,
-                "box-shadow": format!("0 -2px 4px {}",base.hover_shadow),
-                "z-index": 4,
-                "opacity": 1,
-                "position": "absolute",
-                "transition": "width 100ms ease-in",
-                "border-style": "solid",
+                border_color: base.hover_color,
+                box_shadow: format!("0 -2px 4px {}",base.hover_shadow),
+                z_index: 4,
+                opacity: 1,
+                position: "absolute",
+                transition: "width 100ms ease-in",
+                border_style: "solid",
             },
 
             ".has_hover.hovered .hover": {
-                "width": "96%",
+                width: "96%",
             },
 
             ".hover-bottom": {
-                "width": 0,
-                "left": "50%",
-                "bottom": "2px",
-                "transform": "translate(-50%, 0)",
-                "border-width": "4px 0 0 0",
+                width: 0,
+                left: "50%",
+                bottom: "2px",
+                transform: "translate(-50%, 0)",
+                border_width: "4px 0 0 0",
             },
 
 
             // BORDERS these are styled divs wrapping the buttons
             ".border": {
-                "border-color": base.border_color,
-                "box-shadow": format!("0 0 4px {}",base.border_shadow),
-                "z-index": 1,
-                "opacity": 1,
-                "position": "absolute",
-                "transition": "all 250ms ease-in",
-                "border-style": "solid",
+                border_color: base.border_color,
+                box_shadow: format!("0 0 4px {}",base.border_shadow),
+                z_index: 1,
+                opacity: 1,
+                position: "absolute",
+                transition: "all 250ms ease-in",
+                border_style: "solid",
             },
 
 
             ".border-left": {
-                "top": "50%",
-                "left": 0,
-                "height": "100%",
-                "transform": "translate(0, -50%)",
-                "border-width": "0 0 0 1px",
+                top: "50%",
+                left: 0,
+                height: "100%",
+                transform: "translate(0, -50%)",
+                border_width: "0 0 0 1px",
             },
 
             ".border-right": {
-                "top": "50%",
-                "right": 0,
-                "height": "100%",
-                "transform": "translate(0, -50%)",
-                "border-width": "0 0 0 1px",
+                top: "50%",
+                right: 0,
+                height: "100%",
+                transform: "translate(0, -50%)",
+                border_width: "0 0 0 1px",
             },
 
             ".border-top": {
-                "top": 0,
-                "left": "50%",
-                "width": "100%",
-                "transform": "translate(-50%, 0)",
-                "border-width": "1px 0 0 0",
+                top: 0,
+                left: "50%",
+                width: "100%",
+                transform: "translate(-50%, 0)",
+                border_width: "1px 0 0 0",
             },
 
             ".border-bottom": {
-                "left": "50%",
-                "width": "100%",
-                "bottom": 0,
-                "transform": "translate(-50%, 0)",
-                "border-width": "1px 0 0 0",
+                left: "50%",
+                width: "100%",
+                bottom: 0,
+                transform: "translate(-50%, 0)",
+                border_width: "1px 0 0 0",
             },
 
             // CORNERS - the fancy divs which clips the button
             ".corner": {
-                "width": "8px",
-                "height": "8px",
-                "border-color": base.corner_color,
-                "box-shadow": format!("0 0 4px -2px {}",base.corner_shadow),
-                "z-index": 2,
-                "opacity": 1,
-                "position": "absolute",
-                "transition": "all 250ms ease-in",
-                "border-style": "solid",
+                width: "8px",
+                height: "8px",
+                border_color: base.corner_color,
+                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow),
+                z_index: 2,
+                opacity: 1,
+                position: "absolute",
+                transition: "all 250ms ease-in",
+                border_style: "solid",
             },
 
             ".corner__top-left": {
-                "left": "-2px",
-                "top": "-2px",
-                "border-width": "2px 0 0 2px",
+                left: "-2px",
+                top: "-2px",
+                border_width: "2px 0 0 2px",
             },
 
             ".corner__bottom-left": {
-                "left": "-2px",
-                "bottom": "-2px",
-                "border-width": "0 0 2px 2px",
+                left: "-2px",
+                bottom: "-2px",
+                border_width: "0 0 2px 2px",
             },
 
             ".corner__top-right": {
-                "right": "-2px",
-                "top": "-2px",
-                "border-width": "2px 2px 0 0",
+                right: "-2px",
+                top: "-2px",
+                border_width: "2px 2px 0 0",
             },
 
             ".corner__bottom-right": {
-                "right": "-2px",
-                "bottom": "-2px",
-                "border-width": "0 2px 2px 0",
+                right: "-2px",
+                bottom: "-2px",
+                border_width: "0 2px 2px 0",
             },
 
             ".button_wrap": {
-                "background-color": base.content_background_color,
-                "z-index": 3,
-                "display": "block",
-                "position": "relative",
-                "overflow": "hidden",
-                "transition": "background-color 250ms ease-in",
+                background_color: base.content_background_color,
+                z_index: 3,
+                display: "block",
+                position: "relative",
+                overflow: "hidden",
+                transition: "background-color 250ms ease-in",
             },
 
             // The actual button
             ".button": {
-                "color": base.button_text_color,
-                "cursor": "pointer",
-                "margin": 0,
-                "border": "none",
-                "z-index": 2,
-                "display": "inline-block",
-                "padding": "10px 20px",
-                "outline": "none",
-                "position": "relative",
-                "font-size": "15.75px",
-                "background": "transparent",
-                "transition": "all 250ms ease-out",
-                "line-height": 1,
-                "user-select": "none",
-                "vertical-align": "middle",
+                color: base.button_text_color,
+                cursor: "pointer",
+                margin: 0,
+                border: "none",
+                z_index: 2,
+                display: "inline-block",
+                padding: "10px 20px",
+                outline: "none",
+                position: "relative",
+                font_size: "15.75px",
+                background: "transparent",
+                transition: "all 250ms ease-out",
+                line_height: 1,
+                user_select: "none",
+                vertical_align: "middle",
             },
 
             // highlight when clicked and fades out shortly
             ".highlight": {
-                  "z-index": 1,
-                  "position": "absolute",
-                  "left": 0,
-                  "right": 0,
-                  "top": 0,
-                  "bottom": 0,
-                  "background-color": base.highlight_color,
-                  "opacity": 0,
-                  "transition": "all 50ms ease-out",
+                  z_index: 1,
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  background_color: base.highlight_color,
+                  opacity: 0,
+                  transition: "all 50ms ease-out",
             },
 
             ".clicked .highlight": {
-                "opacity": 1,
+                opacity: 1,
             },
 
         };
 
         let skewed_css = jss_ns! {COMPONENT_NAME,
             ".skewed": {
-                "transform": "skewX(-45deg)",
-                "transform-origin": "bottom left",
+                transform: "skewX(-45deg)",
+                transform_origin: "bottom left",
             },
 
             ".skewed .button": {
-                "transform": "skewX(45deg)",
+                transform: "skewX(45deg)",
             },
 
         };
@@ -390,23 +390,23 @@ where
         //
         let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
-                "left": "-6px",
-                "top": "-6px",
+                left: "-6px",
+                top: "-6px",
             },
 
             ".expand_corners.hovered .corner__bottom-left": {
-                "left": "-6px",
-                "bottom": "-6px",
+                left: "-6px",
+                bottom: "-6px",
             },
 
             ".expand_corners.hovered .corner__top-right": {
-                "right": "-6px",
-                "top": "-6px",
+                right: "-6px",
+                top: "-6px",
             },
 
             ".expand_corners.hovered .corner__bottom-right": {
-                "right": "-6px",
-                "bottom": "-6px",
+                right: "-6px",
+                bottom: "-6px",
             },
         };
 

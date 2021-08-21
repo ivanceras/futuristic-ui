@@ -42,81 +42,79 @@ impl<MSG> Spinner<MSG> {
 
         let base_css = jss_ns! {COMPONENT_NAME,
             ".": {
-                "top": 0,
-                "left": 0,
-                "right": 0,
-                "bottom": 0,
-                "position": "absolute",
-                "z-index": 1000,
-                "display": "block",
-                "opacity": 1,
-                "position": "relative",
-                "min-height": "90px",
-                "transition": "all 250ms ease-out",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                position: "absolute",
+                z_index: 1000,
+                display: "block",
+                opacity: 1,
+                position: "relative",
+                min_height: "90px",
+                transition: "all 250ms ease-out",
             },
 
             ".circle": {
-                "border-top": format!("5px solid {}", base.border_color),
-                "border-bottom": format!("5px solid {}",base.border_color),
-                "box-shadow": format!("0 0 8px {}",base.border_shadow),
-                "top": "50%",
-                "left": "50%",
-                "display": "block",
-                "position": "absolute",
-                "transition": "all 250ms ease-out",
-                "border-left": "5px solid transparent",
-                "border-right": "5px solid transparent",
-                "border-radius": "50%",
-                "background-color": "transparent",
+                border_top: format!("5px solid {}", base.border_color),
+                border_bottom: format!("5px solid {}",base.border_color),
+                box_shadow: format!("0 0 8px {}",base.border_shadow),
+                top: "50%",
+                left: "50%",
+                display: "block",
+                position: "absolute",
+                transition: "all 250ms ease-out",
+                border_left: "5px solid transparent",
+                border_right: "5px solid transparent",
+                border_radius: "50%",
+                background_color: "transparent",
             },
 
             ".circle1": {
-                "width": "50px",
-                "height": "50px",
-                "animation": "spinner-loading-circle1 750ms infinite linear",
-                "margin-top": "-25px",
-                "margin-left": "-25px",
+                width: "50px",
+                height: "50px",
+                animation: "spinner-loading-circle1 750ms infinite linear",
+                margin_top: "-25px",
+                margin_left: "-25px",
             },
 
             ".circle2": {
-                "width": "30px",
-                "height": "30px",
-                "animation": "spinner-loading-circle2 750ms infinite linear",
-                "margin-top": "-15px",
-                "margin-left": "-15px",
+                width: "30px",
+                height: "30px",
+                animation: "spinner-loading-circle2 750ms infinite linear",
+                margin_top: "-15px",
+                margin_left: "-15px",
+            },
+
+            "@keyframes spinner-loading-circle1": {
+              "0%": {
+                transform: "rotate(160deg)",
+                opacity: 0,
+              },
+
+              "50%": {
+                transform: "rotate(145deg)",
+                opacity: 1,
+              },
+
+              "100%": {
+                transform: "rotate(-320deg)",
+                opacity: 0,
+              },
+            },
+
+            "@keyframes spinner-loading-circle2": {
+              "0%": {
+                transform: "rotate(0deg)",
+              },
+
+              "100%": {
+                transform: "rotate(360deg)",
+              },
             },
 
         };
 
-        let animation_css = r#"
-            @keyframes spinner-loading-circle1 {
-              0% {
-                transform: rotate(160deg);
-                opacity: 0;
-              }
-
-              50% {
-                transform: rotate(145deg);
-                opacity: 1;
-              }
-
-              100% {
-                transform: rotate(-320deg);
-                opacity: 0;
-              }
-            }
-
-            @keyframes spinner-loading-circle2 {
-              0% {
-                transform: rotate(0deg);
-              }
-
-              100% {
-                transform: rotate(360deg);
-              }
-            }
-        "#;
-
-        vec![base_css, animation_css.to_string()]
+        vec![base_css]
     }
 }

@@ -7,4 +7,4 @@ set -v
 
 ./build_optimized.sh &&\
 
-basic-http-server ./ -a 0.0.0.0:4001
+basic-http-server ./ -a 0.0.0.0:1337

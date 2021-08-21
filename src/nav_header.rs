@@ -111,76 +111,76 @@ impl NavHeader {
         let base = crate::Theme::default();
         let css = jss_ns! {COMPONENT_NAME,
             ".": {
-                "display": "block",
-                "padding": "1px",
-                "position": "relative",
-                "opacity": 1,
-                "color": base.secondary_color.clone(),
-                "font-family": base.primary_font.clone(),
+                display: "block",
+                padding: "1px",
+                position: "relative",
+                opacity: 1,
+                color: base.secondary_color.clone(),
+                font_family: base.primary_font.clone(),
             },
 
             ".content_and_relief": {
-                "width": percent(100),
-                "display": "flex",
+                width: percent(100),
+                display: "flex",
             },
 
             ".hide": {
-                "opacity": 0,
+                opacity: 0,
             },
 
             ".text": {
-                "white-space": "nowrap",
-                "width": percent(100),
+                white_space: "nowrap",
+                width: percent(100),
             },
 
             ".border": {
-                "border-color": base.controls.corner_color.clone(),
-                "box-shadow": format!("0 0 4px {}",base.controls.border_shadow),
-                "z-index": 1,
-                "opacity": 1,
-                "position": "relative",
-                "transition": "all 250ms ease-in",
-                "border-style": "solid",
+                border_color: base.controls.corner_color.clone(),
+                box_shadow: format!("0 0 4px {}",base.controls.border_shadow),
+                z_index: 1,
+                opacity: 1,
+                position: "relative",
+                transition: "all 250ms ease-in",
+                border_style: "solid",
             },
 
             ".hide .border": {
-              "height": 0,
-              "width": 0,
+              height: 0,
+              width: 0,
             },
 
             ".border-bottom": {
-                "left": "50%",
-                "width": "100%",
-                "height": 0,
-                "bottom": 0,
-                "transform": "translate(-50%, 0)",
-                "border-width": "2px 0 0 0",
+                left: "50%",
+                width: "100%",
+                height: 0,
+                bottom: 0,
+                transform: "translate(-50%, 0)",
+                border_width: "2px 0 0 0",
             },
 
             ".text-anim": {
-                "color": base.accent_color.clone(),
-                "transition": "color 250ms ease-out",
-                "font-family": base.secondary_font.clone(),
-                "text-shadow": format!("0 0 4px {}",base.accent_shadow),
+                color: base.accent_color.clone(),
+                transition: "color 250ms ease-out",
+                font_family: base.secondary_font.clone(),
+                text_shadow: format!("0 0 4px {}",base.accent_shadow),
             },
 
             ".link_content": {
-                "transform": "skewX(-45deg)",
-                "border-color": base.controls.corner_color,
-                "border-style": "solid",
-                "border-width": "2px 0 0 16px",
-                "position": "relative",
+                transform: "skewX(-45deg)",
+                border_color: base.controls.corner_color,
+                border_style: "solid",
+                border_width: "2px 0 0 16px",
+                position: "relative",
             },
 
             ".link_content a": {
-                "font-size": px(12),
+                font_size: px(12),
             },
 
             ".link": {
-                "padding-left": px(20),
-                "margin-top": px(10),
-                "transform": "skewX(45deg)",
-                "white-space": "nowrap",
+                padding_left: px(20),
+                margin_top: px(10),
+                transform: "skewX(45deg)",
+                white_space: "nowrap",
             }
 
         };

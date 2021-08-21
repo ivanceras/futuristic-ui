@@ -225,48 +225,47 @@ where
     }
 
     pub fn style(&self) -> Vec<String> {
-        vec![r#"
-            .animate_list {
-                display: inline-block;
-                position: relative;
-            }
+        vec![jss! {
+            ".animate_list": {
+                display: "inline-block",
+                position: "relative",
+            },
 
-            .animated_layer_wrapper {
-              position: absolute;
-              left: 0;
-              right: 0;
-              top: 0;
-              overflow: hidden;
-              display: inline-block;
-              opacity: 0;
-            }
+            ".animated_layer_wrapper": {
+              position: "absolute",
+              left: 0,
+              right: 0,
+              top: 0,
+              overflow: "hidden",
+              display: "inline-block",
+              opacity: 0,
+            },
 
-            .blink {
-              position: relative;
-              width: 0;
-              height: 0;
-              display: inline-block;
-              animation: animate_list_blink-anim 250ms step-end infinite;
-            }
+            ".blink": {
+              position: "relative",
+              width: 0,
+              height: 0,
+              display: "inline-block",
+              animation: "animate_list_blink-anim 250ms step-end infinite",
+            },
 
-            .animating .animate_list_children {
-                opacity: 0;
-             }
+            ".animating .animate_list_children": {
+                opacity: 0,
+             },
 
-            .animating .animated_layer_wrapper {
-                opacity: 1;
-            }
+            ".animating .animated_layer_wrapper": {
+                opacity: 1,
+            },
 
-            @keyframes animate_list_blink-anim {
-              0%, 100% {
-                color: transparent;
+            "@keyframes animate_list_blink-anim": {
+              "0%, 100%": {
+                color: "transparent",
               }
 
-              50% {
-                color: inherit;
+              "50%": {
+                color: "inherit",
               }
-            }
-            "#
-        .to_string()]
+            },
+        }]
     }
 }

@@ -117,118 +117,117 @@ impl Frame {
         let base = crate::Theme::default().controls;
 
         let css = jss_ns! {COMPONENT_NAME,
-            // the ROOT component style
             ".": {
-                "display": "block",
-                "padding": "1px",
-                "position": "relative",
-                "opacity": 1,
+                display: "block",
+                padding: px(1),
+                position: "relative",
+                opacity: 1,
             },
 
             ".border": {
-                "border-color": base.border_color,
-                "box-shadow": format!("0 0 4px {}", base.border_shadow),
-                "z-index": 1,
-                "opacity": 1,
-                "position": "absolute",
-                "transition": "all 250ms ease-in",
-                "border-style": "solid",
+                border_color: base.border_color,
+                box_shadow: format!("0 0 4px {}", base.border_shadow),
+                z_index: 1,
+                opacity: 1,
+                position: "absolute",
+                transition: "all 250ms ease-in",
+                border_style: "solid",
             },
 
             ".hide": {
-                "opacity": 0,
+                opacity: 0,
             },
 
             ".hide .border": {
-                "height": 0,
-                "width": 0,
+                height: 0,
+                width: 0,
             },
 
             ".border-left": {
-                "top": "50%",
-                "left": 0,
-                "height": "100%",
-                "transform": "translate(0, -50%)",
-                "border-width": "0 0 0 1px",
+                top: "50%",
+                left: 0,
+                height: "100%",
+                transform: "translate(0, -50%)",
+                border_width: "0 0 0 1px",
             },
 
             ".border-right": {
-                "top": "50%",
-                "right": 0,
-                "height": "100%",
-                "transform": "translate(0, -50%)",
-                "border-width": "0 0 0 1px",
+                top: "50%",
+                right: 0,
+                height: "100%",
+                transform: "translate(0, -50%)",
+                border_width: "0 0 0 1px",
             },
 
             ".border-top": {
-                "top": 0,
-                "left": "50%",
-                "width": "100%",
-                "transform": "translate(-50%, 0)",
-                "border-width": "1px 0 0 0",
+                top: 0,
+                left: "50%",
+                width: "100%",
+                transform: "translate(-50%, 0)",
+                border_width: "1px 0 0 0",
             },
 
             ".border-bottom": {
-                "left": "50%",
-                "width": "100%",
-                "bottom": 0,
-                "transform": "translate(-50%, 0)",
-                "border-width": "1px 0 0 0",
+                left: "50%",
+                width: "100%",
+                bottom: 0,
+                transform: "translate(-50%, 0)",
+                border_width: "1px 0 0 0",
             },
 
             ".corner": {
-                "width": "24px",
-                "height": "24px",
-                "border-color": base.corner_color,
-                "box-shadow": format!("0 0 4px -2px {}",base.corner_shadow),
-                "z-index": 2,
-                "opacity": 1,
-                "position": "absolute",
-                "transition": "all 250ms ease-in",
-                "border-style": "solid",
+                width: px(24),
+                height: px(24),
+                border_color: base.corner_color,
+                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow),
+                z_index: 2,
+                opacity: 1,
+                position: "absolute",
+                transition: "all 250ms ease-in",
+                border_style: "solid",
             },
 
             ".hide .corner": {
-                "width": 0,
-                "height": 0,
-                "opacity": 0,
+                width: 0,
+                height: 0,
+                opacity: 0,
             },
 
             ".corner__top-left": {
-                "left": "-2px",
-                "top": "-2px",
-                "border-width": "2px 0 0 2px",
+                left: px(-2),
+                top: px(-2),
+                border_width: "2px 0 0 2px",
             },
 
             ".corner__bottom-left": {
-                "left": "-2px",
-                "bottom": "-2px",
-                "border-width": "0 0 2px 2px",
+                left: px(-2),
+                bottom: px(-2),
+                border_width: "0 0 2px 2px",
             },
 
             ".corner__top-right": {
-                "right": "-2px",
-                "top": "-2px",
-                "border-width": "2px 2px 0 0",
+                right: px(-2),
+                top: px(-2),
+                border_width: "2px 2px 0 0",
             },
 
             ".corner__bottom-right": {
-                "right": "-2px",
-                "bottom": "-2px",
-                "border-width": "0 2px 2px 0",
+                right: px(-2),
+                bottom: px(-2),
+                border_width: "0 2px 2px 0",
             },
 
             ".content": {
-                "background-color": base.content_background_color,
-                "z-index": 3,
-                "display": "block",
-                "position": "relative",
-                "overflow": "hidden",
-                "transition": "background-color 250ms ease-in",
+                background_color: base.content_background_color,
+                z_index: 3,
+                display: "block",
+                position: "relative",
+                overflow: "hidden",
+                transition: "background-color 250ms ease-in",
             },
 
             ".hide .content": {
-                "background-color": "transparent",
+                background_color: "transparent",
             },
 
         };
@@ -245,23 +244,23 @@ impl Frame {
         //
         let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
-                "left": "-8px",
-                "top": "-8px",
+                left: px(-8),
+                top: px(-8),
             },
 
             ".expand_corners.hovered .corner__bottom-left": {
-                "left": "-8px",
-                "bottom": "-8px",
+                left: px(-8),
+                bottom: px(-8),
             },
 
             ".expand_corners.hovered .corner__top-right": {
-                "right": "-8px",
-                "top": "-8px",
+                right: px(-8),
+                top: px(-8),
             },
 
             ".expand_corners.hovered .corner__bottom-right": {
-                "right": "-8px",
-                "bottom": "-8px",
+                right: px(-8),
+                bottom: px(-8),
             },
         };
 
