@@ -57,11 +57,19 @@ impl Theme {
 
     #[allow(unused)]
     fn black_on_white() -> Self {
-        Self::calculate_theme(rgba(0, 0, 0, 1.0), rgba(255, 255, 255, 1.0), true)
+        Self::calculate_theme(
+            rgba(0, 0, 0, 1.0),
+            rgba(255, 255, 255, 1.0),
+            true,
+        )
     }
 
     /// light: if background is light and foreground is dark
-    pub fn calculate_theme(foreground: RGBA, background: RGBA, light: bool) -> Self {
+    pub fn calculate_theme(
+        foreground: RGBA,
+        background: RGBA,
+        light: bool,
+    ) -> Self {
         let primary = foreground;
         let accent = if light {
             primary.shade(percent(30))
@@ -126,9 +134,9 @@ impl Theme {
 
 impl Default for Theme {
     fn default() -> Self {
-        //Self::black_on_white()
+        Self::black_on_white()
         //Self::green_on_black()
-        Self::bondi_blue_on_dark()
+        //Self::bondi_blue_on_dark()
     }
 }
 
@@ -203,7 +211,10 @@ mod test {
             c.tint(percent(20)),
             c.mix(rgba(255, 255, 255, 1.0), percent(20))
         );
-        assert_eq!(c.shade(percent(20)), c.mix(rgba(0, 0, 0, 1.0), percent(20)));
+        assert_eq!(
+            c.shade(percent(20)),
+            c.mix(rgba(0, 0, 0, 1.0), percent(20))
+        );
     }
 
     #[test]

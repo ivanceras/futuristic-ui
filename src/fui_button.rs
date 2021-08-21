@@ -1,10 +1,9 @@
 use crate::sounds;
 use sauron::jss::jss_ns;
 use sauron::{
+    dom::Callback,
     html::attributes,
-    html::{
-        attributes::class, attributes::Callback, div, events::on_click, text,
-    },
+    html::{attributes::class, div, events::on_click, text},
     prelude::*,
     Node,
 };
