@@ -37,5 +37,5 @@ lto = true
 panic = "abort"
 
 [patch.crates-io]
-#sauron = { git = "https://github.com/ivanceras/sauron", branch = "master" }
-sauron = { path = "../sauron" }
+sauron = { git = "https://github.com/ivanceras/sauron", branch = "master" }
+#sauron = { path = "../sauron" }
