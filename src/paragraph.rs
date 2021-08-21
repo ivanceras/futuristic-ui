@@ -31,11 +31,11 @@ where
         match msg {
             Msg::AnimateIn => {
                 let effects = self.animated_list.update(animate_list::Msg::AnimateIn);
-                effects.map_follow_ups(Msg::AnimateListMsg)
+                effects.map_msg(Msg::AnimateListMsg)
             }
             Msg::AnimateListMsg(amsg) => {
                 let effects = self.animated_list.update(amsg);
-                effects.map_follow_ups(Msg::AnimateListMsg)
+                effects.map_msg(Msg::AnimateListMsg)
             }
         }
     }

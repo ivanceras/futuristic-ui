@@ -42,7 +42,7 @@ impl Component<Msg, ()> for Image {
         match msg {
             Msg::FrameMsg(fmsg) => {
                 let effects = self.frame.update(fmsg);
-                effects.map_follow_ups(Msg::FrameMsg)
+                effects.map_msg(Msg::FrameMsg)
             }
         }
     }

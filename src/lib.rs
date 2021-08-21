@@ -62,19 +62,19 @@ impl Application<Msg> for App {
         match msg {
             Msg::ReAnimateHeader => {
                 let effects = self.nav_header.update(nav_header::Msg::AnimateIn);
-                Cmd::from(effects.map_follow_ups(Msg::NavHeaderMsg))
+                Cmd::from(effects.map_msg(Msg::NavHeaderMsg))
             }
             Msg::NavHeaderMsg(header_msg) => {
                 let effects = self.nav_header.update(header_msg);
-                Cmd::from(effects.map_follow_ups(Msg::NavHeaderMsg))
+                Cmd::from(effects.map_msg(Msg::NavHeaderMsg))
             }
             Msg::ReAnimateFrame => {
                 let effects = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::from(effects.map_follow_ups(Msg::FrameMsg))
+                Cmd::from(effects.map_msg(Msg::FrameMsg))
             }
             Msg::FrameMsg(frame_msg) => {
                 let effects = self.frame.update(frame_msg);
-                Cmd::from(effects.map_follow_ups(Msg::FrameMsg))
+                Cmd::from(effects.map_msg(Msg::FrameMsg))
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let Effects {
@@ -108,23 +108,23 @@ impl Application<Msg> for App {
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
-                Cmd::map_follow_ups(effects, Msg::AnimateListMsg)
+                Cmd::map_msg(effects, Msg::AnimateListMsg)
             }
             Msg::ReAnimateList => {
                 let effects = self.animate_list.update(animate_list::Msg::AnimateIn);
-                Cmd::map_follow_ups(effects, Msg::AnimateListMsg)
+                Cmd::map_msg(effects, Msg::AnimateListMsg)
             }
             Msg::ParagraphMsg(para_msg) => {
                 let effects = self.paragraph.update(para_msg);
-                Cmd::map_follow_ups(effects, Msg::ParagraphMsg)
+                Cmd::map_msg(effects, Msg::ParagraphMsg)
             }
             Msg::ImageMsg(img_msg) => {
                 let effects = self.image.update(img_msg);
-                Cmd::from(effects.map_follow_ups(Msg::ImageMsg))
+                Cmd::from(effects.map_msg(Msg::ImageMsg))
             }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
-                Cmd::map_follow_ups(effects, Msg::ParagraphMsg)
+                Cmd::map_msg(effects, Msg::ParagraphMsg)
             }
             Msg::ReAnimateAll => Self::reanimate_all(),
             Msg::NoOp => Cmd::none(),
