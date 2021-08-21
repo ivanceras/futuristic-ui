@@ -61,20 +61,20 @@ impl Application<Msg> for App {
     fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
         match msg {
             Msg::ReAnimateHeader => {
-                let follow_ups = self.nav_header.update(nav_header::Msg::AnimateIn);
-                Cmd::map_msgs(follow_ups, Msg::NavHeaderMsg)
+                let effects = self.nav_header.update(nav_header::Msg::AnimateIn);
+                Cmd::from(effects.map_follow_ups(Msg::NavHeaderMsg))
             }
             Msg::NavHeaderMsg(header_msg) => {
-                let follow_ups = self.nav_header.update(header_msg);
-                Cmd::map_msgs(follow_ups, Msg::NavHeaderMsg)
+                let effects = self.nav_header.update(header_msg);
+                Cmd::from(effects.map_follow_ups(Msg::NavHeaderMsg))
             }
             Msg::ReAnimateFrame => {
-                let follow_ups = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::map_msgs(follow_ups, Msg::FrameMsg)
+                let effects = self.frame.update(frame::Msg::AnimateIn);
+                Cmd::from(effects.map_follow_ups(Msg::FrameMsg))
             }
             Msg::FrameMsg(frame_msg) => {
-                let follow_ups = self.frame.update(frame_msg);
-                Cmd::map_msgs(follow_ups, Msg::FrameMsg)
+                let effects = self.frame.update(frame_msg);
+                Cmd::from(effects.map_follow_ups(Msg::FrameMsg))
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let Effects {
@@ -119,8 +119,8 @@ impl Application<Msg> for App {
                 Cmd::map_follow_ups(effects, Msg::ParagraphMsg)
             }
             Msg::ImageMsg(img_msg) => {
-                let follow_ups = self.image.update(img_msg);
-                Cmd::map_msgs(follow_ups, Msg::ImageMsg)
+                let effects = self.image.update(img_msg);
+                Cmd::from(effects.map_follow_ups(Msg::ImageMsg))
             }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);

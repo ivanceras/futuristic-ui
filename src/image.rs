@@ -38,11 +38,11 @@ impl Image {
 }
 
 impl Component<Msg> for Image {
-    fn update(&mut self, msg: Msg) -> Vec<Msg> {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
             Msg::FrameMsg(fmsg) => {
-                let follow_ups = self.frame.update(fmsg);
-                follow_ups.into_iter().map(Msg::FrameMsg).collect()
+                let effects = self.frame.update(fmsg);
+                effects.map_follow_ups(Msg::FrameMsg)
             }
         }
     }

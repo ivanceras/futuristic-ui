@@ -34,17 +34,19 @@ impl NavHeader {
 }
 
 impl Component<Msg> for NavHeader {
-    fn update(&mut self, msg: Msg) -> Vec<Msg> {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
             Msg::AnimateIn => {
                 self.hide = true;
-                self.start_animation()
+                Effects::with_follow_ups(self.start_animation())
             }
             Msg::StopAnimation => {
                 self.hide = false;
-                vec![]
+                Effects::none()
             }
-            Msg::NextAnimation(start, duration) => self.next_animation(start, duration),
+            Msg::NextAnimation(start, duration) => {
+                Effects::with_follow_ups(self.next_animation(start, duration))
+            }
         }
     }
 
