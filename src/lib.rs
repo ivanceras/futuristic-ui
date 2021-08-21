@@ -183,85 +183,85 @@ impl Application<Msg> for App {
 
         let body_css = jss! {
 
-            "button": {
-                "color": controls_button_text_color.clone(),
-                "border": format!("1px solid {}",controls_border_color),
-                "z-index": 2,
-                "display": "inline-block",
-                "padding": "10px 20px",
-                "outline": "none",
-                "position": "relative",
-                "font-size": "15.75px",
-                "background-color": controls_content_background_color,
-                "line-height": 1,
-                "user-select": "none",
-                "vertical-align": "middle",
+            button: {
+                color: controls_button_text_color.clone(),
+                border: format!("1px solid {}",controls_border_color),
+                z_index: 2,
+                display: "inline-block",
+                padding: "10px 20px",
+                outline: "none",
+                position: "relative",
+                font_size: "15.75px",
+                background_color: controls_content_background_color,
+                line_height: 1,
+                user_select: "none",
+                vertical_align: "middle",
             },
 
-            "img": {
-                "display": "inline-block",
+            img: {
+                display: "inline-block",
             },
 
-            "a": {
-                "color": controls_button_text_color,
-                "cursor": "pointer",
-                "transition": "color 250ms ease-out",
-                "text-shadow": format!("0 0 4px {}", accent_shadow),
-                "text-decoration": "none",
+            a: {
+                color: controls_button_text_color,
+                cursor: "pointer",
+                transition: "color 250ms ease-out",
+                text_shadow: format!("0 0 4px {}", accent_shadow),
+                text_decoration: "none",
             },
 
             "a ::selection": {
-                "color": "#021114",
-                "text-shadow": "none",
-                "background-color": secondary_color.clone(),
+                color: "#021114",
+                text_shadow: "none",
+                background_color: secondary_color.clone(),
             },
 
-            "table": {
-                "width": "100%",
-                "border-collapse": "collapse",
-                "color": secondary_color.clone(),
+            table: {
+                width: "100%",
+                border_collapse: "collapse",
+                color: secondary_color.clone(),
             },
 
-            "thead": {
-                "color": accent_color,
-                "text-align": "left",
-                "font-family": secondary_font,
-                "font-weight": "bold",
-                "white-space": "nowrap",
+            thead: {
+                color: accent_color,
+                text_align: "left",
+                font_family: secondary_font,
+                font_weight: "bold",
+                white_space: "nowrap",
             },
 
-            "tr": {
-                "border-bottom": format!("1px solid {}", controls_border_color),
+            tr: {
+                border_bottom: format!("1px solid {}", controls_border_color),
             },
 
-             "td": {
-                "padding": "5px",
-                "vertical-align": "top",
+            td: {
+                padding: "5px",
+                vertical_align: "top",
             },
         };
 
         let container_css = jss! {
             ".container": {
-                "color": secondary_color.clone(),
-                "font-size": "21px",
-                "line-height": "1.5",
-                "font-family": primary_font,
-                "margin": "auto",
-                "background-color": background_color.clone(),
-                "max-width": "50em",
-                "padding": "10px",
+                color: secondary_color.clone(),
+                font_size: "21px",
+                line_height: "1.5",
+                font_family: primary_font,
+                margin: "auto",
+                background_color: background_color.clone(),
+                max_width: "50em",
+                padding: "10px",
             },
 
             ".container ::selection": {
-                "color": background_color,
-                "text-shadow": "none",
-                "background-color": secondary_color,
+                color: background_color,
+                text_shadow: "none",
+                background_color: secondary_color,
             },
 
             ".futuristic-buttons-array": {
-                "display": "flex",
-                "flex-wrap": "wrap",
-                "margin": "20px 10px",
+                display: "flex",
+                flex_wrap: "wrap",
+                margin: "20px 10px",
             }
         };
 
