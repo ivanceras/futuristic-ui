@@ -1,16 +1,13 @@
-use sauron::wasm_bindgen::closure::Closure;
+//use sauron::wasm_bindgen::closure::Closure;
 use sauron::wasm_bindgen::JsCast;
 use web_sys::{HtmlAudioElement, HtmlElement};
 
 /// play sound in request animation frame
 pub fn play(audio: &HtmlAudioElement) {
     let audio = audio.clone();
-    let closure_raf: Closure<dyn FnMut() + 'static> =
-        Closure::once(move || {
-            let _ = audio.play().expect("must play");
-        });
-    sauron::request_animation_frame(&closure_raf);
-    closure_raf.forget();
+    sauron::request_animation_frame(move || {
+        let _ = audio.play().expect("must play");
+    });
 }
 
 /// check if the audio element is already in the document and return it
