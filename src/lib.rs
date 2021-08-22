@@ -3,6 +3,7 @@
 use animate_list::AnimateList;
 use frame::Frame;
 use fui_button::{FuiButton, Options};
+use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
 use sauron::jss::jss;
@@ -39,6 +40,7 @@ pub enum Msg {
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
+    ImageMsg(image::Msg),
     ReAnimateAll,
     NoOp,
 }
@@ -51,6 +53,7 @@ pub struct App {
     fui_button: FuiButton<Msg>,
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
+    image: Image,
     theme: Theme,
 }
 
@@ -101,6 +104,10 @@ impl Default for App {
             spinner: Spinner::new(),
             animate_list: AnimateList::new_with_content(
                 Self::animate_list_content(),
+            ),
+            image: Image::new(
+                "img/space.jpg",
+                Some("Space as seen from space"),
             ),
             theme: Theme::default(),
         }
@@ -161,6 +168,10 @@ impl Application<Msg> for App {
                 let effects = self.paragraph.update(para_msg);
                 Cmd::map_msg(effects, Msg::ParagraphMsg)
             }
+            Msg::ImageMsg(image_msg) => {
+                let effects = self.image.update(image_msg);
+                Cmd::from(effects.map_msg(Msg::ImageMsg))
+            }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
                 Cmd::map_msg(effects, Msg::ParagraphMsg)
@@ -194,6 +205,7 @@ impl Application<Msg> for App {
                         .collect::<Vec<_>>()
                 }),
                 p(vec![], vec![self.animate_list.view()]),
+                self.image.view().map_msg(Msg::ImageMsg),
                 self.spinner.view(),
                 self.paragraph.view(),
                 footer(
@@ -370,6 +382,7 @@ impl App {
             self.fui_button.style(&self.theme).join("\n"),
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
+            self.image.style(&self.theme),
         ]
     }
 
