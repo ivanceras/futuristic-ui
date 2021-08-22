@@ -157,8 +157,8 @@ impl NavHeader {
             },
 
             ".border-bottom": {
-                left: "50%",
-                width: "100%",
+                left: percent(50),
+                width: percent(100),
                 height: 0,
                 bottom: 0,
                 transform: "translate(-50%, 0)",

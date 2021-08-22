@@ -218,9 +218,9 @@ where
             // the ROOT component style
             ".": {
                 display: "inline-block",
-                padding: "1px",
+                padding: px(1),
                 position: "relative",
-                margin: "10px 10px"
+                margin: format!("{} {}",px(10), px(10)),
             },
 
             ".hidden" : {
@@ -230,106 +230,106 @@ where
             // HOVER at the lower  part of the button
             ".hover": {
                 border_color: base.hover_color.clone(),
-                box_shadow: format!("0 -2px 4px {}",base.hover_shadow.clone()),
+                box_shadow: format!("{} {} {} {} {}", 0, px(-2), px(4), 0, base.hover_shadow.clone()),
                 z_index: 4,
                 opacity: 1,
                 position: "absolute",
-                transition: "width 100ms ease-in",
+                transition: format!("width {}ms ease-in",100),
                 border_style: "solid",
             },
 
             ".has_hover.hovered .hover": {
-                width: "96%",
+                width: percent(96),
             },
 
             ".hover-bottom": {
                 width: 0,
-                left: "50%",
-                bottom: "2px",
-                transform: "translate(-50%, 0)",
-                border_width: "4px 0 0 0",
+                left: percent(50),
+                bottom: px(2),
+                transform: format!("translate({}, {})",percent(-50), 0),
+                border_width: format!("{} {} {} {}", px(4), 0, 0, 0),
             },
 
 
             // BORDERS these are styled divs wrapping the buttons
             ".border": {
                 border_color: base.border_color.clone(),
-                box_shadow: format!("0 0 4px {}",base.border_shadow.clone()),
+                box_shadow: format!("{} {} {} {}",0, 0, px(4), base.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
-                transition: "all 250ms ease-in",
+                transition: format!("all {}ms ease-in",250),
                 border_style: "solid",
             },
 
 
             ".border-left": {
-                top: "50%",
+                top: percent(50),
                 left: 0,
-                height: "100%",
-                transform: "translate(0, -50%)",
+                height: percent(100),
+                transform: format!("translate({}, {})", 0,percent(-50)),
                 border_width: "0 0 0 1px",
             },
 
             ".border-right": {
-                top: "50%",
+                top: percent(50),
                 right: 0,
-                height: "100%",
-                transform: "translate(0, -50%)",
+                height: percent(100),
+                transform: format!("translate({}, {})",0,percent(-50)),
                 border_width: "0 0 0 1px",
             },
 
             ".border-top": {
                 top: 0,
-                left: "50%",
-                width: "100%",
-                transform: "translate(-50%, 0)",
+                left: percent(50),
+                width: percent(100),
+                transform: format!("translate({}, {})",percent(-50), 0),
                 border_width: "1px 0 0 0",
             },
 
             ".border-bottom": {
-                left: "50%",
-                width: "100%",
+                left: percent(50),
+                width: percent(100),
                 bottom: 0,
-                transform: "translate(-50%, 0)",
-                border_width: "1px 0 0 0",
+                transform: format!("translate({}, {})",percent(-50), 0),
+                border_width: format!("{} {} {} {}",px(1), 0, 0, 0),
             },
 
             // CORNERS - the fancy divs which clips the button
             ".corner": {
-                width: "8px",
-                height: "8px",
+                width: px(8),
+                height: px(8),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow.clone()),
+                box_shadow: format!("{} {} {} {} {}",0, 0, px(4), px(-2), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
-                transition: "all 250ms ease-in",
+                transition: format!("all {}ms ease-in",250),
                 border_style: "solid",
             },
 
             ".corner__top-left": {
-                left: "-2px",
-                top: "-2px",
-                border_width: "2px 0 0 2px",
+                left: px(-2),
+                top: px(-2),
+                border_width: format!("{} {} {} {}", px(2), 0, 0, px(2)),
             },
 
             ".corner__bottom-left": {
-                left: "-2px",
-                bottom: "-2px",
-                border_width: "0 0 2px 2px",
+                left: px(-2),
+                bottom: px(-2),
+                border_width: format!("{} {} {} {}", 0, 0, px(2), px(2)),
             },
 
             ".corner__top-right": {
-                right: "-2px",
-                top: "-2px",
-                border_width: "2px 2px 0 0",
+                right: px(-2),
+                top: px(-2),
+                border_width: format!("{} {} {} {}", px(2), px(2), 0, 0),
             },
 
             ".corner__bottom-right": {
-                right: "-2px",
-                bottom: "-2px",
-                border_width: "0 2px 2px 0",
+                right: px(-2),
+                bottom: px(-2),
+                border_width: format!("{} {} {} {}", 0, px(2), px(2), 0),
             },
 
             ".button_wrap": {
@@ -338,7 +338,7 @@ where
                 display: "block",
                 position: "relative",
                 overflow: "hidden",
-                transition: "background-color 250ms ease-in",
+                transition: format!("background-color {}ms ease-in", 250),
             },
 
             // The actual button
@@ -349,12 +349,12 @@ where
                 border: "none",
                 z_index: 2,
                 display: "inline-block",
-                padding: "10px 20px",
+                padding: format!("{} {}", px(10), px(20)),
                 outline: "none",
                 position: "relative",
-                font_size: "15.75px",
+                font_size: px(15.75),
                 background: "transparent",
-                transition: "all 250ms ease-out",
+                transition: format!("all {}ms ease-out", 250),
                 line_height: 1,
                 user_select: "none",
                 vertical_align: "middle",
@@ -370,7 +370,7 @@ where
                   bottom: 0,
                   background_color: base.highlight_color.clone(),
                   opacity: 0,
-                  transition: "all 50ms ease-out",
+                  transition: format!("all {}ms ease-out", 50),
             },
 
             ".clicked .highlight": {
@@ -381,12 +381,12 @@ where
 
         let skewed_css = jss_ns! {COMPONENT_NAME,
             ".skewed": {
-                transform: "skewX(-45deg)",
+                transform: format!("skewX({}deg)", -45),
                 transform_origin: "bottom left",
             },
 
             ".skewed .button": {
-                transform: "skewX(45deg)",
+                transform: format!("skewX({}deg)", 45),
             },
 
         };
@@ -403,23 +403,23 @@ where
         //
         let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
-                left: "-6px",
-                top: "-6px",
+                left: px(-6),
+                top: px(-6),
             },
 
             ".expand_corners.hovered .corner__bottom-left": {
-                left: "-6px",
-                bottom: "-6px",
+                left: px(-6),
+                bottom: px(-6),
             },
 
             ".expand_corners.hovered .corner__top-right": {
-                right: "-6px",
-                top: "-6px",
+                right: px(-6),
+                top: px(-6),
             },
 
             ".expand_corners.hovered .corner__bottom-right": {
-                right: "-6px",
-                bottom: "-6px",
+                right: px(-6),
+                bottom: px(-6),
             },
         };
 

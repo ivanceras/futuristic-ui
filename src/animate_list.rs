@@ -276,7 +276,7 @@ where
                 width: 0,
                 height: 0,
                 //display: "inline-block",
-                animation: "animate_list_blink-anim 250ms step-end infinite",
+                animation: format!("animate_list_blink-anim {}ms step-end infinite", 250),
             },
 
             ".animating .animate_list_children": {

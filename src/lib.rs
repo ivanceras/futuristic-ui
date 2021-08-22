@@ -7,6 +7,7 @@ use nav_header::NavHeader;
 use paragraph::Paragraph;
 use sauron::jss::jss;
 use sauron::{
+    html::units::em,
     html::{attributes::class, div, text},
     prelude::*,
     Application, Cmd, Node, Program,
@@ -230,13 +231,13 @@ impl Application<Msg> for App {
 
             button: {
                 color: controls_button_text_color.clone(),
-                border: format!("1px solid {}",controls_border_color),
+                border: format!("{} solid {}",px(1), controls_border_color),
                 z_index: 2,
                 display: "inline-block",
-                padding: "10px 20px",
+                padding: format!("{} {}",px(10), px(20)),
                 outline: "none",
                 position: "relative",
-                font_size: "15.75px",
+                font_size: px(15.75),
                 background_color: controls_content_background_color,
                 line_height: 1,
                 user_select: "none",
@@ -251,7 +252,7 @@ impl Application<Msg> for App {
                 color: controls_button_text_color,
                 cursor: "pointer",
                 transition: "color 250ms ease-out",
-                text_shadow: format!("0 0 4px {}", accent_shadow),
+                text_shadow: format!("{} {} {} {}", 0, 0, px(4), accent_shadow),
                 text_decoration: "none",
             },
 
@@ -262,7 +263,7 @@ impl Application<Msg> for App {
             },
 
             table: {
-                width: "100%",
+                width: percent(100),
                 border_collapse: "collapse",
                 color: secondary_color.clone(),
             },
@@ -280,7 +281,7 @@ impl Application<Msg> for App {
             },
 
             td: {
-                padding: "5px",
+                padding: px(5),
                 vertical_align: "top",
             },
         };
@@ -288,13 +289,13 @@ impl Application<Msg> for App {
         let container_css = jss! {
             ".container": {
                 color: secondary_color.clone(),
-                font_size: "21px",
-                line_height: "1.5",
+                font_size: px(21),
+                line_height: 1.5,
                 font_family: primary_font,
                 margin: "auto",
                 background_color: background_color.clone(),
-                max_width: "50em",
-                padding: "10px",
+                max_width: em(50),
+                padding: px(10),
             },
 
             ".container ::selection": {
@@ -306,7 +307,7 @@ impl Application<Msg> for App {
             ".futuristic-buttons-array": {
                 display: "flex",
                 flex_wrap: "wrap",
-                margin: "20px 10px",
+                margin: format!("{} {}", px(20), px(10)),
             },
 
             ".more_colors": {
