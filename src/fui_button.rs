@@ -230,6 +230,12 @@ where
 
     pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
         let base = &theme.controls;
+        let transition_time_ms = 250; //transition time for most effects on the button
+        let hover_transition_time = 100; // the transition of the lower highligh of the button when hovering
+        let highlight_transition = 50; // the transition time for the highlight color of the button when clicked
+        let corner_width = 2; // width of the corner clip of this button
+        let corner_length = 8; // lengths of the corner clip of this button
+        let corner_expand_distance = 6; // distance that clips at the corner expands when the button is hovered
 
         let base_css = jss_ns! {COMPONENT_NAME,
 
@@ -252,7 +258,7 @@ where
                 z_index: 4,
                 opacity: 1,
                 position: "absolute",
-                transition: format!("width {}ms ease-in",100),
+                transition: format!("width {}ms ease-in", hover_transition_time),
                 border_style: "solid",
             },
 
@@ -276,7 +282,7 @@ where
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
-                transition: format!("all {}ms ease-in",250),
+                transition: format!("all {}ms ease-in",transition_time_ms),
                 border_style: "solid",
             },
 
@@ -285,7 +291,7 @@ where
                 top: percent(50),
                 left: 0,
                 height: percent(100),
-                transform: format!("translate({}, {})", 0,percent(-50)),
+                transform: format!("translate({}, {})", 0, percent(-50)),
                 border_width: "0 0 0 1px",
             },
 
@@ -293,7 +299,7 @@ where
                 top: percent(50),
                 right: 0,
                 height: percent(100),
-                transform: format!("translate({}, {})",0,percent(-50)),
+                transform: format!("translate({}, {})", 0, percent(-50)),
                 border_width: format!("{} {} {} {}", 0, 0, 0, px(1)),
             },
 
@@ -301,53 +307,53 @@ where
                 top: 0,
                 left: percent(50),
                 width: percent(100),
-                transform: format!("translate({}, {})",percent(-50), 0),
-                border_width: format!("{} {} {} {}",px(1), 0, 0, 0),
+                transform: format!("translate({}, {})", percent(-50), 0),
+                border_width: format!("{} {} {} {}", px(1), 0, 0, 0),
             },
 
             ".border-bottom": {
                 left: percent(50),
                 width: percent(100),
                 bottom: 0,
-                transform: format!("translate({}, {})",percent(-50), 0),
-                border_width: format!("{} {} {} {}",px(1), 0, 0, 0),
+                transform: format!("translate({}, {})", percent(-50), 0),
+                border_width: format!("{} {} {} {}", px(1), 0, 0, 0),
             },
 
             // CORNERS - the fancy divs which clips the button
             ".corner": {
-                width: px(8),
-                height: px(8),
+                width: px(corner_length),
+                height: px(corner_length),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("{} {} {} {} {}",0, 0, px(4), px(-2), base.corner_shadow.clone()),
+                box_shadow: format!("{} {} {} {} {}",0, 0, px(4), px(-corner_width), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
-                transition: format!("all {}ms ease-in",250),
+                transition: format!("all {}ms ease-in",transition_time_ms),
                 border_style: "solid",
             },
 
             ".corner__top-left": {
-                left: px(-2),
-                top: px(-2),
-                border_width: format!("{} {} {} {}", px(2), 0, 0, px(2)),
+                left: px(-corner_width),
+                top: px(-corner_width),
+                border_width: format!("{} {} {} {}", px(corner_width), 0, 0, px(corner_width)),
             },
 
             ".corner__bottom-left": {
-                left: px(-2),
-                bottom: px(-2),
-                border_width: format!("{} {} {} {}", 0, 0, px(2), px(2)),
+                left: px(-corner_width),
+                bottom: px(-corner_width),
+                border_width: format!("{} {} {} {}", 0, 0, px(corner_width), px(corner_width)),
             },
 
             ".corner__top-right": {
-                right: px(-2),
-                top: px(-2),
-                border_width: format!("{} {} {} {}", px(2), px(2), 0, 0),
+                right: px(-corner_width),
+                top: px(-corner_width),
+                border_width: format!("{} {} {} {}", px(corner_width), px(corner_width), 0, 0),
             },
 
             ".corner__bottom-right": {
-                right: px(-2),
-                bottom: px(-2),
-                border_width: format!("{} {} {} {}", 0, px(2), px(2), 0),
+                right: px(-corner_width),
+                bottom: px(-corner_width),
+                border_width: format!("{} {} {} {}", 0, px(corner_width), px(corner_width), 0),
             },
 
             ".button_wrap": {
@@ -356,7 +362,7 @@ where
                 display: "block",
                 position: "relative",
                 overflow: "hidden",
-                transition: format!("background-color {}ms ease-in", 250),
+                transition: format!("background-color {}ms ease-in", transition_time_ms),
             },
 
             // The actual button
@@ -372,7 +378,7 @@ where
                 position: "relative",
                 font_size: px(15.75),
                 background: "transparent",
-                transition: format!("all {}ms ease-out", 250),
+                transition: format!("all {}ms ease-out", transition_time_ms),
                 line_height: 1,
                 user_select: "none",
                 vertical_align: "middle",
@@ -388,7 +394,7 @@ where
                   bottom: 0,
                   background_color: base.highlight_color.clone(),
                   opacity: 0,
-                  transition: format!("all {}ms ease-out", 50),
+                  transition: format!("all {}ms ease-out", highlight_transition),
             },
 
             ".clicked .highlight": {
@@ -421,23 +427,23 @@ where
         //
         let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
-                left: px(-6),
-                top: px(-6),
+                left: px(-corner_expand_distance),
+                top: px(-corner_expand_distance),
             },
 
             ".expand_corners.hovered .corner__bottom-left": {
-                left: px(-6),
-                bottom: px(-6),
+                left: px(-corner_expand_distance),
+                bottom: px(-corner_expand_distance),
             },
 
             ".expand_corners.hovered .corner__top-right": {
-                right: px(-6),
-                top: px(-6),
+                right: px(-corner_expand_distance),
+                top: px(-corner_expand_distance),
             },
 
             ".expand_corners.hovered .corner__bottom-right": {
-                right: px(-6),
-                bottom: px(-6),
+                right: px(-corner_expand_distance),
+                bottom: px(-corner_expand_distance),
             },
         };
 
@@ -462,9 +468,23 @@ impl Options {
         }
     }
 
-    /// full effect, skewed
+    /// full effect, not skewed
     #[allow(unused)]
     pub fn full() -> Self {
+        Options {
+            sound: true,
+            click_highlights: true,
+            skewed: false,
+            has_corners: true,
+            expand_corners: true,
+            has_hover: true,
+            disabled: false,
+            hidden: false,
+        }
+    }
+
+    #[allow(unused)]
+    pub fn skewed() -> Self {
         Options {
             sound: true,
             click_highlights: true,
@@ -537,11 +557,6 @@ impl Options {
             disabled: true,
             hidden: false,
         }
-    }
-
-    pub fn skewed(mut self, skewed: bool) -> Self {
-        self.skewed = skewed;
-        self
     }
 
     pub fn hidden(mut self, hidden: bool) -> Self {

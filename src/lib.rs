@@ -57,18 +57,14 @@ pub struct App {
 impl Default for App {
     fn default() -> Self {
         let button_options = vec![
-            ("ReAnimate All", Options::regular(), Msg::ReAnimateAll),
+            ("ReAnimate All", Options::full(), Msg::ReAnimateAll),
             (
                 "Animate Paragraph",
-                Options::regular(),
+                Options::full(),
                 Msg::ReAnimateParagraph,
             ),
             ("Animate List", Options::full(), Msg::ReAnimateList),
-            (
-                "Animate Frame",
-                Options::simple().skewed(true),
-                Msg::ReAnimateFrame,
-            ),
+            ("Animate Frame", Options::skewed(), Msg::ReAnimateFrame),
             ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
             ("Click", Options::regular(), Msg::NoOp),
             ("Disabled", Options::disabled(), Msg::NoOp),
@@ -94,7 +90,7 @@ impl Default for App {
         fui_button.width(400);
         fui_button.height(100);
         fui_button.add_click_listener(|_| Msg::ReAnimateAll);
-        fui_button.set_options(Options::regular());
+        fui_button.set_options(Options::full());
 
         App {
             frame: Frame::new_with_content(frame_content),
@@ -181,7 +177,7 @@ impl Application<Msg> for App {
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
                 div(
                     vec![
-                        style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0)))},
+                        style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0) / 2))},
                     ],
                     vec![self.fui_button.view().map_msg(Msg::FuiButtonMsg)],
                 ),
