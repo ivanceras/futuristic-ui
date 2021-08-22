@@ -208,7 +208,48 @@ impl Application<Msg> for App {
             ],
         )
     }
+}
 
+impl App {
+    fn calculate_theme_from_url_hash(hash: &str) -> Theme {
+        let hash = hash.trim_start_matches("#/");
+        let splinters: Vec<&str> = hash.split("/").collect();
+        if splinters.len() >= 2 {
+            let primary = splinters[0];
+            let background = splinters[1];
+            if let Ok(theme) = Theme::from_str(&primary, background) {
+                theme
+            } else {
+                Theme::default()
+            }
+        } else {
+            Theme::default()
+        }
+    }
+
+    fn restyle(&mut self, hash: &str) {
+        log::trace!("hash: {}", hash);
+        self.theme = Self::calculate_theme_from_url_hash(&hash);
+        log::debug!("theme: {:?}", self.theme);
+        let styles = self.style();
+        Self::inject_style(&styles.join("\n"));
+    }
+
+    fn remove_style() {
+        use sauron::wasm_bindgen::JsCast;
+        log::trace!("Attempting to remove the old style");
+        let document = crate::document();
+        if let Some(html_style) = document
+            .query_selector(".futuristic-ui")
+            .expect("must query")
+        {
+            log::trace!("actually removing the style element");
+            let html_style: web_sys::Element = html_style.unchecked_into();
+            html_style.remove();
+        }
+    }
+
+    /// We are using a custom way to put style
     fn style(&self) -> Vec<String> {
         let base = &self.theme;
         let controls_content_background_color =
@@ -330,46 +371,6 @@ impl Application<Msg> for App {
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
         ]
-    }
-}
-
-impl App {
-    fn calculate_theme_from_url_hash(hash: &str) -> Theme {
-        let hash = hash.trim_start_matches("#/");
-        let splinters: Vec<&str> = hash.split("/").collect();
-        if splinters.len() >= 2 {
-            let primary = splinters[0];
-            let background = splinters[1];
-            if let Ok(theme) = Theme::from_str(&primary, background) {
-                theme
-            } else {
-                Theme::default()
-            }
-        } else {
-            Theme::default()
-        }
-    }
-
-    fn restyle(&mut self, hash: &str) {
-        log::trace!("hash: {}", hash);
-        self.theme = Self::calculate_theme_from_url_hash(&hash);
-        log::debug!("theme: {:?}", self.theme);
-        let styles = self.style();
-        Self::inject_style(&styles.join("\n"));
-    }
-
-    fn remove_style() {
-        use sauron::wasm_bindgen::JsCast;
-        log::trace!("Attempting to remove the old style");
-        let document = crate::document();
-        if let Some(html_style) = document
-            .query_selector(".futuristic-ui")
-            .expect("must query")
-        {
-            log::trace!("actually removing the style element");
-            let html_style: web_sys::Element = html_style.unchecked_into();
-            html_style.remove();
-        }
     }
 
     fn inject_style(style: &str) {
