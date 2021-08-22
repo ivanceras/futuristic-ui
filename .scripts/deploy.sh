@@ -2,7 +2,7 @@
 
 set -v
 
-./build_optimized.sh
+./build.sh
 
 dest="../../../ivanceras.github.io/futuristic-ui/"
 
