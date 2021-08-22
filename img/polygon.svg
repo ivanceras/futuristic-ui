@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="css-1owyh9f">
     <style>
-        path {
-            stroke-width: 1px;
+        polygon, polyline {
+            stroke-width: 2px;
             stroke: #00f8f8;
             vector-effect: non-scaling-stroke;
             fill: transparent;
@@ -10,9 +10,9 @@
     </style>
     <g style="transform: translate(2px, 2px);">
        <g>
-          <path data-type="shape" d="M0,34 L168,34 L183,19 L183,0 L0,0" class="css-15zxwgn"></path>
+          <polygon points="0,34 168,34 183,19 183,0 0,0"/>
        </g>
-       <path data-type="polyline" d="M0,34 L168,34 L183,19 L183,0" class="css-1o1psaz"></path>
-       <path data-type="polyline" d="M183,0 L0,0 L0,34" class="css-1o1psaz"></path>
+       <polyline points="0,34 168,34 183,19 183,0"/>
+       <polyline points="183,0 0,0 0,34"/>
     </g>
 </svg>
