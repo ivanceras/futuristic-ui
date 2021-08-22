@@ -1,6 +1,5 @@
 use super::*;
-use css_color::Rgba;
-use css_colors::{percent, rgb, rgba, Color, RGBA};
+use css_colors::{percent, rgb, rgba, Color};
 
 #[test]
 fn test_colors() {
@@ -40,7 +39,7 @@ fn bondi_blue_is_lighter_than_black() {
 #[test]
 fn equivalent_colors() {
     let hex = "#029dbb"; //border_color,
-    let c = hex_to_real_rgba(hex);
+    let c = hex_to_real_rgba(hex).unwrap();
     println!("c:{}", c);
     assert_eq!(c, rgba(2, 157, 187, 1.0));
     let light_c = c.lighten(percent(20)); // hover_color, corner_color,
@@ -54,7 +53,7 @@ fn equivalent_colors() {
     assert_eq!(dark_c, rgba(1, 73, 87, 1.0));
 
     let button_text_color = "#acf9fb";
-    let button_text_color = hex_to_real_rgba(button_text_color);
+    let button_text_color = hex_to_real_rgba(button_text_color).unwrap();
     println!("button_text_color: {}", button_text_color);
     assert_eq!(button_text_color, rgba(172, 249, 251, 1.0));
 
@@ -88,7 +87,7 @@ fn equivalent_colors() {
 #[test]
 fn test_generate_from_secondary() {
     let hex = "#26dafd"; // very close to #029dbb -> lighten 20% = rgba(39, 217, 253, 1.0) which is the secondary color
-    let base = hex_to_real_rgba(hex);
+    let base = hex_to_real_rgba(hex).unwrap();
     println!("base: {}", base);
 
     assert_eq!(base, rgba(38, 218, 253, 1.0));
@@ -127,7 +126,7 @@ fn test_generate_from_secondary() {
 #[test]
 fn test_generate_from_header() {
     let hex = "#a1ecfb";
-    let base = hex_to_real_rgba(hex);
+    let base = hex_to_real_rgba(hex).unwrap();
     println!("base: {}", base);
 
     assert_eq!(base, rgba(161, 236, 251, 1.00));
@@ -144,7 +143,7 @@ fn test_generate_from_header() {
 #[test]
 fn test_generate_from_alt_color() {
     let hex = "#00ff00";
-    let base = hex_to_real_rgba(hex);
+    let base = hex_to_real_rgba(hex).unwrap();
     println!("base: {}", base);
 
     assert_eq!(base, rgba(0, 255, 0, 1.0));

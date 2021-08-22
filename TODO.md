@@ -37,3 +37,6 @@
     and string manipulation to extract just the base struct name and into lower case, it will be the namespace to be used for css classnames
 - [X] Remove the use of qoutes in style names
 - [ ] Change the theme using the url
+- [ ] Unify frame and button.
+    - There should be container that has the 4 corner clip, the children components can then be put into it
+    such as the buttons, chip buttons.
