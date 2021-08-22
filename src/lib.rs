@@ -91,6 +91,8 @@ impl Default for App {
         .add_children(vec![Self::show_color_selection()]);
 
         let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
+        fui_button.width(400);
+        fui_button.height(100);
         fui_button.add_click_listener(|_| Msg::ReAnimateAll);
         fui_button.set_options(Options::regular());
 
@@ -179,7 +181,7 @@ impl Application<Msg> for App {
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
                 div(
                     vec![
-                        style! {"padding":px(20), "position": "relative", "left": percent(40)},
+                        style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0)))},
                     ],
                     vec![self.fui_button.view().map_msg(Msg::FuiButtonMsg)],
                 ),

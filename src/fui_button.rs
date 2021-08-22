@@ -27,6 +27,8 @@ pub struct FuiButton<PMSG> {
     click: bool,
     hover: bool,
     click_listeners: Vec<Callback<MouseEvent, PMSG>>,
+    pub width: Option<usize>,
+    pub height: Option<usize>,
 }
 
 pub struct Options {
@@ -46,8 +48,6 @@ pub struct Options {
     pub expand_corners: bool,
     /// the button is disabled
     pub disabled: bool,
-    pub width: Option<u32>,
-    pub height: Option<u32>,
 }
 
 impl<PMSG> FuiButton<PMSG>
@@ -63,6 +63,8 @@ where
             hover: false,
             label: label.to_string(),
             click_listeners: vec![],
+            width: None,
+            height: None,
         }
     }
 }
@@ -174,8 +176,16 @@ where
                                 vec![
                                     class_ns("button"),
                                     disabled(self.options.disabled),
-                                    maybe_attr("width", self.options.width),
-                                    maybe_attr("height", self.options.height),
+                                    if let Some(width) = self.width {
+                                        style! {width: px(width)}
+                                    } else {
+                                        empty_attr()
+                                    },
+                                    if let Some(height) = self.height {
+                                        style! { height: px(height) }
+                                    } else {
+                                        empty_attr()
+                                    },
                                 ],
                                 vec![text(&self.label)],
                             )],
@@ -200,6 +210,14 @@ where
 {
     pub fn set_options(&mut self, options: Options) {
         self.options = options;
+    }
+
+    pub fn width(&mut self, width: usize) {
+        self.width = Some(width);
+    }
+
+    pub fn height(&mut self, height: usize) {
+        self.height = Some(height);
     }
 
     pub fn add_click_listener<F>(&mut self, f: F)
@@ -276,7 +294,7 @@ where
                 right: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})",0,percent(-50)),
-                border_width: "0 0 0 1px",
+                border_width: format!("{} {} {} {}", 0, 0, 0, px(1)),
             },
 
             ".border-top": {
@@ -441,8 +459,6 @@ impl Options {
             has_hover: false,
             disabled: false,
             hidden: false,
-            width: None,
-            height: None,
         }
     }
 
@@ -458,12 +474,11 @@ impl Options {
             has_hover: true,
             disabled: false,
             hidden: false,
-            width: None,
-            height: None,
         }
     }
 
     /// regular futuristic button
+    /// don't expand corners
     #[allow(unused)]
     pub fn regular() -> Self {
         Options {
@@ -471,12 +486,10 @@ impl Options {
             click_highlights: true,
             skewed: false,
             has_corners: true,
-            expand_corners: true,
+            expand_corners: false,
             has_hover: true,
             disabled: false,
             hidden: false,
-            width: None,
-            height: None,
         }
     }
 
@@ -493,8 +506,6 @@ impl Options {
             has_hover: true,
             disabled: false,
             hidden: false,
-            width: None,
-            height: None,
         }
     }
 
@@ -510,8 +521,6 @@ impl Options {
             has_hover: false,
             disabled: false,
             hidden: false,
-            width: None,
-            height: None,
         }
     }
 
@@ -527,8 +536,6 @@ impl Options {
             has_hover: false,
             disabled: true,
             hidden: false,
-            width: None,
-            height: None,
         }
     }
 
