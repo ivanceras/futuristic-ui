@@ -4,7 +4,7 @@ set -v
 
 ./build.sh
 
-dest="../../../ivanceras.github.io/futuristic-ui/"
+dest="../ivanceras.github.io/futuristic-ui/"
 
 mkdir -p "$dest"
 
