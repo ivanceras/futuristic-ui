@@ -143,11 +143,11 @@ impl NavHeader {
 
             ".border": {
                 border_color: base.controls.corner_color.clone(),
-                box_shadow: format!("0 0 4px {}",base.controls.border_shadow.clone()),
+                box_shadow: format!("{} {} {} {}",0, 0, px(4), base.controls.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "relative",
-                transition: "all 250ms ease-in",
+                transition: format!("all {}ms ease-in",250),
                 border_style: "solid",
             },
 
@@ -161,22 +161,22 @@ impl NavHeader {
                 width: percent(100),
                 height: 0,
                 bottom: 0,
-                transform: "translate(-50%, 0)",
-                border_width: "2px 0 0 0",
+                transform: format!("translate({}, {})",percent(-50), 0),
+                border_width: format!("{} {} {} {}", px(2), 0, 0, 0),
             },
 
             ".text-anim": {
                 color: base.accent_color.clone(),
-                transition: "color 250ms ease-out",
+                transition: format!("color {}ms ease-out", 250),
                 font_family: base.secondary_font.clone(),
-                text_shadow: format!("0 0 4px {}",base.accent_shadow.clone()),
+                text_shadow: format!("{} {} {} {}",0, 0, px(4), base.accent_shadow.clone()),
             },
 
             ".link_content": {
-                transform: "skewX(-45deg)",
+                transform: format!("skewX({}deg)",-45),
                 border_color: base.controls.corner_color.clone(),
                 border_style: "solid",
-                border_width: "2px 0 0 16px",
+                border_width: format!("{} {} {} {}",px(2), 0, 0, px(16)),
                 position: "relative",
             },
 
@@ -187,7 +187,7 @@ impl NavHeader {
             ".link": {
                 padding_left: px(20),
                 margin_top: px(10),
-                transform: "skewX(45deg)",
+                transform: format!("skewX({}deg)", 45),
                 white_space: "nowrap",
             }
 

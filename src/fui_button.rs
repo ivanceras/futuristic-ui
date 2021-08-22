@@ -284,7 +284,7 @@ where
                 left: percent(50),
                 width: percent(100),
                 transform: format!("translate({}, {})",percent(-50), 0),
-                border_width: "1px 0 0 0",
+                border_width: format!("{} {} {} {}",px(1), 0, 0, 0),
             },
 
             ".border-bottom": {

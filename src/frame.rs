@@ -131,11 +131,11 @@ impl Frame {
 
             ".border": {
                 border_color: base.border_color.clone(),
-                box_shadow: format!("0 0 4px {}", base.border_shadow.clone()),
+                box_shadow: format!("{} {} {} {}", 0, 0, px(4), base.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
-                transition: "all 250ms ease-in",
+                transition: format!("all {}ms ease-in", 250),
                 border_style: "solid",
             },
 
@@ -149,46 +149,46 @@ impl Frame {
             },
 
             ".border-left": {
-                top: "50%",
+                top: percent(50),
                 left: 0,
-                height: "100%",
-                transform: "translate(0, -50%)",
-                border_width: "0 0 0 1px",
+                height: percent(100),
+                transform: format!("translate({}, {})",0, percent(-50)),
+                border_width: format!("{} {} {} {}",0, 0, 0, px(1)),
             },
 
             ".border-right": {
-                top: "50%",
+                top: percent(50),
                 right: 0,
-                height: "100%",
-                transform: "translate(0, -50%)",
-                border_width: "0 0 0 1px",
+                height: percent(100),
+                transform: format!("translate({}, {})",0, percent(-50)),
+                border_width: format!("{} {} {} {}",0, 0, 0, px(1)),
             },
 
             ".border-top": {
                 top: 0,
-                left: "50%",
-                width: "100%",
-                transform: "translate(-50%, 0)",
-                border_width: "1px 0 0 0",
+                left: percent(50),
+                width: percent(100),
+                transform: format!("translate({}, {})", percent(-50), 0),
+                border_width: format!("{} {} {} {}",px(1), 0, 0, 0),
             },
 
             ".border-bottom": {
-                left: "50%",
-                width: "100%",
+                left: percent(50),
+                width: percent(100),
                 bottom: 0,
-                transform: "translate(-50%, 0)",
-                border_width: "1px 0 0 0",
+                transform: format!("translate({}, {})",percent(-50), 0),
+                border_width: format!("{} {} {} {}", px(1), 0, 0, 0),
             },
 
             ".corner": {
                 width: px(24),
                 height: px(24),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow.clone()),
+                box_shadow: format!("{} {} {} {} {}", 0, 0, px(4), px(-2), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
-                transition: "all 250ms ease-in",
+                transition: format!("all {}ms ease-in",250),
                 border_style: "solid",
             },
 
@@ -201,25 +201,25 @@ impl Frame {
             ".corner__top-left": {
                 left: px(-2),
                 top: px(-2),
-                border_width: "2px 0 0 2px",
+                border_width: format!("{} {} {} {}",px(2), 0, 0, px(2)),
             },
 
             ".corner__bottom-left": {
                 left: px(-2),
                 bottom: px(-2),
-                border_width: "0 0 2px 2px",
+                border_width: format!("{} {} {} {}",0, 0, px(2), px(2)),
             },
 
             ".corner__top-right": {
                 right: px(-2),
                 top: px(-2),
-                border_width: "2px 2px 0 0",
+                border_width: format!("{} {} {} {}",px(2), px(2), 0, 0),
             },
 
             ".corner__bottom-right": {
                 right: px(-2),
                 bottom: px(-2),
-                border_width: "0 2px 2px 0",
+                border_width: format!("{} {} {} {}",0, px(2), px(2), 0),
             },
 
             ".content": {
@@ -228,7 +228,7 @@ impl Frame {
                 display: "block",
                 position: "relative",
                 overflow: "hidden",
-                transition: "background-color 250ms ease-in",
+                transition: format!("background-color {}ms ease-in", 250),
             },
 
             ".hide .content": {

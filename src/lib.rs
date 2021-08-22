@@ -277,7 +277,7 @@ impl Application<Msg> for App {
             },
 
             tr: {
-                border_bottom: format!("1px solid {}", controls_border_color),
+                border_bottom: format!("{} solid {}", px(1), controls_border_color),
             },
 
             td: {
