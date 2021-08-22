@@ -3,7 +3,6 @@
 use animate_list::AnimateList;
 use frame::Frame;
 use fui_button::{FuiButton, Options};
-use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
 use sauron::jss::jss;
@@ -18,6 +17,7 @@ use theme::Theme;
 mod animate_list;
 mod frame;
 mod fui_button;
+#[allow(unused)]
 mod image;
 mod nav_header;
 mod paragraph;
@@ -38,7 +38,6 @@ pub enum Msg {
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
-    ImageMsg(image::Msg),
     ReAnimateAll,
     NoOp,
 }
@@ -51,8 +50,67 @@ pub struct App {
     fui_button: FuiButton<Msg>,
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
-    image: Image,
     theme: Theme,
+}
+
+impl Default for App {
+    fn default() -> Self {
+        let button_options = vec![
+            ("ReAnimate All", Options::regular(), Msg::ReAnimateAll),
+            (
+                "Animate Paragraph",
+                Options::regular(),
+                Msg::ReAnimateParagraph,
+            ),
+            ("Animate List", Options::full(), Msg::ReAnimateList),
+            (
+                "Animate Frame",
+                Options::simple().skewed(true),
+                Msg::ReAnimateFrame,
+            ),
+            ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
+            ("Click", Options::regular(), Msg::NoOp),
+            ("Disabled", Options::disabled(), Msg::NoOp),
+            ("Muted", Options::muted(), Msg::NoOp),
+        ];
+        let button_array: Vec<FuiButton<Msg>> = button_options
+            .into_iter()
+            .map(|(label, options, msg)| {
+                let mut btn = FuiButton::new_with_label(label);
+                btn.set_options(options);
+                btn.add_click_listener(move |_| msg.clone());
+                btn
+            })
+            .collect();
+
+        let paragraph_content = "This is an experimental demo showcasing usage of [Sauron](https://github.com/ivanceras/sauron). \
+                    Application lifecycle to work alongside\
+                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.\
+                    Sauron is a light-weight web framework designed to have you write least amount of code possible.";
+
+        let frame_content = div(
+            vec![styles([("padding", "20px 40px"), ("font-size", "32px")])],
+            vec![text("Retro Futuristic UI in rust")],
+        )
+        .add_children(vec![Self::show_color_selection()]);
+
+        let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
+        fui_button.add_click_listener(|_| Msg::ReAnimateAll);
+        fui_button.set_options(Options::regular());
+
+        App {
+            frame: Frame::new_with_content(frame_content),
+            nav_header: NavHeader::new_with_content("Navigation Header"),
+            paragraph: Paragraph::new_with_markdown(paragraph_content),
+            button_array,
+            fui_button,
+            spinner: Spinner::new(),
+            animate_list: AnimateList::new_with_content(
+                Self::animate_list_content(),
+            ),
+            theme: Theme::default(),
+        }
+    }
 }
 
 impl Application<Msg> for App {
@@ -67,7 +125,7 @@ impl Application<Msg> for App {
         match msg {
             Msg::HashChanged(hash) => {
                 self.restyle(&hash);
-                Cmd::none()
+                Self::reanimate_all()
             }
             Msg::ReAnimateHeader => {
                 let effects =
@@ -109,10 +167,6 @@ impl Application<Msg> for App {
                 let effects = self.paragraph.update(para_msg);
                 Cmd::map_msg(effects, Msg::ParagraphMsg)
             }
-            Msg::ImageMsg(img_msg) => {
-                let effects = self.image.update(img_msg);
-                Cmd::from(effects.map_msg(Msg::ImageMsg))
-            }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
                 Cmd::map_msg(effects, Msg::ParagraphMsg)
@@ -129,7 +183,7 @@ impl Application<Msg> for App {
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
                 div(
                     vec![
-                        style! {"padding":px(20), "position": "relative", "left": percent(50)},
+                        style! {"padding":px(20), "position": "relative", "left": percent(40)},
                     ],
                     vec![self.fui_button.view().map_msg(Msg::FuiButtonMsg)],
                 ),
@@ -148,7 +202,6 @@ impl Application<Msg> for App {
                 self.paragraph.view(),
                 p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
-                self.image.view().map_msg(Msg::ImageMsg),
                 footer(
                     vec![],
                     vec![a(
@@ -259,6 +312,18 @@ impl Application<Msg> for App {
                 display: "flex",
                 flex_wrap: "wrap",
                 margin: "20px 10px",
+            },
+
+            ".more_colors": {
+                display: "flex",
+                flex_direction: "row",
+            },
+
+            ".more_colors .pick": {
+                width: px(10),
+                height: px(10),
+                border_width: px(4),
+                border_style: "solid",
             }
         };
 
@@ -271,69 +336,6 @@ impl Application<Msg> for App {
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
         ]
-    }
-}
-
-impl Default for App {
-    fn default() -> Self {
-        let button_options = vec![
-            ("ReAnimate All", Options::regular(), Msg::ReAnimateAll),
-            (
-                "Animate Paragraph",
-                Options::regular(),
-                Msg::ReAnimateParagraph,
-            ),
-            ("Animate List", Options::full(), Msg::ReAnimateList),
-            (
-                "Animate Frame",
-                Options::simple().skewed(true),
-                Msg::ReAnimateFrame,
-            ),
-            ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
-            ("Click", Options::regular(), Msg::NoOp),
-            ("Disabled", Options::disabled(), Msg::NoOp),
-            ("Muted", Options::muted(), Msg::NoOp),
-        ];
-        let button_array: Vec<FuiButton<Msg>> = button_options
-            .into_iter()
-            .map(|(label, options, msg)| {
-                let mut btn = FuiButton::new_with_label(label);
-                btn.set_options(options);
-                btn.add_click_listener(move |_| msg.clone());
-                btn
-            })
-            .collect();
-
-        let paragraph_content = "This is an experimental demo showcasing usage of [Sauron](https://github.com/ivanceras/sauron). \
-                    Application lifecycle to work alongside\
-                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.\
-                    Sauron is a light-weight web framework designed to have you write least amount of code possible.";
-
-        let frame_content = div(
-            vec![styles([("padding", "20px 40px"), ("font-size", "32px")])],
-            vec![text("Retro Futuristic UI in rust")],
-        );
-
-        let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
-        fui_button.add_click_listener(|_| Msg::ReAnimateAll);
-        fui_button.set_options(Options::regular());
-
-        App {
-            frame: Frame::new_with_content(frame_content),
-            nav_header: NavHeader::new_with_content("Navigation Header"),
-            paragraph: Paragraph::new_with_markdown(paragraph_content),
-            button_array,
-            fui_button,
-            spinner: Spinner::new(),
-            animate_list: AnimateList::new_with_content(
-                Self::animate_list_content(),
-            ),
-            image: Image::new(
-                "img/space.jpg",
-                Some("Space as seen from space"),
-            ),
-            theme: Theme::default(),
-        }
     }
 }
 
@@ -393,6 +395,29 @@ impl App {
         head.append_child(&html_style).expect("must append style");
     }
 
+    fn show_color_selection<MSG>() -> Node<MSG> {
+        let colors = vec![
+            "#029dbb", "black", "green", "red", "white", "yellow", "purple",
+        ];
+        let backgrounds = vec!["white", "black"];
+        let mut pairs: Vec<(&str, &str)> = vec![];
+        for primary in colors.iter() {
+            for background in backgrounds.iter() {
+                if primary != background {
+                    pairs.push((primary, background));
+                }
+            }
+        }
+        div(
+            vec![class("more_colors")],
+            pairs.into_iter().map(|(primary,background)|{
+                a(vec![class("colors"), href(format!("#/{}/{}",primary,background))], vec![
+                    div(vec![class("pick"), style!{background_color: primary, border_color: background}], vec![]),
+                ])
+            }).collect()
+        )
+    }
+
     fn animate_list_content() -> Node<Msg> {
         let long_txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque purus faucibus urna venenatis, a elementum diam laoreet. Fusce eget enim justo. Pellentesque cursus metus elit, ut porttitor eros iaculis sit amet. Quisque varius felis id turpis iaculis, et viverra enim pulvinar. Curabitur vel lacus interdum, molestie purus ut, pretium nibh. Mauris commodo dolor magna, eget dignissim mauris semper vitae. Ut viverra nec ex quis semper. Sed sit amet tincidunt mauris. Mauris in imperdiet ipsum. Praesent pretium tortor ut felis posuere, sed lacinia nunc pretium. Morbi et felis nec neque accumsan tincidunt. In hac habitasse platea dictumst. Nulla sit amet elit sed purus posuere placerat ut quis metus. Etiam mattis interdum dui at ornare. Nunc sit amet venenatis lorem, sed eleifend mauris. Pellentesque eros sem, fermentum vel lacus at, congue rhoncus elit. ";
         div(
@@ -403,7 +428,6 @@ impl App {
                     css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.
                     Sauron is a light-weight web framework designed to have you write least amount of code possible."),
                     a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
-                    img(vec![styles([("width","600px"),("height", "auto"),("display","block")]),src("img/space.jpg")], vec![]),
                 ]),
                 li(vec![], vec![text(long_txt)]),
                 li(vec![], vec![text("List 2")]),

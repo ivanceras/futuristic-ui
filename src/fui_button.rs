@@ -46,6 +46,8 @@ pub struct Options {
     pub expand_corners: bool,
     /// the button is disabled
     pub disabled: bool,
+    pub width: Option<u32>,
+    pub height: Option<u32>,
 }
 
 impl<PMSG> FuiButton<PMSG>
@@ -172,6 +174,8 @@ where
                                 vec![
                                     class_ns("button"),
                                     disabled(self.options.disabled),
+                                    maybe_attr("width", self.options.width),
+                                    maybe_attr("height", self.options.height),
                                 ],
                                 vec![text(&self.label)],
                             )],
@@ -216,7 +220,7 @@ where
                 display: "inline-block",
                 padding: "1px",
                 position: "relative",
-                margin: "4px 4px"
+                margin: "10px 10px"
             },
 
             ".hidden" : {
@@ -437,6 +441,8 @@ impl Options {
             has_hover: false,
             disabled: false,
             hidden: false,
+            width: None,
+            height: None,
         }
     }
 
@@ -452,6 +458,8 @@ impl Options {
             has_hover: true,
             disabled: false,
             hidden: false,
+            width: None,
+            height: None,
         }
     }
 
@@ -467,6 +475,8 @@ impl Options {
             has_hover: true,
             disabled: false,
             hidden: false,
+            width: None,
+            height: None,
         }
     }
 
@@ -483,6 +493,8 @@ impl Options {
             has_hover: true,
             disabled: false,
             hidden: false,
+            width: None,
+            height: None,
         }
     }
 
@@ -498,6 +510,8 @@ impl Options {
             has_hover: false,
             disabled: false,
             hidden: false,
+            width: None,
+            height: None,
         }
     }
 
@@ -513,6 +527,8 @@ impl Options {
             has_hover: false,
             disabled: true,
             hidden: false,
+            width: None,
+            height: None,
         }
     }
 
