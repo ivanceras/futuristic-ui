@@ -27,6 +27,7 @@ mod theme;
 
 #[derive(Clone, Debug)]
 pub enum Msg {
+    HashChanged(String),
     ReAnimateFrame,
     ReAnimateHeader,
     ReAnimateParagraph,
@@ -57,16 +58,17 @@ pub struct App {
 impl Application<Msg> for App {
     fn init(&mut self) -> Cmd<Self, Msg> {
         let hash = sauron::window().location().hash().expect("must get hash");
-        log::trace!("hash: {}", hash);
-        self.theme = Self::calculate_theme_from_url_hash(&hash);
-        log::debug!("theme: {:?}", self.theme);
-        let styles = self.style();
-        Self::inject_style(&styles.join("\n"));
-        Self::reanimate_all()
+        self.restyle(&hash);
+        let cmd_hash_changed = Window::on_hashchange(Msg::HashChanged);
+        Self::reanimate_all().append(vec![cmd_hash_changed])
     }
 
     fn update(&mut self, msg: Msg) -> Cmd<Self, Msg> {
         match msg {
+            Msg::HashChanged(hash) => {
+                self.restyle(&hash);
+                Cmd::none()
+            }
             Msg::ReAnimateHeader => {
                 let effects =
                     self.nav_header.update(nav_header::Msg::AnimateIn);
@@ -350,6 +352,14 @@ impl App {
         } else {
             Theme::default()
         }
+    }
+
+    fn restyle(&mut self, hash: &str) {
+        log::trace!("hash: {}", hash);
+        self.theme = Self::calculate_theme_from_url_hash(&hash);
+        log::debug!("theme: {:?}", self.theme);
+        let styles = self.style();
+        Self::inject_style(&styles.join("\n"));
     }
 
     fn remove_style() {
