@@ -11,15 +11,15 @@ crate-type = ["cdylib"]
 sauron = "0.42"
 sauron-markdown = "0.42"
 log = "0.4"
-console_log = { version = "0.2", features = ["color"], optional = true }
+console_log = { version = "0.2", features = ["color"] }
 web-sys = { version = "0.3", features = ["HtmlAudioElement"] }
 serde_json = { version = "1", features = ["preserve_order"] }
-console_error_panic_hook = { version = "0.1", optional = true }
-wee_alloc = { version = "0.4", optional = true }
+console_error_panic_hook = { version = "0.1" }
+wee_alloc = { version = "0.4" }
 css-colors = "1" # for using lighten, and darken when calculating theme colors
+css-color = "0.1.1" #for parsing hex color into rgb, don't get mix with css-colors with a `s`
 
 [dev-dependencies]
-css-color = "0.1.1" #for parsing hex color into rgb, don't get mix with css-colors with a `s`
 color_processing = "0.6.0"
 
 [features]
@@ -36,4 +36,4 @@ panic = "abort"
 
 [patch.crates-io]
 #sauron = { git = "https://github.com/ivanceras/sauron", branch = "master" }
-#sauron = { path = "../sauron" }
+sauron = { path = "../sauron" }

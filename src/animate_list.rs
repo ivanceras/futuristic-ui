@@ -64,14 +64,19 @@ where
                     classes_flag([("animating", self.animating)]),
                 ],
                 vec![
-                    div(vec![class("animate_list_children")], vec![self.children()]),
+                    div(
+                        vec![class("animate_list_children")],
+                        vec![self.children()],
+                    ),
                     view_if(
                         self.animating,
                         div(
                             vec![class("animated_layer_wrapper")],
                             vec![div(
                                 vec![class("animated_layer")],
-                                if let Some(animated_layer) = &self.animated_layer {
+                                if let Some(animated_layer) =
+                                    &self.animated_layer
+                                {
                                     vec![animated_layer.clone()]
                                 } else {
                                     vec![]
@@ -126,7 +131,11 @@ where
 
     /// include the the element from the src to dest
     /// as long as its current_cnt is less than the chars_limit
-    fn include_node(dest: &mut Node<PMSG>, src: &Node<PMSG>, chars_limit: usize) {
+    fn include_node(
+        dest: &mut Node<PMSG>,
+        src: &Node<PMSG>,
+        chars_limit: usize,
+    ) {
         let mut current_cnt = 0;
         Self::include_node_recursive(dest, src, chars_limit, &mut current_cnt);
     }
@@ -142,7 +151,11 @@ where
         match src {
             Node::Element(element) => {
                 if *current_cnt < chars_limit {
-                    let shallow_src = html_element(element.tag, element.attrs.clone(), vec![]);
+                    let shallow_src = html_element(
+                        element.tag,
+                        element.attrs.clone(),
+                        vec![],
+                    );
                     dest.add_children_ref_mut(vec![shallow_src]);
 
                     let last_index = dest
@@ -195,7 +208,12 @@ where
         }
     }
 
-    fn next_animation(&mut self, is_in: bool, start: f64, duration: f64) -> Vec<Msg> {
+    fn next_animation(
+        &mut self,
+        is_in: bool,
+        start: f64,
+        duration: f64,
+    ) -> Vec<Msg> {
         let timestamp = crate::dom::now();
 
         let content_len = self.children().node_count();
@@ -205,7 +223,8 @@ where
             anim_progress = duration - anim_progress;
         }
 
-        let new_length = (anim_progress * content_len as f64 / duration).round() as usize;
+        let new_length =
+            (anim_progress * content_len as f64 / duration).round() as usize;
 
         let mut dest: Node<PMSG> = div(vec![], vec![]);
 
@@ -225,7 +244,7 @@ where
         }
     }
 
-    pub fn style(&self) -> Vec<String> {
+    pub fn style(&self, _theme: &crate::Theme) -> Vec<String> {
         vec![jss! {
             ".animate_list": {
                 display: "inline-block",

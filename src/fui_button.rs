@@ -206,8 +206,8 @@ where
         self.click_listeners.push(cb);
     }
 
-    pub fn style(&self) -> Vec<String> {
-        let base = crate::Theme::default().controls;
+    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+        let base = &theme.controls;
 
         let base_css = jss_ns! {COMPONENT_NAME,
 
@@ -225,8 +225,8 @@ where
 
             // HOVER at the lower  part of the button
             ".hover": {
-                border_color: base.hover_color,
-                box_shadow: format!("0 -2px 4px {}",base.hover_shadow),
+                border_color: base.hover_color.clone(),
+                box_shadow: format!("0 -2px 4px {}",base.hover_shadow.clone()),
                 z_index: 4,
                 opacity: 1,
                 position: "absolute",
@@ -249,8 +249,8 @@ where
 
             // BORDERS these are styled divs wrapping the buttons
             ".border": {
-                border_color: base.border_color,
-                box_shadow: format!("0 0 4px {}",base.border_shadow),
+                border_color: base.border_color.clone(),
+                box_shadow: format!("0 0 4px {}",base.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
@@ -295,8 +295,8 @@ where
             ".corner": {
                 width: "8px",
                 height: "8px",
-                border_color: base.corner_color,
-                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow),
+                border_color: base.corner_color.clone(),
+                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
@@ -329,7 +329,7 @@ where
             },
 
             ".button_wrap": {
-                background_color: base.content_background_color,
+                background_color: base.content_background_color.clone(),
                 z_index: 3,
                 display: "block",
                 position: "relative",
@@ -339,7 +339,7 @@ where
 
             // The actual button
             ".button": {
-                color: base.button_text_color,
+                color: base.button_text_color.clone(),
                 cursor: "pointer",
                 margin: 0,
                 border: "none",
@@ -364,7 +364,7 @@ where
                   right: 0,
                   top: 0,
                   bottom: 0,
-                  background_color: base.highlight_color,
+                  background_color: base.highlight_color.clone(),
                   opacity: 0,
                   transition: "all 50ms ease-out",
             },

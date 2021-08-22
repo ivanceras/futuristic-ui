@@ -51,10 +51,17 @@ pub struct App {
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
     image: Image,
+    theme: Theme,
 }
 
 impl Application<Msg> for App {
     fn init(&mut self) -> Cmd<Self, Msg> {
+        let hash = sauron::window().location().hash().expect("must get hash");
+        log::trace!("hash: {}", hash);
+        self.theme = Self::calculate_theme_from_url_hash(&hash);
+        log::debug!("theme: {:?}", self.theme);
+        let styles = self.style();
+        Self::inject_style(&styles.join("\n"));
         Self::reanimate_all()
     }
 
@@ -154,8 +161,7 @@ impl Application<Msg> for App {
     }
 
     fn style(&self) -> Vec<String> {
-        let base = crate::Theme::default();
-
+        let base = &self.theme;
         let controls_content_background_color =
             base.controls.content_background_color.to_owned();
         let controls_button_text_color =
@@ -168,7 +174,7 @@ impl Application<Msg> for App {
         let primary_font = base.primary_font.to_owned();
         let secondary_font = base.secondary_font.to_owned();
         let controls_border_color = base.controls.border_color.to_owned();
-        let background_color = base.background_color;
+        let background_color = base.background_color.to_owned();
 
         let body_css = jss! {
 
@@ -257,11 +263,11 @@ impl Application<Msg> for App {
         vec![
             body_css,
             container_css,
-            self.nav_header.style().join("\n"),
-            self.frame.style().join("\n"),
-            self.fui_button.style().join("\n"),
-            self.animate_list.style().join("\n"),
-            self.spinner.style().join("\n"),
+            self.nav_header.style(&self.theme).join("\n"),
+            self.frame.style(&self.theme).join("\n"),
+            self.fui_button.style(&self.theme).join("\n"),
+            self.animate_list.style(&self.theme).join("\n"),
+            self.spinner.style(&self.theme).join("\n"),
         ]
     }
 }
@@ -324,11 +330,59 @@ impl Default for App {
                 "img/space.jpg",
                 Some("Space as seen from space"),
             ),
+            theme: Theme::default(),
         }
     }
 }
 
 impl App {
+    fn calculate_theme_from_url_hash(hash: &str) -> Theme {
+        let hash = hash.trim_start_matches("#/");
+        let splinters: Vec<&str> = hash.split("/").collect();
+        if splinters.len() >= 2 {
+            let primary = splinters[0];
+            let background = splinters[1];
+            if let Ok(theme) = Theme::from_str(&primary, background) {
+                theme
+            } else {
+                Theme::default()
+            }
+        } else {
+            Theme::default()
+        }
+    }
+
+    fn remove_style() {
+        use sauron::wasm_bindgen::JsCast;
+        log::trace!("Attempting to remove the old style");
+        let document = crate::document();
+        if let Some(html_style) = document
+            .query_selector(".futuristic-ui")
+            .expect("must query")
+        {
+            log::trace!("actually removing the style element");
+            let html_style: web_sys::Element = html_style.unchecked_into();
+            html_style.remove();
+        }
+    }
+
+    fn inject_style(style: &str) {
+        use sauron::wasm_bindgen::JsCast;
+        log::trace!("injecting style..");
+        Self::remove_style();
+        let document = crate::document();
+        let html_style = document
+            .create_element("style")
+            .expect("must be able to create style element");
+        html_style
+            .set_attribute("class", "futuristic-ui")
+            .expect("must set attribute");
+        let html_style: web_sys::Node = html_style.unchecked_into();
+        html_style.set_text_content(Some(style));
+        let head = document.head().expect("must have a head");
+        head.append_child(&html_style).expect("must append style");
+    }
+
     fn animate_list_content() -> Node<Msg> {
         let long_txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam scelerisque purus faucibus urna venenatis, a elementum diam laoreet. Fusce eget enim justo. Pellentesque cursus metus elit, ut porttitor eros iaculis sit amet. Quisque varius felis id turpis iaculis, et viverra enim pulvinar. Curabitur vel lacus interdum, molestie purus ut, pretium nibh. Mauris commodo dolor magna, eget dignissim mauris semper vitae. Ut viverra nec ex quis semper. Sed sit amet tincidunt mauris. Mauris in imperdiet ipsum. Praesent pretium tortor ut felis posuere, sed lacinia nunc pretium. Morbi et felis nec neque accumsan tincidunt. In hac habitasse platea dictumst. Nulla sit amet elit sed purus posuere placerat ut quis metus. Etiam mattis interdum dui at ornare. Nunc sit amet venenatis lorem, sed eleifend mauris. Pellentesque eros sem, fermentum vel lacus at, congue rhoncus elit. ";
         div(
@@ -396,15 +450,12 @@ impl App {
     }
 }
 
-#[cfg(feature = "wee_alloc")]
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    #[cfg(feature = "console_log")]
     console_log::init_with_level(log::Level::Trace).unwrap();
-    #[cfg(feature = "console_error_panic_hook")]
     console_error_panic_hook::set_once();
     let app_container = sauron::document()
         .get_element_by_id("app_container")

@@ -51,10 +51,15 @@ impl Component<Msg, ()> for NavHeader {
     }
 
     fn view(&self) -> Node<Msg> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
 
         let classes_ns_flag = |class_name_flags| {
-            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
+            attributes::classes_flag_namespaced(
+                COMPONENT_NAME,
+                class_name_flags,
+            )
         };
         header(
             vec![
@@ -75,7 +80,10 @@ impl Component<Msg, ()> for NavHeader {
                         vec![class_ns("link_content")],
                         vec![div(
                             vec![class_ns("link")],
-                            vec![a(vec![href("#readmore")], vec![text("Read more..")])],
+                            vec![a(
+                                vec![href("#readmore")],
+                                vec![text("Read more..")],
+                            )],
                         )],
                     ),
                 ],
@@ -107,8 +115,8 @@ impl NavHeader {
         }
     }
 
-    pub fn style(&self) -> Vec<String> {
-        let base = crate::Theme::default();
+    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+        let base = &theme;
         let css = jss_ns! {COMPONENT_NAME,
             ".": {
                 display: "block",
@@ -135,7 +143,7 @@ impl NavHeader {
 
             ".border": {
                 border_color: base.controls.corner_color.clone(),
-                box_shadow: format!("0 0 4px {}",base.controls.border_shadow),
+                box_shadow: format!("0 0 4px {}",base.controls.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "relative",
@@ -161,12 +169,12 @@ impl NavHeader {
                 color: base.accent_color.clone(),
                 transition: "color 250ms ease-out",
                 font_family: base.secondary_font.clone(),
-                text_shadow: format!("0 0 4px {}",base.accent_shadow),
+                text_shadow: format!("0 0 4px {}",base.accent_shadow.clone()),
             },
 
             ".link_content": {
                 transform: "skewX(-45deg)",
-                border_color: base.controls.corner_color,
+                border_color: base.controls.corner_color.clone(),
                 border_style: "solid",
                 border_width: "2px 0 0 16px",
                 position: "relative",

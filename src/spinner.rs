@@ -24,7 +24,9 @@ impl<MSG> Spinner<MSG> {
 
 impl<MSG> View<MSG> for Spinner<MSG> {
     fn view(&self) -> Node<MSG> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
 
         div(
             vec![class(COMPONENT_NAME)],
@@ -37,8 +39,8 @@ impl<MSG> View<MSG> for Spinner<MSG> {
 }
 
 impl<MSG> Spinner<MSG> {
-    pub fn style(&self) -> Vec<String> {
-        let base = crate::Theme::default().controls;
+    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+        let base = &theme.controls;
 
         let base_css = jss_ns! {COMPONENT_NAME,
             ".": {

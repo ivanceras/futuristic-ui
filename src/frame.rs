@@ -62,10 +62,15 @@ impl Component<Msg, ()> for Frame {
     }
 
     fn view(&self) -> Node<Msg> {
-        let class_ns = |class_names| attributes::class_namespaced(COMPONENT_NAME, class_names);
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
 
         let classes_ns_flag = |class_name_flags| {
-            attributes::classes_flag_namespaced(COMPONENT_NAME, class_name_flags)
+            attributes::classes_flag_namespaced(
+                COMPONENT_NAME,
+                class_name_flags,
+            )
         };
 
         div(
@@ -113,8 +118,8 @@ impl Frame {
         }
     }
 
-    pub fn style(&self) -> Vec<String> {
-        let base = crate::Theme::default().controls;
+    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+        let base = &theme.controls;
 
         let css = jss_ns! {COMPONENT_NAME,
             ".": {
@@ -125,8 +130,8 @@ impl Frame {
             },
 
             ".border": {
-                border_color: base.border_color,
-                box_shadow: format!("0 0 4px {}", base.border_shadow),
+                border_color: base.border_color.clone(),
+                box_shadow: format!("0 0 4px {}", base.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
@@ -178,8 +183,8 @@ impl Frame {
             ".corner": {
                 width: px(24),
                 height: px(24),
-                border_color: base.corner_color,
-                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow),
+                border_color: base.corner_color.clone(),
+                box_shadow: format!("0 0 4px -2px {}",base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
@@ -218,7 +223,7 @@ impl Frame {
             },
 
             ".content": {
-                background_color: base.content_background_color,
+                background_color: base.content_background_color.clone(),
                 z_index: 3,
                 display: "block",
                 position: "relative",
