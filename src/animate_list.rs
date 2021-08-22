@@ -244,10 +244,14 @@ where
         }
     }
 
-    pub fn style(&self, _theme: &crate::Theme) -> Vec<String> {
+    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
         vec![jss! {
+
+            "hr": {
+                color: theme.primary_color.clone(),
+            },
             ".animate_list": {
-                display: "inline-block",
+                //display: "inline-block",
                 position: "relative",
             },
 
@@ -257,15 +261,21 @@ where
                 right: 0,
                 top: 0,
                 overflow: "hidden",
-                display: "inline-block",
+                //display: "inline-block",
                 opacity: 0,
+            },
+
+            ".animate_list img": {
+                width: percent(100),
+                max_width: percent(100),
+                height: "auto",
             },
 
             ".blink": {
                 position: "relative",
                 width: 0,
                 height: 0,
-                display: "inline-block",
+                //display: "inline-block",
                 animation: "animate_list_blink-anim 250ms step-end infinite",
             },
 
