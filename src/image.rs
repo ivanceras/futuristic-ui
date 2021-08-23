@@ -52,14 +52,17 @@ impl Image {
             ".": {
                 background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
                         ,theme.background_color, theme.primary_color, theme.accent_color, theme.background_color, self.url),
-                background_size: "auto auto",
-                background_position: "top left",
+                background_size: format!("{} auto",percent(100)),
+                background_position: "center",
                 background_repeat: "no-repeat",
                 background_blend_mode: "color",
             },
             // hide the actual image, and show only the modified one with blended colors
             ".img": {
                 opacity: 0,
+                width: percent(100),
+                max_width: percent(100),
+                height: "auto",
             }
 
         }

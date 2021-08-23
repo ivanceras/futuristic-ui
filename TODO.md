@@ -23,7 +23,7 @@
 - [ ] Add more futuristic widgets
     - [ ] Searchbox
     - [ ] Navigation links, anchors
-        - [ ] cut out button links
+        - [ ] cut out/chipped button links
 - [ ] use css-colors crate to manipulate colors in theme
     - Issue, crate `css-colors` can't parse hex colors, will need to add crate `css-color` to do that
     - crate `color_processing` seems to have both parsing and process of colors https://crates.io/crates/color_processing
@@ -40,3 +40,4 @@
 - [ ] Unify frame and button.
     - There should be container that has the 4 corner clip, the children components can then be put into it
     such as the buttons, chip buttons.
+- [ ] Add animation to image where the image is subdivided into multiple squares and displayed from top-left to right bottom
