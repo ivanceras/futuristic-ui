@@ -236,6 +236,7 @@ where
         let corner_width = 2; // width of the corner clip of this button
         let corner_length = 8; // lengths of the corner clip of this button
         let corner_expand_distance = 6; // distance that clips at the corner expands when the button is hovered
+        let border_width = 1; // the width of the border for each side of the button
 
         let base_css = jss_ns! {COMPONENT_NAME,
 
@@ -292,7 +293,7 @@ where
                 left: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})", 0, percent(-50)),
-                border_width: "0 0 0 1px",
+                border_width: format!("{} {} {} {}",0, 0, 0, px(border_width)),
             },
 
             ".border-right": {
@@ -300,7 +301,7 @@ where
                 right: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})", 0, percent(-50)),
-                border_width: format!("{} {} {} {}", 0, 0, 0, px(1)),
+                border_width: format!("{} {} {} {}", 0, 0, 0, px(border_width)),
             },
 
             ".border-top": {
@@ -308,7 +309,7 @@ where
                 left: percent(50),
                 width: percent(100),
                 transform: format!("translate({}, {})", percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(1), 0, 0, 0),
+                border_width: format!("{} {} {} {}", px(border_width), 0, 0, 0),
             },
 
             ".border-bottom": {
@@ -316,7 +317,7 @@ where
                 width: percent(100),
                 bottom: 0,
                 transform: format!("translate({}, {})", percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(1), 0, 0, 0),
+                border_width: format!("{} {} {} {}", px(border_width), 0, 0, 0),
             },
 
             // CORNERS - the fancy divs which clips the button

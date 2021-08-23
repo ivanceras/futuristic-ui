@@ -120,6 +120,7 @@ impl Frame {
 
     pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
         let base = &theme.controls;
+        let border_width = 10;
 
         let css = jss_ns! {COMPONENT_NAME,
             ".": {
@@ -153,7 +154,7 @@ impl Frame {
                 left: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})",0, percent(-50)),
-                border_width: format!("{} {} {} {}",0, 0, 0, px(1)),
+                border_width: format!("{} {} {} {}",0, 0, 0, px(border_width)),
             },
 
             ".border-right": {
@@ -161,7 +162,7 @@ impl Frame {
                 right: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})",0, percent(-50)),
-                border_width: format!("{} {} {} {}",0, 0, 0, px(1)),
+                border_width: format!("{} {} {} {}",0, 0, 0, px(border_width)),
             },
 
             ".border-top": {
@@ -169,7 +170,7 @@ impl Frame {
                 left: percent(50),
                 width: percent(100),
                 transform: format!("translate({}, {})", percent(-50), 0),
-                border_width: format!("{} {} {} {}",px(1), 0, 0, 0),
+                border_width: format!("{} {} {} {}",px(border_width), 0, 0, 0),
             },
 
             ".border-bottom": {
@@ -177,7 +178,7 @@ impl Frame {
                 width: percent(100),
                 bottom: 0,
                 transform: format!("translate({}, {})",percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(1), 0, 0, 0),
+                border_width: format!("{} {} {} {}", px(border_width), 0, 0, 0),
             },
 
             ".corner": {
