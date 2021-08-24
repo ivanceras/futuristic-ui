@@ -45,6 +45,7 @@ pub enum Msg {
     ImageMsg(image::Msg),
     ImageEffectsMsg(image_effects::Msg),
     AnimateImageBtnMsg(fui_button::Msg),
+    AnimateParagraphBtnMsg(fui_button::Msg),
     StartAnimateImageEffects,
     ReAnimateAll,
     NoOp,
@@ -60,6 +61,7 @@ pub struct App {
     animate_list: AnimateList<Msg>,
     image: Image,
     animate_image_btn: FuiButton<Msg>,
+    animate_paragraph_btn: FuiButton<Msg>,
     image_effects: ImageEffects,
     theme: Theme,
 }
@@ -68,11 +70,6 @@ impl Default for App {
     fn default() -> Self {
         let button_options = vec![
             ("ReAnimate All", Options::full(), Msg::ReAnimateAll),
-            (
-                "Animate Paragraph",
-                Options::full(),
-                Msg::ReAnimateParagraph,
-            ),
             ("Animate List", Options::full(), Msg::ReAnimateList),
             ("Animate Frame", Options::skewed(), Msg::ReAnimateFrame),
             ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
@@ -102,8 +99,13 @@ impl Default for App {
         fui_button.add_click_listener(|_| Msg::ReAnimateAll);
         fui_button.set_options(Options::full());
 
-        let mut animate_btn = FuiButton::<Msg>::new_with_label("animate_image");
-        animate_btn.add_click_listener(|_| Msg::StartAnimateImageEffects);
+        let mut animate_image_btn =
+            FuiButton::<Msg>::new_with_label("Animate Image");
+        animate_image_btn.add_click_listener(|_| Msg::StartAnimateImageEffects);
+
+        let mut animate_paragraph_btn =
+            FuiButton::<Msg>::new_with_label("Animate Paragraph");
+        animate_paragraph_btn.add_click_listener(|_| Msg::ReAnimateParagraph);
 
         App {
             frame: Frame::new_with_content(frame_content),
@@ -115,7 +117,8 @@ impl Default for App {
             animate_list: AnimateList::new_with_content(
                 Self::animate_list_content(),
             ),
-            animate_image_btn: animate_btn,
+            animate_image_btn,
+            animate_paragraph_btn,
             image_effects: ImageEffects::new("img/space.jpg"),
             image: Image::new(
                 "img/space.jpg",
@@ -184,6 +187,10 @@ impl Application<Msg> for App {
                 let effects = self.animate_image_btn.update(btn_msg);
                 Cmd::map_msg(effects, Msg::AnimateImageBtnMsg)
             }
+            Msg::AnimateParagraphBtnMsg(btn_msg) => {
+                let effects = self.animate_paragraph_btn.update(btn_msg);
+                Cmd::map_msg(effects, Msg::AnimateParagraphBtnMsg)
+            }
             Msg::ImageEffectsMsg(effects_msg) => {
                 let effects = self.image_effects.update(effects_msg);
                 Cmd::from(effects.map_msg(Msg::ImageEffectsMsg))
@@ -236,6 +243,9 @@ impl Application<Msg> for App {
                 self.image_effects.view().map_msg(Msg::ImageEffectsMsg),
                 self.image.view().map_msg(Msg::ImageMsg),
                 self.spinner.view(),
+                self.animate_paragraph_btn
+                    .view()
+                    .map_msg(Msg::AnimateParagraphBtnMsg),
                 self.paragraph.view(),
                 footer(
                     vec![],
