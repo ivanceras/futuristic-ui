@@ -66,7 +66,7 @@ where
                 vec![
                     div(
                         vec![class("animate_list_children")],
-                        vec![self.children()],
+                        vec![self.children.clone()],
                     ),
                     view_if(
                         self.animating,
@@ -94,10 +94,6 @@ impl<PMSG> AnimateList<PMSG>
 where
     PMSG: Clone,
 {
-    fn children(&self) -> Node<PMSG> {
-        self.children.clone()
-    }
-
     pub fn animate_in(&mut self) -> Vec<Msg> {
         sounds::play(&self.audio);
         self.start_animation(true)
@@ -109,7 +105,7 @@ where
     }
 
     fn start_animation(&mut self, is_in: bool) -> Vec<Msg> {
-        let content_len = self.children().node_count();
+        let content_len = self.children.node_count();
 
         if content_len == 0 {
             return vec![];
@@ -157,28 +153,17 @@ where
                         vec![],
                     );
                     dest.add_children_ref_mut(vec![shallow_src]);
+                    let truncate_len = element.children.len().min(chars_limit);
 
-                    let last_index = dest
-                        .as_element_ref()
-                        .expect("this is an element")
-                        .children
-                        .len()
-                        - 1;
-
-                    let mut just_added_child = &mut dest
-                        .children_mut()
-                        .expect("must have children, since just added 1")
-                        .get_mut(last_index)
-                        .expect("must get the last child");
-
-                    for child in element.children.iter() {
+                    for child in &element.children[0..truncate_len] {
                         Self::include_node_recursive(
-                            &mut just_added_child,
+                            dest,
                             child,
                             chars_limit,
                             current_cnt,
                         );
                     }
+                    *current_cnt += truncate_len;
                 }
             }
             Node::Text(txt) => {
@@ -216,7 +201,7 @@ where
     ) -> Vec<Msg> {
         let timestamp = crate::dom::now();
 
-        let content_len = self.children().node_count();
+        let content_len = self.children.node_count();
 
         let mut anim_progress = (timestamp - start).max(0.0);
         if !is_in {
@@ -228,7 +213,7 @@ where
 
         let mut dest: Node<PMSG> = div(vec![], vec![]);
 
-        Self::include_node(&mut dest, &self.children(), new_length);
+        Self::include_node(&mut dest, &self.children, new_length);
         self.animated_layer = Some(dest);
 
         let continue_animation = if is_in {
@@ -251,7 +236,7 @@ where
                 color: theme.primary_color.clone(),
             },
             ".animate_list": {
-                //display: "inline-block",
+                display: "inline-block",
                 position: "relative",
             },
 
@@ -261,7 +246,7 @@ where
                 right: 0,
                 top: 0,
                 overflow: "hidden",
-                //display: "inline-block",
+                display: "inline-block",
                 opacity: 0,
             },
 
@@ -275,7 +260,7 @@ where
                 position: "relative",
                 width: 0,
                 height: 0,
-                //display: "inline-block",
+                display: "inline-block",
                 animation: format!("animate_list_blink-anim {}ms step-end infinite", 250),
             },
 

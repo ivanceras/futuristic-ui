@@ -1,4 +1,4 @@
-use crate::{frame, Frame};
+use crate::{animate_list, AnimateList};
 use sauron::{
     html::{
         attributes,
@@ -14,11 +14,11 @@ const COMPONENT_NAME: &str = "image_effects";
 
 #[derive(Clone, Debug)]
 pub enum Msg {
-    FrameMsg(frame::Msg),
+    AnimateIn,
+    AnimateListMsg(animate_list::Msg),
 }
 
-pub struct ImageEffects {
-    frame: Frame,
+pub struct Properties {
     url: String,
     width: f32,
     height: f32,
@@ -27,29 +27,12 @@ pub struct ImageEffects {
     gap: f32,
 }
 
-impl ImageEffects {
-    pub fn new(url: impl ToString) -> Self {
-        let width = 1000.0;
-        let height = 600.0;
-        let slice_size = 50.0;
-        let gap = 4.0;
+pub struct ImageEffects {
+    animate_list: AnimateList<Msg>,
+    properties: Properties,
+}
 
-        let class_ns = |class_names| {
-            attributes::class_namespaced(COMPONENT_NAME, class_names)
-        };
-        ImageEffects {
-            frame: Frame::new_with_content(div(
-                vec![class(COMPONENT_NAME)],
-                vec![img(vec![class_ns("img"), src(url.to_string())], vec![])],
-            )),
-            url: url.to_string(),
-            width,
-            height,
-            slice_size,
-            gap,
-        }
-    }
-
+impl Properties {
     /// slices on x and slices on y
     fn slices(&self) -> (usize, usize) {
         (
@@ -57,14 +40,8 @@ impl ImageEffects {
             (self.height / self.slice_size).round() as usize,
         )
     }
-}
 
-impl Component<Msg, ()> for ImageEffects {
-    fn update(&mut self, _: Msg) -> Effects<Msg, ()> {
-        Effects::none()
-    }
-
-    fn view(&self) -> Node<Msg> {
+    fn slice_view(&self) -> Node<Msg> {
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
@@ -106,10 +83,58 @@ impl Component<Msg, ()> for ImageEffects {
               height: px(self.slice_size),
               background_size: format!("{} {}", px(self.width), px(self.height)),
               position: "absolute",
-              background_image: format!("url({})","img/space.jpg"),
+              background_image: format!("url({})",self.url),
               background_repeat:"no-repeat no-repeat",
               background_attachment: "local, local",
             }
         }
+    }
+}
+
+impl ImageEffects {
+    pub fn new(url: impl ToString) -> Self {
+        let width = 1000.0;
+        let height = 600.0;
+        let slice_size = 50.0;
+        let gap = 4.0;
+
+        let properties = Properties {
+            width,
+            height,
+            slice_size,
+            gap,
+            url: url.to_string(),
+        };
+
+        ImageEffects {
+            animate_list: AnimateList::new_with_content(
+                properties.slice_view(),
+            ),
+            properties,
+        }
+    }
+}
+
+impl Component<Msg, ()> for ImageEffects {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
+        match msg {
+            Msg::AnimateIn => {
+                let effects =
+                    self.animate_list.update(animate_list::Msg::AnimateIn);
+                effects.follow_through(Msg::AnimateListMsg)
+            }
+            Msg::AnimateListMsg(amsg) => {
+                let effects = self.animate_list.update(amsg);
+                effects.follow_through(Msg::AnimateListMsg)
+            }
+        }
+    }
+
+    fn view(&self) -> Node<Msg> {
+        div(vec![], vec![self.animate_list.view()])
+    }
+
+    fn style(&self) -> String {
+        self.properties.style()
     }
 }

@@ -44,6 +44,8 @@ pub enum Msg {
     AnimateListMsg(animate_list::Msg),
     ImageMsg(image::Msg),
     ImageEffectsMsg(image_effects::Msg),
+    AnimateImageBtnMsg(fui_button::Msg),
+    StartAnimateImageEffects,
     ReAnimateAll,
     NoOp,
 }
@@ -57,6 +59,7 @@ pub struct App {
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
     image: Image,
+    animate_image_btn: FuiButton<Msg>,
     image_effects: ImageEffects,
     theme: Theme,
 }
@@ -99,6 +102,9 @@ impl Default for App {
         fui_button.add_click_listener(|_| Msg::ReAnimateAll);
         fui_button.set_options(Options::full());
 
+        let mut animate_btn = FuiButton::<Msg>::new_with_label("animate_image");
+        animate_btn.add_click_listener(|_| Msg::StartAnimateImageEffects);
+
         App {
             frame: Frame::new_with_content(frame_content),
             nav_header: NavHeader::new_with_content("Navigation Header"),
@@ -109,6 +115,7 @@ impl Default for App {
             animate_list: AnimateList::new_with_content(
                 Self::animate_list_content(),
             ),
+            animate_image_btn: animate_btn,
             image_effects: ImageEffects::new("img/space.jpg"),
             image: Image::new(
                 "img/space.jpg",
@@ -173,11 +180,19 @@ impl Application<Msg> for App {
                 let effects = self.paragraph.update(para_msg);
                 Cmd::map_msg(effects, Msg::ParagraphMsg)
             }
-            Msg::ImageEffectsMsg(effects_msg) => Cmd::from(
-                self.image_effects
-                    .update(effects_msg)
-                    .map_msg(Msg::ImageEffectsMsg),
-            ),
+            Msg::AnimateImageBtnMsg(btn_msg) => {
+                let effects = self.animate_image_btn.update(btn_msg);
+                Cmd::map_msg(effects, Msg::AnimateImageBtnMsg)
+            }
+            Msg::ImageEffectsMsg(effects_msg) => {
+                let effects = self.image_effects.update(effects_msg);
+                Cmd::from(effects.map_msg(Msg::ImageEffectsMsg))
+            }
+            Msg::StartAnimateImageEffects => {
+                let effects =
+                    self.image_effects.update(image_effects::Msg::AnimateIn);
+                Cmd::from(effects.map_msg(Msg::ImageEffectsMsg))
+            }
             Msg::ImageMsg(image_msg) => {
                 let effects = self.image.update(image_msg);
                 Cmd::from(effects.map_msg(Msg::ImageMsg))
@@ -215,6 +230,9 @@ impl Application<Msg> for App {
                         .collect::<Vec<_>>()
                 }),
                 p(vec![], vec![self.animate_list.view()]),
+                self.animate_image_btn
+                    .view()
+                    .map_msg(Msg::AnimateImageBtnMsg),
                 self.image_effects.view().map_msg(Msg::ImageEffectsMsg),
                 self.image.view().map_msg(Msg::ImageMsg),
                 self.spinner.view(),
