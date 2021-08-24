@@ -162,34 +162,35 @@ impl Application<Msg> for App {
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let effects = self.button_array[index].update(btn_msg);
-                Cmd::map_msg(effects, move |follow_up| {
-                    Msg::BtnMsg(index, follow_up)
-                })
+                Cmd::from(
+                    effects
+                        .merge(move |follow_up| Msg::BtnMsg(index, follow_up)),
+                )
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
                 let effects = self.fui_button.update(fui_btn_msg);
-                Cmd::map_msg(effects, Msg::FuiButtonMsg)
+                Cmd::from(effects.merge(Msg::FuiButtonMsg))
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
-                Cmd::map_msg(effects, Msg::AnimateListMsg)
+                Cmd::from(effects.merge(Msg::AnimateListMsg))
             }
             Msg::ReAnimateList => {
                 let effects =
                     self.animate_list.update(animate_list::Msg::AnimateIn);
-                Cmd::map_msg(effects, Msg::AnimateListMsg)
+                Cmd::from(effects.merge(Msg::AnimateListMsg))
             }
             Msg::ParagraphMsg(para_msg) => {
                 let effects = self.paragraph.update(para_msg);
-                Cmd::map_msg(effects, Msg::ParagraphMsg)
+                Cmd::from(effects.merge(Msg::ParagraphMsg))
             }
             Msg::AnimateImageBtnMsg(btn_msg) => {
                 let effects = self.animate_image_btn.update(btn_msg);
-                Cmd::map_msg(effects, Msg::AnimateImageBtnMsg)
+                Cmd::from(effects.merge(Msg::AnimateImageBtnMsg))
             }
             Msg::AnimateParagraphBtnMsg(btn_msg) => {
                 let effects = self.animate_paragraph_btn.update(btn_msg);
-                Cmd::map_msg(effects, Msg::AnimateParagraphBtnMsg)
+                Cmd::from(effects.merge(Msg::AnimateParagraphBtnMsg))
             }
             Msg::ImageEffectsMsg(effects_msg) => {
                 let effects = self.image_effects.update(effects_msg);
@@ -206,7 +207,7 @@ impl Application<Msg> for App {
             }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
-                Cmd::map_msg(effects, Msg::ParagraphMsg)
+                Cmd::from(effects.merge(Msg::ParagraphMsg))
             }
             Msg::ReAnimateAll => Self::reanimate_all(),
             Msg::NoOp => Cmd::none(),
@@ -241,7 +242,7 @@ impl Application<Msg> for App {
                     .view()
                     .map_msg(Msg::AnimateImageBtnMsg),
                 self.image_effects.view().map_msg(Msg::ImageEffectsMsg),
-                self.image.view().map_msg(Msg::ImageMsg),
+                //self.image.view().map_msg(Msg::ImageMsg),
                 self.spinner.view(),
                 self.animate_paragraph_btn
                     .view()
@@ -264,11 +265,11 @@ impl Application<Msg> for App {
 impl App {
     fn calculate_theme_from_url_hash(hash: &str) -> Theme {
         let hash = hash.trim_start_matches("#/");
-        let splinters: Vec<&str> = hash.split("/").collect();
+        let splinters: Vec<&str> = hash.split('/').collect();
         if splinters.len() >= 2 {
             let primary = splinters[0];
             let background = splinters[1];
-            if let Ok(theme) = Theme::from_str(&primary, background) {
+            if let Ok(theme) = Theme::from_str(primary, background) {
                 theme
             } else {
                 Theme::default()
@@ -280,7 +281,7 @@ impl App {
 
     fn restyle(&mut self, hash: &str) {
         log::trace!("hash: {}", hash);
-        self.theme = Self::calculate_theme_from_url_hash(&hash);
+        self.theme = Self::calculate_theme_from_url_hash(hash);
         log::debug!("theme: {:?}", self.theme);
         let styles = self.style();
         Self::inject_style(&styles.join("\n"));

@@ -1,10 +1,6 @@
 use crate::{animate_list, AnimateList};
 use sauron::{
-    html::{
-        attributes,
-        attributes::{empty_attr, title},
-        div,
-    },
+    html::{attributes, div},
     jss::jss_ns,
     prelude::*,
     Node,
@@ -16,6 +12,7 @@ const COMPONENT_NAME: &str = "image_effects";
 pub enum Msg {
     AnimateIn,
     AnimateListMsg(animate_list::Msg),
+    AnimationDone,
 }
 
 pub struct Properties {
@@ -30,6 +27,80 @@ pub struct Properties {
 pub struct ImageEffects {
     animate_list: AnimateList<Msg>,
     properties: Properties,
+    is_animating: bool,
+}
+
+impl ImageEffects {
+    pub fn new(url: impl ToString) -> Self {
+        let width = 1000.0;
+        let height = 600.0;
+        let slice_size = 50.0;
+        let gap = 1.0;
+
+        let properties = Properties {
+            width,
+            height,
+            slice_size,
+            gap,
+            url: url.to_string(),
+        };
+
+        let mut animate_list =
+            AnimateList::new_with_content(properties.slice_view());
+        animate_list.add_stop_animation_listener(|_| Msg::AnimationDone);
+
+        ImageEffects {
+            animate_list,
+            properties,
+            is_animating: false,
+        }
+    }
+
+    pub fn style(&self, theme: &crate::Theme) -> String {
+        self.properties.style(theme)
+    }
+}
+
+impl Component<Msg, ()> for ImageEffects {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
+        match msg {
+            Msg::AnimateIn => {
+                self.is_animating = true;
+                let effects =
+                    self.animate_list.update(animate_list::Msg::AnimateIn);
+                effects.merge(Msg::AnimateListMsg)
+            }
+            Msg::AnimateListMsg(amsg) => {
+                log::trace!("Got some msg mean to AnimateList: {:?}", amsg);
+                let effects = self.animate_list.update(amsg);
+                effects.merge(Msg::AnimateListMsg)
+            }
+            Msg::AnimationDone => {
+                log::trace!("Animation is done...");
+                self.is_animating = false;
+                Effects::none()
+            }
+        }
+    }
+
+    fn view(&self) -> Node<Msg> {
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
+        let classes_ns_flag = |class_name_flags| {
+            attributes::classes_flag_namespaced(
+                COMPONENT_NAME,
+                class_name_flags,
+            )
+        };
+        div(
+            vec![classes_ns_flag([("animating", self.is_animating)])],
+            vec![
+                view_if(self.is_animating, self.animate_list.view()),
+                img(vec![class_ns("img"), src(&self.properties.url)], vec![]),
+            ],
+        )
+    }
 }
 
 impl Properties {
@@ -49,17 +120,15 @@ impl Properties {
         let (slice_x, slice_y) = self.slices();
         for y in 0..slice_y {
             let top = (self.slice_size + self.gap) * y as f32;
-            let bg_y = -(self.slice_size * y as f32);
             for x in 0..slice_x {
                 let left = (self.slice_size + self.gap) * x as f32;
-                let bg_x = -(self.slice_size * x as f32);
                 let cell = div(
                     vec![
                         class_ns("slice"),
                         style! {
                             left: px(left),
                             top: px(top),
-                            background_position: format!("{} {}", px(bg_x), px(bg_y)),
+                            background_position: format!("{} {}", px(-left), px(-top)),
                         },
                     ],
                     vec![],
@@ -77,6 +146,14 @@ impl Properties {
                 width: px(self.width),
                 height: px(self.height),
             },
+            ".img": {
+                width: px(self.width),
+                height: px(self.height),
+                opacity: 1,
+            },
+            ".animating .img": {
+                opacity: 0,
+            },
             ".slice": {
               width: px(self.slice_size),
               height: px(self.slice_size),
@@ -89,53 +166,5 @@ impl Properties {
               background_blend_mode: "color",
             }
         }
-    }
-}
-
-impl ImageEffects {
-    pub fn new(url: impl ToString) -> Self {
-        let width = 1000.0;
-        let height = 600.0;
-        let slice_size = 50.0;
-        let gap = 4.0;
-
-        let properties = Properties {
-            width,
-            height,
-            slice_size,
-            gap,
-            url: url.to_string(),
-        };
-
-        ImageEffects {
-            animate_list: AnimateList::new_with_content(
-                properties.slice_view(),
-            ),
-            properties,
-        }
-    }
-
-    pub fn style(&self, theme: &crate::Theme) -> String {
-        self.properties.style(theme)
-    }
-}
-
-impl Component<Msg, ()> for ImageEffects {
-    fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
-        match msg {
-            Msg::AnimateIn => {
-                let effects =
-                    self.animate_list.update(animate_list::Msg::AnimateIn);
-                effects.follow_through(Msg::AnimateListMsg)
-            }
-            Msg::AnimateListMsg(amsg) => {
-                let effects = self.animate_list.update(amsg);
-                effects.follow_through(Msg::AnimateListMsg)
-            }
-        }
-    }
-
-    fn view(&self) -> Node<Msg> {
-        div(vec![], vec![self.animate_list.view()])
     }
 }

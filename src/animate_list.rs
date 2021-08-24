@@ -20,6 +20,8 @@ pub struct AnimateList<PMSG> {
     children: Node<PMSG>,
     animating: bool,
     content_len: usize,
+    /// these are listeners that will be called when the anination is done
+    on_stop_animation: Vec<Callback<(), PMSG>>,
 }
 
 impl<PMSG> AnimateList<PMSG>
@@ -34,6 +36,7 @@ where
             animated_layer: None,
             children,
             content_len,
+            on_stop_animation: vec![],
         }
     }
 }
@@ -46,8 +49,18 @@ where
         match msg {
             Msg::AnimateIn => Effects::with_follow_ups(self.animate_in()),
             Msg::StopAnimation => {
+                log::trace!("animation is stopped in animate list...");
+                log::trace!(
+                    "There are follow ups? : {:#?}",
+                    self.on_stop_animation
+                );
                 self.stop_animation();
-                Effects::none()
+                let pmsg_list = self
+                    .on_stop_animation
+                    .iter()
+                    .map(|listener| listener.emit(()))
+                    .collect();
+                Effects::with_effects(pmsg_list)
             }
             Msg::NextAnimation(is_in, start, duration) => {
                 let follow_ups = self.next_animation(is_in, start, duration);
@@ -105,6 +118,15 @@ where
     fn stop_animation(&mut self) -> Vec<Msg> {
         self.animating = false;
         vec![]
+    }
+
+    pub fn add_stop_animation_listener<F>(&mut self, f: F)
+    where
+        F: Fn(()) -> PMSG + 'static,
+    {
+        let cb = Callback::from(f);
+        log::trace!("Adding a stop animation listener here..");
+        self.on_stop_animation.push(cb);
     }
 
     fn start_animation(&mut self, is_in: bool) -> Vec<Msg> {
