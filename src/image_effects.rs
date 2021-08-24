@@ -34,7 +34,7 @@ impl ImageEffects {
     pub fn new(url: impl ToString) -> Self {
         let width = 1000.0;
         let height = 600.0;
-        let slice_size = 50.0;
+        let slice_size = 40.0;
         let gap = 1.0;
 
         let properties = Properties {
@@ -61,6 +61,8 @@ impl ImageEffects {
     }
 }
 
+///TODO: create a copy of AnimateList effects here, so we can customize it specific to the image.
+/// Wrap this with frame as well
 impl Component<Msg, ()> for ImageEffects {
     fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
