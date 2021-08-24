@@ -1,9 +1,10 @@
-#![deny(warnings)]
+//#![deny(warnings)]
 #![recursion_limit = "256"]
 use animate_list::AnimateList;
 use frame::Frame;
 use fui_button::{FuiButton, Options};
 use image::Image;
+use image_effects::ImageEffects;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
 use sauron::jss::jss;
@@ -21,6 +22,7 @@ mod frame;
 mod fui_button;
 #[allow(unused)]
 mod image;
+mod image_effects;
 mod nav_header;
 mod paragraph;
 pub mod sounds;
@@ -41,6 +43,7 @@ pub enum Msg {
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
     ImageMsg(image::Msg),
+    ImageEffectsMsg(image_effects::Msg),
     ReAnimateAll,
     NoOp,
 }
@@ -54,6 +57,7 @@ pub struct App {
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
     image: Image,
+    image_effects: ImageEffects,
     theme: Theme,
 }
 
@@ -105,6 +109,7 @@ impl Default for App {
             animate_list: AnimateList::new_with_content(
                 Self::animate_list_content(),
             ),
+            image_effects: ImageEffects::new("img/space.jpg"),
             image: Image::new(
                 "img/space.jpg",
                 Some("Space as seen from space"),
@@ -168,6 +173,11 @@ impl Application<Msg> for App {
                 let effects = self.paragraph.update(para_msg);
                 Cmd::map_msg(effects, Msg::ParagraphMsg)
             }
+            Msg::ImageEffectsMsg(effects_msg) => Cmd::from(
+                self.image_effects
+                    .update(effects_msg)
+                    .map_msg(Msg::ImageEffectsMsg),
+            ),
             Msg::ImageMsg(image_msg) => {
                 let effects = self.image.update(image_msg);
                 Cmd::from(effects.map_msg(Msg::ImageMsg))
@@ -205,6 +215,7 @@ impl Application<Msg> for App {
                         .collect::<Vec<_>>()
                 }),
                 p(vec![], vec![self.animate_list.view()]),
+                self.image_effects.view().map_msg(Msg::ImageEffectsMsg),
                 self.image.view().map_msg(Msg::ImageMsg),
                 self.spinner.view(),
                 self.paragraph.view(),
@@ -383,6 +394,7 @@ impl App {
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
             self.image.style(&self.theme),
+            self.image_effects.style(),
         ]
     }
 
