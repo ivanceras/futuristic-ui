@@ -237,17 +237,17 @@ impl Application<Msg> for App {
                         })
                         .collect::<Vec<_>>()
                 }),
-                p(vec![], vec![self.animate_list.view()]),
                 self.animate_image_btn
                     .view()
                     .map_msg(Msg::AnimateImageBtnMsg),
                 self.image_effects.view().map_msg(Msg::ImageEffectsMsg),
-                //self.image.view().map_msg(Msg::ImageMsg),
+                p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
                 self.animate_paragraph_btn
                     .view()
                     .map_msg(Msg::AnimateParagraphBtnMsg),
                 self.paragraph.view(),
+                self.image.view().map_msg(Msg::ImageMsg),
                 footer(
                     vec![],
                     vec![a(
@@ -529,6 +529,7 @@ impl App {
             Msg::ReAnimateHeader,
             Msg::ReAnimateParagraph,
             Msg::ReAnimateList,
+            Msg::StartAnimateImageEffects,
         ]))
     }
 }

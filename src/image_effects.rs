@@ -102,7 +102,7 @@ impl Component<Msg, ()> for ImageEffects {
             ],
             vec![
                 view_if(self.is_animating, self.animate_list.view()),
-                img(vec![class_ns("img"), src(&self.properties.url)], vec![]),
+                div(vec![class_ns("img")], vec![]),
             ],
         )
     }
@@ -160,20 +160,24 @@ impl Properties {
                 height: px(self.height),
                 position: "absolute",
                 opacity: 1,
+                background_size: format!("{} {}", px(self.width), px(self.height)),
+                background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
+                        ,theme.background_color, theme.primary_color, theme.accent_color, theme.background_color, self.url),
+                background_blend_mode: "color",
             },
             ".animating .img": {
                 opacity: 0,
             },
             ".slice": {
-              width: px(self.slice_size),
-              height: px(self.slice_size),
-              position: "absolute",
-              background_size: format!("{} {}", px(self.width), px(self.height)),
-              background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
-                  ,theme.background_color, theme.primary_color, theme.accent_color, theme.background_color, self.url),
-              background_repeat:"no-repeat no-repeat",
-              background_attachment: "local, local",
-              background_blend_mode: "color",
+                  width: px(self.slice_size),
+                  height: px(self.slice_size),
+                  position: "absolute",
+                  background_size: format!("{} {}", px(self.width), px(self.height)),
+                  background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
+                      ,theme.background_color, theme.primary_color, theme.accent_color, theme.background_color, self.url),
+                  background_repeat:"no-repeat no-repeat",
+                  background_attachment: "local, local",
+                  background_blend_mode: "color",
             }
         }
     }
