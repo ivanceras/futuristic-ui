@@ -19,6 +19,7 @@ pub struct AnimateList<PMSG> {
     animated_layer: Option<Node<PMSG>>,
     children: Node<PMSG>,
     animating: bool,
+    content_len: usize,
 }
 
 impl<PMSG> AnimateList<PMSG>
@@ -26,11 +27,13 @@ where
     PMSG: Clone,
 {
     pub fn new_with_content(children: Node<PMSG>) -> Self {
+        let content_len = children.node_count();
         AnimateList {
             audio: sounds::preload("sounds/typing.mp3"),
             animating: false,
             animated_layer: None,
             children,
+            content_len,
         }
     }
 }
@@ -105,14 +108,12 @@ where
     }
 
     fn start_animation(&mut self, is_in: bool) -> Vec<Msg> {
-        let content_len = self.children.node_count();
-
-        if content_len == 0 {
+        if self.content_len == 0 {
             return vec![];
         }
 
         let interval = 1_000.0 / 60.0;
-        let real_duration = interval * content_len as f64;
+        let real_duration = interval * self.content_len as f64;
         let timeout = 500.0;
         let duration = real_duration.min(timeout);
         let start = crate::dom::now();
@@ -201,15 +202,13 @@ where
     ) -> Vec<Msg> {
         let timestamp = crate::dom::now();
 
-        let content_len = self.children.node_count();
-
         let mut anim_progress = (timestamp - start).max(0.0);
         if !is_in {
             anim_progress = duration - anim_progress;
         }
 
-        let new_length =
-            (anim_progress * content_len as f64 / duration).round() as usize;
+        let new_length = (anim_progress * self.content_len as f64 / duration)
+            .round() as usize;
 
         let mut dest: Node<PMSG> = div(vec![], vec![]);
 
@@ -217,7 +216,7 @@ where
         self.animated_layer = Some(dest);
 
         let continue_animation = if is_in {
-            new_length <= (content_len - 1)
+            new_length <= (self.content_len - 1)
         } else {
             new_length > 0
         };

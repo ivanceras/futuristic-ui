@@ -120,7 +120,7 @@ impl Frame {
 
     pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
         let base = &theme.controls;
-        let border_width = 10;
+        let border_width = 2;
 
         let css = jss_ns! {COMPONENT_NAME,
             ".": {
