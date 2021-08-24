@@ -94,7 +94,10 @@ impl Component<Msg, ()> for ImageEffects {
             )
         };
         div(
-            vec![classes_ns_flag([("animating", self.is_animating)])],
+            vec![
+                class(COMPONENT_NAME),
+                classes_ns_flag([("animating", self.is_animating)]),
+            ],
             vec![
                 view_if(self.is_animating, self.animate_list.view()),
                 img(vec![class_ns("img"), src(&self.properties.url)], vec![]),
@@ -136,19 +139,24 @@ impl Properties {
                 cells.push(cell);
             }
         }
-        div(vec![class(COMPONENT_NAME)], cells)
+        div(vec![class_ns("effects_slices")], cells)
     }
 
     fn style(&self, theme: &crate::Theme) -> String {
         jss_ns! {COMPONENT_NAME,
             ".": {
-                position: "relative",
                 width: px(self.width),
                 height: px(self.height),
+            },
+            ".effects_slices": {
+                width: px(self.width),
+                height: px(self.height),
+                position: "relative",
             },
             ".img": {
                 width: px(self.width),
                 height: px(self.height),
+                position: "absolute",
                 opacity: 1,
             },
             ".animating .img": {
@@ -157,8 +165,8 @@ impl Properties {
             ".slice": {
               width: px(self.slice_size),
               height: px(self.slice_size),
-              background_size: format!("{} {}", px(self.width), px(self.height)),
               position: "absolute",
+              background_size: format!("{} {}", px(self.width), px(self.height)),
               background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
                   ,theme.background_color, theme.primary_color, theme.accent_color, theme.background_color, self.url),
               background_repeat:"no-repeat no-repeat",
