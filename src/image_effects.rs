@@ -36,8 +36,8 @@ impl Properties {
     /// slices on x and slices on y
     fn slices(&self) -> (usize, usize) {
         (
-            (self.width / self.slice_size).round() as usize,
-            (self.height / self.slice_size).round() as usize,
+            (self.width / (self.slice_size + self.gap)).round() as usize,
+            (self.height / (self.slice_size + self.gap)).round() as usize,
         )
     }
 
@@ -70,22 +70,23 @@ impl Properties {
         div(vec![class(COMPONENT_NAME)], cells)
     }
 
-    fn style(&self) -> String {
+    fn style(&self, theme: &crate::Theme) -> String {
         jss_ns! {COMPONENT_NAME,
             ".": {
                 position: "relative",
                 width: px(self.width),
                 height: px(self.height),
-                margin: px(10),
             },
             ".slice": {
               width: px(self.slice_size),
               height: px(self.slice_size),
               background_size: format!("{} {}", px(self.width), px(self.height)),
               position: "absolute",
-              background_image: format!("url({})",self.url),
+              background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
+                  ,theme.background_color, theme.primary_color, theme.accent_color, theme.background_color, self.url),
               background_repeat:"no-repeat no-repeat",
               background_attachment: "local, local",
+              background_blend_mode: "color",
             }
         }
     }
@@ -113,6 +114,10 @@ impl ImageEffects {
             properties,
         }
     }
+
+    pub fn style(&self, theme: &crate::Theme) -> String {
+        self.properties.style(theme)
+    }
 }
 
 impl Component<Msg, ()> for ImageEffects {
@@ -132,9 +137,5 @@ impl Component<Msg, ()> for ImageEffects {
 
     fn view(&self) -> Node<Msg> {
         div(vec![], vec![self.animate_list.view()])
-    }
-
-    fn style(&self) -> String {
-        self.properties.style()
     }
 }

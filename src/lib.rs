@@ -422,7 +422,7 @@ impl App {
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
             self.image.style(&self.theme),
-            self.image_effects.style(),
+            self.image_effects.style(&self.theme),
         ]
     }
 

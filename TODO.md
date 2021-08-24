@@ -40,4 +40,20 @@
 - [ ] Unify frame and button.
     - There should be container that has the 4 corner clip, the children components can then be put into it
     such as the buttons, chip buttons.
-- [ ] Add animation to image where the image is subdivided into multiple squares and displayed from top-left to right bottom
+- [X] Add animation to image where the image is subdivided into multiple squares and displayed from top-left to right bottom
+- [ ] Design a Component macro where the Component is declared in the view. The state of the component
+    wil be stored in the `Program` hidden from the app. An Msg wrapper for the component is added automatically to the App's Msg.
+    ```rust
+        enum Msg{
+            BtnClicked,
+            Other(..)
+        }
+    ```
+    ```rust
+        node!{
+            <div class="container">
+                <FuiButton on_click=|_|Msg::BtnClicked>
+            </div>
+        }
+    ```
+
