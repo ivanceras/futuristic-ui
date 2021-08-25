@@ -134,7 +134,14 @@ where
                         class_ns("chipped"),
                         viewBox([0, 0, width, height]),
                     ],
-                    vec![polygon(vec![points(poly_points_str)], vec![])],
+                    vec![polygon(
+                        vec![
+                            class_ns("chipped_polygon"),
+                            points(poly_points_str),
+                            on_transitionend(|_| Msg::HighlightEnd),
+                        ],
+                        vec![],
+                    )],
                 ),
                 self.view_actual_button(Some(width), Some(height)),
             ],
@@ -309,7 +316,7 @@ where
         self.options.has_borders = false;
         self.options.has_corners = true;
         self.options.expand_corners = true;
-        self.options.click_highlights = false;
+        self.options.click_highlights = true;
         self
     }
 
@@ -487,11 +494,16 @@ where
                 position: "absolute",
             },
 
-            ".chipped polyline, .chipped polygon": {
+            ".chipped_polygon": {
                 stroke_width: px(2),
                 stroke: base.corner_color.clone(),
                 fill: "transparent",
                 vector_effect: "non-scaling-stroke",
+                transition: format!("all {}ms ease-out", highlight_transition),
+            },
+
+            ".click_highlights.clicked .chipped_polygon": {
+                fill: base.highlight_color.clone(),
             },
 
             // highlight when clicked and fades out shortly
