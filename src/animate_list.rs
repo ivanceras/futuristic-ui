@@ -176,11 +176,29 @@ where
                         vec![],
                     );
                     dest.add_children_ref_mut(vec![shallow_src]);
-                    let truncate_len = element.children.len().min(chars_limit);
+                    let children_len = element.children.len();
+                    let truncate_len = if chars_limit > *current_cnt {
+                        std::cmp::min(children_len, chars_limit - *current_cnt)
+                    } else {
+                        0
+                    };
+
+                    let last_index = dest
+                        .as_element_ref()
+                        .expect("this is an element")
+                        .children
+                        .len()
+                        - 1;
+
+                    let mut just_added_child = dest
+                        .children_mut()
+                        .expect("must have children, since just added 1")
+                        .get_mut(last_index)
+                        .expect("must get the last child");
 
                     for child in &element.children[0..truncate_len] {
                         Self::include_node_recursive(
-                            dest,
+                            &mut just_added_child,
                             child,
                             chars_limit,
                             current_cnt,
@@ -198,10 +216,7 @@ where
                 };
 
                 if truncate_len > 0 {
-                    let start = 0;
-                    let end = truncate_len;
-
-                    let truncated_txt = &txt.text[start..end];
+                    let truncated_txt = &txt.text[0..truncate_len];
                     let text_node = Node::Text(Text::new(truncated_txt));
                     dest.add_children_ref_mut(vec![text_node]);
                     // we append the blinking character to the end of the text
