@@ -163,34 +163,35 @@ impl Application<Msg> for App {
             Msg::BtnMsg(index, btn_msg) => {
                 let effects = self.button_array[index].update(btn_msg);
                 Cmd::from(
-                    effects
-                        .merge(move |follow_up| Msg::BtnMsg(index, follow_up)),
+                    effects.localize(move |follow_up| {
+                        Msg::BtnMsg(index, follow_up)
+                    }),
                 )
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
                 let effects = self.fui_button.update(fui_btn_msg);
-                Cmd::from(effects.merge(Msg::FuiButtonMsg))
+                Cmd::from(effects.localize(Msg::FuiButtonMsg))
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
-                Cmd::from(effects.merge(Msg::AnimateListMsg))
+                Cmd::from(effects.localize(Msg::AnimateListMsg))
             }
             Msg::ReAnimateList => {
                 let effects =
                     self.animate_list.update(animate_list::Msg::AnimateIn);
-                Cmd::from(effects.merge(Msg::AnimateListMsg))
+                Cmd::from(effects.localize(Msg::AnimateListMsg))
             }
             Msg::ParagraphMsg(para_msg) => {
                 let effects = self.paragraph.update(para_msg);
-                Cmd::from(effects.merge(Msg::ParagraphMsg))
+                Cmd::from(effects.localize(Msg::ParagraphMsg))
             }
             Msg::AnimateImageBtnMsg(btn_msg) => {
                 let effects = self.animate_image_btn.update(btn_msg);
-                Cmd::from(effects.merge(Msg::AnimateImageBtnMsg))
+                Cmd::from(effects.localize(Msg::AnimateImageBtnMsg))
             }
             Msg::AnimateParagraphBtnMsg(btn_msg) => {
                 let effects = self.animate_paragraph_btn.update(btn_msg);
-                Cmd::from(effects.merge(Msg::AnimateParagraphBtnMsg))
+                Cmd::from(effects.localize(Msg::AnimateParagraphBtnMsg))
             }
             Msg::ImageEffectsMsg(effects_msg) => {
                 let effects = self.image_effects.update(effects_msg);
@@ -207,7 +208,7 @@ impl Application<Msg> for App {
             }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
-                Cmd::from(effects.merge(Msg::ParagraphMsg))
+                Cmd::from(effects.localize(Msg::ParagraphMsg))
             }
             Msg::ReAnimateAll => Self::reanimate_all(),
             Msg::NoOp => Cmd::none(),
@@ -524,7 +525,7 @@ impl App {
     }
 
     fn reanimate_all() -> Cmd<Self, Msg> {
-        Cmd::from(Effects::with_follow_ups(vec![
+        Cmd::from(Effects::with_local(vec![
             Msg::ReAnimateFrame,
             Msg::ReAnimateHeader,
             Msg::ReAnimateParagraph,

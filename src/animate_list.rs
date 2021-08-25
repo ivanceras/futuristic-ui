@@ -47,7 +47,7 @@ where
 {
     fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
-            Msg::AnimateIn => Effects::with_follow_ups(self.animate_in()),
+            Msg::AnimateIn => Effects::with_local(self.animate_in()),
             Msg::StopAnimation => {
                 log::trace!("animation is stopped in animate list...");
                 log::trace!(
@@ -60,11 +60,11 @@ where
                     .iter()
                     .map(|listener| listener.emit(()))
                     .collect();
-                Effects::with_effects(pmsg_list)
+                Effects::with_external(pmsg_list)
             }
             Msg::NextAnimation(is_in, start, duration) => {
                 let follow_ups = self.next_animation(is_in, start, duration);
-                Effects::with_follow_ups(follow_ups)
+                Effects::with_local(follow_ups)
             }
         }
     }

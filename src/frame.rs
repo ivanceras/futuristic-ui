@@ -41,7 +41,7 @@ impl Component<Msg, ()> for Frame {
         match msg {
             Msg::AnimateIn => {
                 self.hide = true;
-                Effects::with_follow_ups(self.start_animation())
+                Effects::with_local(self.start_animation())
             }
             Msg::StopAnimation => {
                 self.hide = false;
@@ -56,7 +56,7 @@ impl Component<Msg, ()> for Frame {
                 Effects::none()
             }
             Msg::NextAnimation(start, duration) => {
-                Effects::with_follow_ups(self.next_animation(start, duration))
+                Effects::with_local(self.next_animation(start, duration))
             }
         }
     }

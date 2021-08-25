@@ -38,14 +38,14 @@ impl Component<Msg, ()> for NavHeader {
         match msg {
             Msg::AnimateIn => {
                 self.hide = true;
-                Effects::with_follow_ups(self.start_animation())
+                Effects::with_local(self.start_animation())
             }
             Msg::StopAnimation => {
                 self.hide = false;
                 Effects::none()
             }
             Msg::NextAnimation(start, duration) => {
-                Effects::with_follow_ups(self.next_animation(start, duration))
+                Effects::with_local(self.next_animation(start, duration))
             }
         }
     }

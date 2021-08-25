@@ -165,7 +165,7 @@ where
                     .iter()
                     .map(|listener| listener.emit(mouse_event.clone()))
                     .collect();
-                Effects::with_effects(pmsg_list)
+                Effects::with_external(pmsg_list)
             }
             Msg::HoverIn => {
                 self.hover = true;
