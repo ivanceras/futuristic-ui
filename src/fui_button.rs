@@ -385,7 +385,7 @@ where
                 left: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})", 0, percent(-50)),
-                border_width: format!("{} {} {} {}",0, 0, 0, px(border_width)),
+                border_width: px([0, 0, 0, border_width]),
             },
 
             ".border-right": {
@@ -393,7 +393,7 @@ where
                 right: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})", 0, percent(-50)),
-                border_width: format!("{} {} {} {}", 0, 0, 0, px(border_width)),
+                border_width: px([0, 0, 0, border_width]),
             },
 
             ".border-top": {
@@ -401,7 +401,7 @@ where
                 left: percent(50),
                 width: percent(100),
                 transform: format!("translate({}, {})", percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(border_width), 0, 0, 0),
+                border_width: px([border_width, 0, 0, 0]),
             },
 
             ".border-bottom": {
@@ -409,7 +409,7 @@ where
                 width: percent(100),
                 bottom: 0,
                 transform: format!("translate({}, {})", percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(border_width), 0, 0, 0),
+                border_width: px([border_width, 0, 0, 0]),
             },
 
             // CORNERS - the fancy divs which clips the button
@@ -417,7 +417,7 @@ where
                 width: px(corner_length),
                 height: px(corner_length),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("{} {} {} {} {}",0, 0, px(4), px(-corner_width), base.corner_shadow.clone()),
+                box_shadow: format!("{} {}",px([0, 0, 4, -corner_width]), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
@@ -428,25 +428,25 @@ where
             ".corner__top-left": {
                 left: px(-corner_width),
                 top: px(-corner_width),
-                border_width: format!("{} {} {} {}", px(corner_width), 0, 0, px(corner_width)),
+                border_width: px([corner_width, 0, 0, corner_width]),
             },
 
             ".corner__bottom-left": {
                 left: px(-corner_width),
                 bottom: px(-corner_width),
-                border_width: format!("{} {} {} {}", 0, 0, px(corner_width), px(corner_width)),
+                border_width: px([0, 0, corner_width, corner_width]),
             },
 
             ".corner__top-right": {
                 right: px(-corner_width),
                 top: px(-corner_width),
-                border_width: format!("{} {} {} {}", px(corner_width), px(corner_width), 0, 0),
+                border_width: px([corner_width, corner_width, 0, 0]),
             },
 
             ".corner__bottom-right": {
                 right: px(-corner_width),
                 bottom: px(-corner_width),
-                border_width: format!("{} {} {} {}", 0, px(corner_width), px(corner_width), 0),
+                border_width: px([0, corner_width, corner_width, 0]),
             },
 
             ".button_wrap": {
@@ -466,7 +466,7 @@ where
                 border: "none",
                 z_index: 2,
                 display: "inline-block",
-                padding: format!("{} {}", px(10), px(20)),
+                padding: px([10, 20]),
                 outline: "none",
                 position: "relative",
                 font_size: px(15.75),
