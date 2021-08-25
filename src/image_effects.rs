@@ -99,6 +99,7 @@ impl Component<Msg, ()> for ImageEffects {
             vec![
                 class(COMPONENT_NAME),
                 classes_ns_flag([("animating", self.is_animating)]),
+                on_mouseout(|_| Msg::AnimateIn),
             ],
             vec![
                 view_if(self.is_animating, self.animate_list.view()),
@@ -147,10 +148,13 @@ impl Properties {
     fn style(&self, theme: &crate::Theme) -> String {
         jss_ns! {COMPONENT_NAME,
             ".": {
+                display: "inline-block",
                 width: px(self.width),
                 height: px(self.height),
+                position: "relative",
             },
             ".effects_slices": {
+                display: "inline-block",
                 width: px(self.width),
                 height: px(self.height),
                 position: "relative",
