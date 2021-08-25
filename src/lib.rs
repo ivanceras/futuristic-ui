@@ -100,7 +100,7 @@ impl Default for App {
         fui_button.set_options(Options::full());
 
         let mut animate_image_btn =
-            FuiButton::<Msg>::new_with_label("Animate Image");
+            FuiButton::<Msg>::new_with_label("Animate Image").chipped(true);
         animate_image_btn.add_click_listener(|_| Msg::StartAnimateImageEffects);
 
         let mut animate_paragraph_btn =

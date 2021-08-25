@@ -5,7 +5,7 @@ use sauron::{
     html::attributes,
     html::{attributes::class, div, events::on_click, text},
     prelude::*,
-    Node,
+    svg, Node,
 };
 use web_sys::HtmlAudioElement;
 use web_sys::MouseEvent;
@@ -42,12 +42,16 @@ pub struct Options {
     pub skewed: bool,
     /// has corners
     pub has_corners: bool,
+    /// the button has borders
+    pub has_borders: bool,
     /// enable/disable hover effect
     pub has_hover: bool,
     /// expand corners when hovered
     pub expand_corners: bool,
     /// the button is disabled
     pub disabled: bool,
+    /// the bottom right of the button is chipped
+    pub chipped: bool,
 }
 
 impl<PMSG> FuiButton<PMSG>
@@ -66,6 +70,72 @@ where
             width: None,
             height: None,
         }
+    }
+
+    fn view_actual_button(&self) -> Node<Msg> {
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
+        button(
+            vec![
+                class_ns("button"),
+                disabled(self.options.disabled),
+                if let Some(width) = self.width {
+                    style! {width: px(width)}
+                } else {
+                    empty_attr()
+                },
+                if let Some(height) = self.height {
+                    style! { height: px(height) }
+                } else {
+                    empty_attr()
+                },
+            ],
+            vec![text(&self.label)],
+        )
+    }
+
+    fn view_chipped_button(&self) -> Node<Msg> {
+        let width = 183;
+        let height = 34;
+        let chip_width = 15;
+        let chip_height = 15;
+        let top_left = (0, 0);
+        let top_right = (width, 0);
+        let bottom_left = (0, height);
+        let chip1 = (width - chip_width, height);
+        let chip2 = (width, height - chip_height);
+
+        let poly_points = [bottom_left, chip1, chip2, top_right, top_left];
+
+        let poly_points_str = poly_points
+            .iter()
+            .map(|p| format!("{},{}", p.0, p.1))
+            .collect::<Vec<_>>()
+            .join(" ");
+        log::trace!("points:{}", poly_points_str);
+
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
+        div(
+            vec![class_ns("chipped_wrapper")],
+            vec![
+                svg(
+                    vec![
+                        xmlns("http://www.w3.org/2000/svg"),
+                        preserveAspectRatio("none"),
+                        class_ns("chipped"),
+                        viewBox("0 0 183 34"),
+                    ],
+                    vec![g(
+                        vec![],
+                        vec![polygon(vec![points(poly_points_str)], vec![])],
+                    )],
+                ),
+                self.view_actual_button(),
+            ],
+        )
     }
 }
 
@@ -145,11 +215,22 @@ where
                     div(vec![class_ns("hover hover-bottom")], vec![]),
                 ),
                 //borders
-                div(vec![class_ns("border border-bottom")], vec![]),
-                div(vec![class_ns("border border-left")], vec![]),
-                div(vec![class_ns("border border-right")], vec![]),
-                div(vec![class_ns("border border-top")], vec![]),
-                div(vec![class_ns("border border-bottom")], vec![]),
+                view_if(
+                    self.options.has_borders,
+                    div(vec![class_ns("border border-left")], vec![]),
+                ),
+                view_if(
+                    self.options.has_borders,
+                    div(vec![class_ns("border border-right")], vec![]),
+                ),
+                view_if(
+                    self.options.has_borders,
+                    div(vec![class_ns("border border-top")], vec![]),
+                ),
+                view_if(
+                    self.options.has_borders,
+                    div(vec![class_ns("border border-bottom")], vec![]),
+                ),
                 // corners
                 view_if(
                     self.options.has_corners,
@@ -167,38 +248,26 @@ where
                     self.options.has_corners,
                     div(vec![class_ns("corner corner__bottom-right")], vec![]),
                 ),
-                div(
-                    vec![],
-                    vec![
-                        div(
-                            vec![class_ns("button_wrap")],
-                            vec![button(
+                if self.options.chipped {
+                    self.view_chipped_button()
+                } else {
+                    div(
+                        vec![],
+                        vec![
+                            div(
+                                vec![class_ns("button_wrap")],
+                                vec![self.view_actual_button()],
+                            ),
+                            div(
                                 vec![
-                                    class_ns("button"),
-                                    disabled(self.options.disabled),
-                                    if let Some(width) = self.width {
-                                        style! {width: px(width)}
-                                    } else {
-                                        empty_attr()
-                                    },
-                                    if let Some(height) = self.height {
-                                        style! { height: px(height) }
-                                    } else {
-                                        empty_attr()
-                                    },
+                                    class_ns("highlight"),
+                                    on_transitionend(|_| Msg::HighlightEnd),
                                 ],
-                                vec![text(&self.label)],
-                            )],
-                        ),
-                        div(
-                            vec![
-                                class_ns("highlight"),
-                                on_transitionend(|_| Msg::HighlightEnd),
-                            ],
-                            vec![],
-                        ),
-                    ],
-                ),
+                                vec![],
+                            ),
+                        ],
+                    )
+                },
             ],
         )
     }
@@ -226,6 +295,16 @@ where
     {
         let cb = Callback::from(f);
         self.click_listeners.push(cb);
+    }
+
+    pub fn chipped(mut self, chipped: bool) -> Self {
+        self.options.chipped = chipped;
+        self.options.has_hover = false;
+        self.options.has_borders = false;
+        self.options.has_corners = true;
+        self.options.expand_corners = true;
+        self.options.click_highlights = false;
+        self
     }
 
     pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
@@ -385,8 +464,32 @@ where
                 vertical_align: "middle",
             },
 
+            ".chipped_wrapper": {
+                position: "relative",
+                width: px(183),
+                height: px(34),
+            },
+
+            // the svg of the chipped button
+            ".chipped": {
+                width: px(183),
+                height: px(34),
+                position: "absolute",
+            },
+
+            ".chipped_wrapper label": {
+                position: "absolute",
+            },
+
+            ".chipped polyline, .chipped polygon": {
+                stroke_width: px(2),
+                stroke: base.corner_color.clone(),
+                fill: "transparent",
+                vector_effect: "non-scaling-stroke",
+            },
+
             // highlight when clicked and fades out shortly
-            ".highlight": {
+            ".click_highlights .highlight": {
                   z_index: 1,
                   position: "absolute",
                   left: 0,
@@ -398,7 +501,7 @@ where
                   transition: format!("all {}ms ease-out", highlight_transition),
             },
 
-            ".clicked .highlight": {
+            ".click_highlights.clicked .highlight": {
                 opacity: 1,
             },
 
@@ -462,10 +565,12 @@ impl Options {
             click_highlights: false,
             skewed: false,
             has_corners: false,
+            has_borders: true,
             expand_corners: false,
             has_hover: false,
             disabled: false,
             hidden: false,
+            chipped: false,
         }
     }
 
@@ -477,10 +582,28 @@ impl Options {
             click_highlights: true,
             skewed: false,
             has_corners: true,
+            has_borders: true,
             expand_corners: true,
             has_hover: true,
             disabled: false,
             hidden: false,
+            chipped: false,
+        }
+    }
+
+    #[allow(unused)]
+    pub fn chipped() -> Self {
+        Options {
+            sound: true,
+            click_highlights: true,
+            skewed: false,
+            has_corners: true,
+            has_borders: false,
+            expand_corners: true,
+            has_hover: true,
+            disabled: false,
+            hidden: false,
+            chipped: true,
         }
     }
 
@@ -491,10 +614,12 @@ impl Options {
             click_highlights: true,
             skewed: true,
             has_corners: true,
+            has_borders: true,
             expand_corners: true,
             has_hover: true,
             disabled: false,
             hidden: false,
+            chipped: false,
         }
     }
 
@@ -507,10 +632,12 @@ impl Options {
             click_highlights: true,
             skewed: false,
             has_corners: true,
+            has_borders: true,
             expand_corners: false,
             has_hover: true,
             disabled: false,
             hidden: false,
+            chipped: false,
         }
     }
 
@@ -523,10 +650,12 @@ impl Options {
             click_highlights: true,
             skewed: false,
             has_corners: true,
+            has_borders: true,
             expand_corners: true,
             has_hover: true,
             disabled: false,
             hidden: false,
+            chipped: false,
         }
     }
 
@@ -538,10 +667,12 @@ impl Options {
             click_highlights: true,
             skewed: false,
             has_corners: false,
+            has_borders: true,
             expand_corners: false,
             has_hover: false,
             disabled: false,
             hidden: false,
+            chipped: false,
         }
     }
 
@@ -553,10 +684,12 @@ impl Options {
             click_highlights: false,
             skewed: false,
             has_corners: false,
+            has_borders: true,
             expand_corners: false,
             has_hover: false,
             disabled: true,
             hidden: false,
+            chipped: false,
         }
     }
 

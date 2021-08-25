@@ -1,13 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" class="css-1owyh9f">
-    <style>
-        polygon, polyline {
-            stroke-width: 2px;
-            stroke: #00f8f8;
-            vector-effect: non-scaling-stroke;
-            fill: transparent;
-            transition: stroke 100ms ease-out 0s;
-        }
-    </style>
+<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
     <g style="transform: translate(2px, 2px);">
        <g>
           <polygon points="0,34 168,34 183,19 183,0 0,0"/>
