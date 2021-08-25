@@ -11,6 +11,8 @@ use web_sys::HtmlAudioElement;
 use web_sys::MouseEvent;
 
 const COMPONENT_NAME: &str = "fui_button";
+const DEFAULT_CHIPPED_BUTTON_WIDTH: usize = 200;
+const DEFAULT_CHIPPED_BUTTON_HEIGHT: usize = 40;
 
 #[derive(Clone, Debug)]
 pub enum Msg {
@@ -72,7 +74,11 @@ where
         }
     }
 
-    fn view_actual_button(&self) -> Node<Msg> {
+    fn view_actual_button(
+        &self,
+        width: Option<usize>,
+        height: Option<usize>,
+    ) -> Node<Msg> {
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
@@ -80,12 +86,12 @@ where
             vec![
                 class_ns("button"),
                 disabled(self.options.disabled),
-                if let Some(width) = self.width {
+                if let Some(width) = width {
                     style! {width: px(width)}
                 } else {
                     empty_attr()
                 },
-                if let Some(height) = self.height {
+                if let Some(height) = height {
                     style! { height: px(height) }
                 } else {
                     empty_attr()
@@ -96,8 +102,8 @@ where
     }
 
     fn view_chipped_button(&self) -> Node<Msg> {
-        let width = 183;
-        let height = 34;
+        let width = DEFAULT_CHIPPED_BUTTON_WIDTH;
+        let height = DEFAULT_CHIPPED_BUTTON_HEIGHT;
         let chip_width = 15;
         let chip_height = 15;
         let top_left = (0, 0);
@@ -126,14 +132,11 @@ where
                         xmlns("http://www.w3.org/2000/svg"),
                         preserveAspectRatio("none"),
                         class_ns("chipped"),
-                        viewBox("0 0 183 34"),
+                        viewBox([0, 0, width, height]),
                     ],
-                    vec![g(
-                        vec![],
-                        vec![polygon(vec![points(poly_points_str)], vec![])],
-                    )],
+                    vec![polygon(vec![points(poly_points_str)], vec![])],
                 ),
-                self.view_actual_button(),
+                self.view_actual_button(Some(width), Some(height)),
             ],
         )
     }
@@ -256,7 +259,10 @@ where
                         vec![
                             div(
                                 vec![class_ns("button_wrap")],
-                                vec![self.view_actual_button()],
+                                vec![self.view_actual_button(
+                                    self.width,
+                                    self.height,
+                                )],
                             ),
                             div(
                                 vec![
@@ -466,14 +472,14 @@ where
 
             ".chipped_wrapper": {
                 position: "relative",
-                width: px(183),
-                height: px(34),
+                width: px(DEFAULT_CHIPPED_BUTTON_WIDTH),
+                height: px(DEFAULT_CHIPPED_BUTTON_HEIGHT),
             },
 
             // the svg of the chipped button
             ".chipped": {
-                width: px(183),
-                height: px(34),
+                width: px(DEFAULT_CHIPPED_BUTTON_WIDTH),
+                height: px(DEFAULT_CHIPPED_BUTTON_HEIGHT),
                 position: "absolute",
             },
 
