@@ -337,7 +337,7 @@ where
                 display: "inline-block",
                 padding: px(1),
                 position: "relative",
-                margin: format!("{} {}",px(10), px(10)),
+                margin: px([10, 10]),
             },
 
             ".hidden" : {
@@ -364,7 +364,7 @@ where
                 left: percent(50),
                 bottom: px(2),
                 transform: format!("translate({}, {})",percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(4), 0, 0, 0),
+                border_width: px([4, 0, 0, 0]),
             },
 
 
@@ -470,7 +470,7 @@ where
                 outline: "none",
                 position: "relative",
                 font_size: px(15.75),
-                background: "transparent",
+                background_color: base.content_background_color.clone(),
                 transition: format!("all {}ms ease-out", transition_time_ms),
                 line_height: 1,
                 user_select: "none",
@@ -496,8 +496,8 @@ where
 
             ".chipped_polygon": {
                 stroke_width: px(2),
-                stroke: base.corner_color.clone(),
-                fill: "transparent",
+                stroke: base.border_color.clone(),
+                fill: base.content_background_color.clone(),
                 vector_effect: "non-scaling-stroke",
                 transition: format!("all {}ms ease-out", highlight_transition),
             },
