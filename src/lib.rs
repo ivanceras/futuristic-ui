@@ -266,6 +266,8 @@ impl Application<Msg> for App {
                     vec![
                         style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0) / 2))},
                     ],
+                    //FIXME: this will have a performance penalty
+                    //since this is called at every view call
                     vec![btn_context.map_view(
                         |btn_id, bmsg| Msg::FuiButtonMsg(btn_id, bmsg),
                         {

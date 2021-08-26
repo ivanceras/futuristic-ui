@@ -143,7 +143,15 @@ where
                         vec![],
                     )],
                 ),
-                self.view_actual_button(Some(width), Some(height)),
+                button(
+                    vec![
+                        class_ns("button"),
+                        disabled(self.options.disabled),
+                        style! {width: px(width)},
+                        style! {height: px(height)},
+                    ],
+                    vec![text(&self.label)],
+                ),
             ],
         )
     }
