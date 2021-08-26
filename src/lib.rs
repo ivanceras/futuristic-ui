@@ -15,6 +15,7 @@ use sauron::{
     Application, Cmd, Node, Program,
 };
 use spinner::Spinner;
+use std::cell::RefCell;
 use theme::Theme;
 
 mod animate_list;
@@ -64,6 +65,29 @@ pub struct App {
     animate_paragraph_btn: FuiButton<Msg>,
     image_effects: ImageEffects,
     theme: Theme,
+    btn_context: RefCell<Context<Msg, fui_button::Msg>>,
+}
+
+struct Context<CMSG, MSG> {
+    components: Vec<Box<dyn Component<CMSG, MSG>>>,
+}
+
+impl<CMSG, MSG> Context<CMSG, MSG> {
+    fn new() -> Self {
+        Self { components: vec![] }
+    }
+    fn map_view<F, COMP>(&mut self, f: F, component: COMP) -> Node<MSG>
+    where
+        F: Fn(usize, CMSG) -> MSG + 'static,
+        COMP: Component<CMSG, MSG> + 'static,
+        MSG: 'static,
+        CMSG: 'static,
+    {
+        let current_index = self.components.len();
+        let view = component.view().map_msg(move |cmsg| f(current_index, cmsg));
+        self.components.push(Box::new(component));
+        view
+    }
 }
 
 impl Default for App {
@@ -125,6 +149,7 @@ impl Default for App {
                 Some("Space as seen from space"),
             ),
             theme: Theme::default(),
+            btn_context: RefCell::new(Context::new()),
         }
     }
 }
@@ -216,6 +241,7 @@ impl Application<Msg> for App {
     }
 
     fn view(&self) -> Node<Msg> {
+        let btn_context = self.btn_context.borrow_mut();
         div(
             vec![class("container")],
             vec![
