@@ -38,7 +38,7 @@ pub enum Msg {
     ReAnimateParagraph,
     ReAnimateList,
     BtnMsg(usize, fui_button::Msg),
-    FuiButtonMsg(fui_button::Msg),
+    FuiButtonMsg(usize, fui_button::Msg),
     FrameMsg(frame::Msg),
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
@@ -68,11 +68,11 @@ pub struct App {
     btn_context: RefCell<Context<Msg, fui_button::Msg>>,
 }
 
-struct Context<CMSG, MSG> {
+struct Context<MSG, CMSG> {
     components: Vec<Box<dyn Component<CMSG, MSG>>>,
 }
 
-impl<CMSG, MSG> Context<CMSG, MSG> {
+impl<MSG, CMSG> Context<MSG, CMSG> {
     fn new() -> Self {
         Self { components: vec![] }
     }
@@ -87,6 +87,18 @@ impl<CMSG, MSG> Context<CMSG, MSG> {
         let view = component.view().map_msg(move |cmsg| f(current_index, cmsg));
         self.components.push(Box::new(component));
         view
+    }
+
+    fn update<F>(
+        &mut self,
+        f: F,
+        comp_id: usize,
+        cmsg: CMSG,
+    ) -> Effects<MSG, ()>
+    where
+        F: Fn(CMSG) -> MSG + 'static,
+    {
+        self.components[comp_id].update(cmsg).localize(f)
     }
 }
 
@@ -193,9 +205,13 @@ impl Application<Msg> for App {
                     }),
                 )
             }
-            Msg::FuiButtonMsg(fui_btn_msg) => {
-                let effects = self.fui_button.update(fui_btn_msg);
-                Cmd::from(effects.localize(Msg::FuiButtonMsg))
+            Msg::FuiButtonMsg(btn_id, fui_btn_msg) => {
+                let effects = self.btn_context.borrow_mut().update(
+                    move |fui_btn_msg| Msg::FuiButtonMsg(btn_id, fui_btn_msg),
+                    btn_id,
+                    fui_btn_msg,
+                );
+                Cmd::from(effects)
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
@@ -241,7 +257,7 @@ impl Application<Msg> for App {
     }
 
     fn view(&self) -> Node<Msg> {
-        let btn_context = self.btn_context.borrow_mut();
+        let mut btn_context = self.btn_context.borrow_mut();
         div(
             vec![class("container")],
             vec![
@@ -250,7 +266,19 @@ impl Application<Msg> for App {
                     vec![
                         style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0) / 2))},
                     ],
-                    vec![self.fui_button.view().map_msg(Msg::FuiButtonMsg)],
+                    vec![btn_context.map_view(
+                        |btn_id, bmsg| Msg::FuiButtonMsg(btn_id, bmsg),
+                        {
+                            let mut fui_button =
+                                FuiButton::<Msg>::new_with_label("Welcome");
+                            fui_button.width(400);
+                            fui_button.height(100);
+                            fui_button
+                                .add_click_listener(|_| Msg::ReAnimateAll);
+                            fui_button.set_options(Options::full());
+                            fui_button
+                        },
+                    )],
                 ),
                 self.frame.view().map_msg(Msg::FrameMsg),
                 div(vec![class("futuristic-buttons-array")], {
