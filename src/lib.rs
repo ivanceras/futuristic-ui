@@ -39,7 +39,7 @@ pub enum Msg {
     ReAnimateParagraph,
     ReAnimateList,
     BtnMsg(usize, fui_button::Msg),
-    FuiButtonMsg(usize, fui_button::Msg),
+    FuiButtonMsg(fui_button::Msg),
     FrameMsg(frame::Msg),
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
@@ -220,13 +220,11 @@ impl Application<Msg> for App {
                 )
                 .measure()
             }
-            Msg::FuiButtonMsg(btn_id, fui_btn_msg) => {
-                let mut context = self.btn_context.borrow_mut();
-                let effects = context.update_component_with_id(
-                    btn_id,
-                    fui_btn_msg,
-                    move |fui_btn_msg| Msg::FuiButtonMsg(btn_id, fui_btn_msg),
-                );
+            Msg::FuiButtonMsg(fui_btn_msg) => {
+                let effects = self
+                    .fui_button
+                    .update(fui_btn_msg)
+                    .localize(Msg::FuiButtonMsg);
                 Cmd::from(effects).measure()
             }
             Msg::AnimateListMsg(animate_list_msg) => {
@@ -297,15 +295,10 @@ impl Application<Msg> for App {
                     ],
                     //FIXME: this will have a performance penalty
                     //since this is called at every view call
-                    vec![btn_context.map_view(Msg::FuiButtonMsg, {
-                        let mut fui_button =
-                            FuiButton::<Msg>::new_with_label("Welcome");
-                        fui_button.width(400);
-                        fui_button.height(100);
-                        fui_button.add_click_listener(|_| Msg::ReAnimateAll);
-                        fui_button.set_options(Options::full());
-                        fui_button
-                    })],
+                    vec![self
+                        .fui_button
+                        .view()
+                        .map_msg(move |btn_msg| Msg::FuiButtonMsg(btn_msg))],
                 ),
                 self.frame.view().map_msg(Msg::FrameMsg),
                 div(vec![class("futuristic-buttons-array")], {
