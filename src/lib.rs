@@ -16,6 +16,7 @@ use sauron::{
 };
 use spinner::Spinner;
 use std::cell::RefCell;
+use std::marker::PhantomData;
 use theme::Theme;
 
 mod animate_list;
@@ -66,28 +67,38 @@ pub struct App {
     animate_paragraph_btn: FuiButton<Msg>,
     image_effects: ImageEffects,
     theme: Theme,
-    btn_context: RefCell<Context<Msg, fui_button::Msg>>,
+    btn_context: RefCell<Context<FuiButton<Msg>, Msg, fui_button::Msg>>,
     measurements: Option<Measurements>,
 }
 
-struct Context<MSG, CMSG> {
-    components: Vec<Box<dyn Component<CMSG, MSG>>>,
+struct Context<COMP, MSG, CMSG> {
+    components: Vec<COMP>,
+    _phantom_msg: PhantomData<MSG>,
+    _phantom_cmsg: PhantomData<CMSG>,
 }
 
-impl<MSG, CMSG> Context<MSG, CMSG> {
+impl<COMP, MSG, CMSG> Context<COMP, MSG, CMSG>
+where
+    COMP: Component<CMSG, MSG> + 'static,
+    MSG: 'static,
+    CMSG: 'static,
+{
     fn new() -> Self {
-        Self { components: vec![] }
+        Self {
+            components: vec![],
+            _phantom_msg: PhantomData,
+            _phantom_cmsg: PhantomData,
+        }
     }
-    fn map_view<F, COMP>(&mut self, f: F, component: COMP) -> Node<MSG>
+    fn map_view<F>(&mut self, mapper: F, component: COMP) -> Node<MSG>
     where
         F: Fn(usize, CMSG) -> MSG + 'static,
-        COMP: Component<CMSG, MSG> + 'static,
-        MSG: 'static,
-        CMSG: 'static,
     {
         let current_index = self.components.len();
-        let view = component.view().map_msg(move |cmsg| f(current_index, cmsg));
-        self.components.push(Box::new(component));
+        let view = component
+            .view()
+            .map_msg(move |cmsg| mapper(current_index, cmsg));
+        self.components.push(component);
         view
     }
 
