@@ -58,7 +58,6 @@ pub struct App {
     nav_header: NavHeader,
     frame: Frame,
     paragraph: Paragraph<Msg>,
-    button_array: Vec<FuiButton<Msg>>,
     fui_button: FuiButton<Msg>,
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
@@ -73,6 +72,7 @@ pub struct App {
 
 struct Context<COMP, MSG, CMSG> {
     components: Vec<COMP>,
+    component_pointer: usize,
     _phantom_msg: PhantomData<MSG>,
     _phantom_cmsg: PhantomData<CMSG>,
 }
@@ -86,6 +86,7 @@ where
     fn new() -> Self {
         Self {
             components: vec![],
+            component_pointer: 0,
             _phantom_msg: PhantomData,
             _phantom_cmsg: PhantomData,
         }
@@ -94,12 +95,25 @@ where
     where
         F: Fn(usize, CMSG) -> MSG + 'static,
     {
-        let current_index = self.components.len();
-        let view = component
-            .view()
-            .map_msg(move |cmsg| mapper(current_index, cmsg));
-        self.components.push(component);
-        view
+        if let Some(existing) = self.components.get(self.component_pointer) {
+            log::trace!("this is an existing component.. reusing..");
+            let component_pointer = self.component_pointer;
+            let view = existing
+                .view()
+                .map_msg(move |cmsg| mapper(component_pointer, cmsg));
+            self.component_pointer += 1;
+            view
+        } else {
+            log::trace!(
+                "this is a new component encountered in the view.. adding"
+            );
+            let comp_id = self.components.len();
+            self.component_pointer += 1;
+            let view =
+                component.view().map_msg(move |cmsg| mapper(comp_id, cmsg));
+            self.components.push(component);
+            view
+        }
     }
 
     fn update_component_with_id<F>(
@@ -113,29 +127,18 @@ where
     {
         self.components[comp_id].update(cmsg).localize(mapper)
     }
+
+    fn start_view(&mut self) {
+        log::trace!(
+            "starting a new view.. total number of components: {}",
+            self.components.len()
+        );
+        self.component_pointer = 0;
+    }
 }
 
 impl Default for App {
     fn default() -> Self {
-        let button_options = vec![
-            ("ReAnimate All", Options::full(), Msg::ReAnimateAll),
-            ("Animate List", Options::full(), Msg::ReAnimateList),
-            ("Animate Frame", Options::skewed(), Msg::ReAnimateFrame),
-            ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
-            ("Click", Options::regular(), Msg::NoOp),
-            ("Disabled", Options::disabled(), Msg::NoOp),
-            ("Muted", Options::muted(), Msg::NoOp),
-        ];
-        let button_array: Vec<FuiButton<Msg>> = button_options
-            .into_iter()
-            .map(|(label, options, msg)| {
-                let mut btn = FuiButton::new_with_label(label);
-                btn.set_options(options);
-                btn.add_click_listener(move |_| msg.clone());
-                btn
-            })
-            .collect();
-
         let frame_content = div(
             vec![styles([("padding", "20px 40px"), ("font-size", "32px")])],
             vec![text("Retro Futuristic UI in rust")],
@@ -160,7 +163,6 @@ impl Default for App {
             frame: Frame::new_with_content(frame_content),
             nav_header: NavHeader::new_with_content("Navigation Header"),
             paragraph: Paragraph::new_with_markdown(MARKDOWN_EXAMPLE),
-            button_array,
             fui_button,
             spinner: Spinner::new(),
             animate_list: AnimateList::new_with_content(
@@ -211,14 +213,14 @@ impl Application<Msg> for App {
                 let effects = self.frame.update(frame_msg);
                 Cmd::from(effects.map_msg(Msg::FrameMsg)).measure()
             }
-            Msg::BtnMsg(index, btn_msg) => {
-                let effects = self.button_array[index].update(btn_msg);
-                Cmd::from(
-                    effects.localize(move |follow_up| {
-                        Msg::BtnMsg(index, follow_up)
-                    }),
-                )
-                .measure()
+            Msg::BtnMsg(btn_id, btn_msg) => {
+                let mut btn_context = self.btn_context.borrow_mut();
+                let effects = btn_context.update_component_with_id(
+                    btn_id,
+                    btn_msg,
+                    move |btn_msg| Msg::BtnMsg(btn_id, btn_msg),
+                );
+                Cmd::from(effects)
             }
             Msg::FuiButtonMsg(fui_btn_msg) => {
                 let effects = self
@@ -277,6 +279,7 @@ impl Application<Msg> for App {
 
     fn view(&self) -> Node<Msg> {
         let mut btn_context = self.btn_context.borrow_mut();
+        btn_context.start_view();
         div(
             vec![class("container")],
             vec![
@@ -302,15 +305,31 @@ impl Application<Msg> for App {
                 ),
                 self.frame.view().map_msg(Msg::FrameMsg),
                 div(vec![class("futuristic-buttons-array")], {
-                    self.button_array
-                        .iter()
-                        .enumerate()
-                        .map(|(index, btn)| {
-                            btn.view().map_msg(move |btn_msg| {
-                                Msg::BtnMsg(index, btn_msg)
+                    let button_options = vec![
+                        ("ReAnimate All", Options::full(), Msg::ReAnimateAll),
+                        ("Animate List", Options::full(), Msg::ReAnimateList),
+                        (
+                            "Animate Frame",
+                            Options::skewed(),
+                            Msg::ReAnimateFrame,
+                        ),
+                        ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
+                        ("Click", Options::regular(), Msg::NoOp),
+                        ("Disabled", Options::disabled(), Msg::NoOp),
+                        ("Muted", Options::muted(), Msg::NoOp),
+                    ];
+
+                    button_options
+                        .into_iter()
+                        .map(|(label, options, msg)| {
+                            btn_context.map_view(Msg::BtnMsg, {
+                                let mut btn = FuiButton::new_with_label(label);
+                                btn.set_options(options);
+                                btn.add_click_listener(move |_| msg.clone());
+                                btn
                             })
                         })
-                        .collect::<Vec<_>>()
+                        .collect()
                 }),
                 self.animate_image_btn
                     .view()
