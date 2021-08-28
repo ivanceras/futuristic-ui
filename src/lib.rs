@@ -47,6 +47,7 @@ pub enum Msg {
     ImageEffectsMsg(image_effects::Msg),
     AnimateImageBtnMsg(fui_button::Msg),
     AnimateParagraphBtnMsg(fui_button::Msg),
+    SetMeasurements(Measurements),
     StartAnimateImageEffects,
     ReAnimateAll,
     NoOp,
@@ -66,6 +67,7 @@ pub struct App {
     image_effects: ImageEffects,
     theme: Theme,
     btn_context: RefCell<Context<Msg, fui_button::Msg>>,
+    measurements: Option<Measurements>,
 }
 
 struct Context<MSG, CMSG> {
@@ -162,6 +164,7 @@ impl Default for App {
             ),
             theme: Theme::default(),
             btn_context: RefCell::new(Context::new()),
+            measurements: None,
         }
     }
 }
@@ -178,24 +181,24 @@ impl Application<Msg> for App {
         match msg {
             Msg::HashChanged(hash) => {
                 self.restyle(&hash);
-                Self::reanimate_all()
+                Self::reanimate_all().measure()
             }
             Msg::ReAnimateHeader => {
                 let effects =
                     self.nav_header.update(nav_header::Msg::AnimateIn);
-                Cmd::from(effects.map_msg(Msg::NavHeaderMsg))
+                Cmd::from(effects.map_msg(Msg::NavHeaderMsg)).measure()
             }
             Msg::NavHeaderMsg(header_msg) => {
                 let effects = self.nav_header.update(header_msg);
-                Cmd::from(effects.map_msg(Msg::NavHeaderMsg))
+                Cmd::from(effects.map_msg(Msg::NavHeaderMsg)).measure()
             }
             Msg::ReAnimateFrame => {
                 let effects = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::from(effects.map_msg(Msg::FrameMsg))
+                Cmd::from(effects.map_msg(Msg::FrameMsg)).measure()
             }
             Msg::FrameMsg(frame_msg) => {
                 let effects = self.frame.update(frame_msg);
-                Cmd::from(effects.map_msg(Msg::FrameMsg))
+                Cmd::from(effects.map_msg(Msg::FrameMsg)).measure()
             }
             Msg::BtnMsg(index, btn_msg) => {
                 let effects = self.button_array[index].update(btn_msg);
@@ -204,6 +207,7 @@ impl Application<Msg> for App {
                         Msg::BtnMsg(index, follow_up)
                     }),
                 )
+                .measure()
             }
             Msg::FuiButtonMsg(btn_id, fui_btn_msg) => {
                 let effects = self.btn_context.borrow_mut().update(
@@ -211,47 +215,52 @@ impl Application<Msg> for App {
                     btn_id,
                     fui_btn_msg,
                 );
-                Cmd::from(effects)
+                Cmd::from(effects).measure()
             }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
-                Cmd::from(effects.localize(Msg::AnimateListMsg))
+                Cmd::from(effects.localize(Msg::AnimateListMsg)).measure()
             }
             Msg::ReAnimateList => {
                 let effects =
                     self.animate_list.update(animate_list::Msg::AnimateIn);
-                Cmd::from(effects.localize(Msg::AnimateListMsg))
+                Cmd::from(effects.localize(Msg::AnimateListMsg)).measure()
             }
             Msg::ParagraphMsg(para_msg) => {
                 let effects = self.paragraph.update(para_msg);
-                Cmd::from(effects.localize(Msg::ParagraphMsg))
+                Cmd::from(effects.localize(Msg::ParagraphMsg)).measure()
             }
             Msg::AnimateImageBtnMsg(btn_msg) => {
                 let effects = self.animate_image_btn.update(btn_msg);
-                Cmd::from(effects.localize(Msg::AnimateImageBtnMsg))
+                Cmd::from(effects.localize(Msg::AnimateImageBtnMsg)).measure()
             }
             Msg::AnimateParagraphBtnMsg(btn_msg) => {
                 let effects = self.animate_paragraph_btn.update(btn_msg);
                 Cmd::from(effects.localize(Msg::AnimateParagraphBtnMsg))
+                    .measure()
             }
             Msg::ImageEffectsMsg(effects_msg) => {
                 let effects = self.image_effects.update(effects_msg);
-                Cmd::from(effects.map_msg(Msg::ImageEffectsMsg))
+                Cmd::from(effects.map_msg(Msg::ImageEffectsMsg)).measure()
             }
             Msg::StartAnimateImageEffects => {
                 let effects =
                     self.image_effects.update(image_effects::Msg::AnimateIn);
-                Cmd::from(effects.map_msg(Msg::ImageEffectsMsg))
+                Cmd::from(effects.map_msg(Msg::ImageEffectsMsg)).measure()
             }
             Msg::ImageMsg(image_msg) => {
                 let effects = self.image.update(image_msg);
-                Cmd::from(effects.map_msg(Msg::ImageMsg))
+                Cmd::from(effects.map_msg(Msg::ImageMsg)).measure()
             }
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
-                Cmd::from(effects.localize(Msg::ParagraphMsg))
+                Cmd::from(effects.localize(Msg::ParagraphMsg)).measure()
             }
-            Msg::ReAnimateAll => Self::reanimate_all(),
+            Msg::SetMeasurements(measurements) => {
+                self.measurements = Some(measurements);
+                Cmd::none()
+            }
+            Msg::ReAnimateAll => Self::reanimate_all().measure(),
             Msg::NoOp => Cmd::none(),
         }
     }
@@ -262,6 +271,14 @@ impl Application<Msg> for App {
             vec![class("container")],
             vec![
                 self.nav_header.view().map_msg(Msg::NavHeaderMsg),
+                div(
+                    vec![class("measurements")],
+                    vec![if let Some(measurements) = &self.measurements {
+                        text!("total patches: {}, node_count: {}, update took: {}ms", measurements.total_patches, measurements.view_node_count, measurements.total_time)
+                    } else {
+                        text("")
+                    }],
+                ),
                 div(
                     vec![
                         style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0) / 2))},
@@ -320,7 +337,7 @@ impl Application<Msg> for App {
 
     fn measurements(&self, measurements: Measurements) -> Cmd<Self, Msg> {
         log::info!("measurements: {:#?}", measurements);
-        Cmd::none()
+        Cmd::batch_msg(vec![Msg::SetMeasurements(measurements)])
     }
 }
 
@@ -588,6 +605,7 @@ impl App {
             Msg::ReAnimateList,
             Msg::StartAnimateImageEffects,
         ]))
+        .measure()
     }
 }
 

@@ -5,7 +5,7 @@ use sauron::{
     html::attributes,
     html::{attributes::class, div, events::on_click, text},
     prelude::*,
-    svg, Node,
+    Node,
 };
 use web_sys::HtmlAudioElement;
 use web_sys::MouseEvent;
@@ -497,8 +497,9 @@ where
                 position: "absolute",
             },
 
-            ".chipped_wrapper label": {
+            ".chipped_wrapper button": {
                 position: "absolute",
+                background_color: "transparent",
             },
 
             ".chipped_polygon": {
