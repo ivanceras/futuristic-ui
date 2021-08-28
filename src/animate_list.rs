@@ -49,11 +49,6 @@ where
         match msg {
             Msg::AnimateIn => Effects::with_local(self.animate_in()),
             Msg::StopAnimation => {
-                log::trace!("animation is stopped in animate list...");
-                log::trace!(
-                    "There are follow ups? : {:#?}",
-                    self.on_stop_animation
-                );
                 self.stop_animation();
                 let pmsg_list = self
                     .on_stop_animation
@@ -125,7 +120,6 @@ where
         F: Fn(()) -> PMSG + 'static,
     {
         let cb = Callback::from(f);
-        log::trace!("Adding a stop animation listener here..");
         self.on_stop_animation.push(cb);
     }
 

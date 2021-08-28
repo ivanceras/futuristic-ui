@@ -317,6 +317,11 @@ impl Application<Msg> for App {
             ],
         )
     }
+
+    fn measurements(&self, measurements: Measurements) -> Cmd<Self, Msg> {
+        log::info!("measurements: {:#?}", measurements);
+        Cmd::none()
+    }
 }
 
 impl App {
@@ -337,22 +342,18 @@ impl App {
     }
 
     fn restyle(&mut self, hash: &str) {
-        log::trace!("hash: {}", hash);
         self.theme = Self::calculate_theme_from_url_hash(hash);
-        log::debug!("theme: {:?}", self.theme);
         let styles = self.style();
         Self::inject_style(&styles.join("\n"));
     }
 
     fn remove_style() {
         use sauron::wasm_bindgen::JsCast;
-        log::trace!("Attempting to remove the old style");
         let document = crate::document();
         if let Some(html_style) = document
             .query_selector(".futuristic-ui")
             .expect("must query")
         {
-            log::trace!("actually removing the style element");
             let html_style: web_sys::Element = html_style.unchecked_into();
             html_style.remove();
         }
@@ -486,7 +487,6 @@ impl App {
 
     fn inject_style(style: &str) {
         use sauron::wasm_bindgen::JsCast;
-        log::trace!("injecting style..");
         Self::remove_style();
         let document = crate::document();
         let html_style = document

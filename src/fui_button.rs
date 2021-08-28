@@ -119,7 +119,6 @@ where
             .map(|p| format!("{},{}", p.0, p.1))
             .collect::<Vec<_>>()
             .join(" ");
-        log::trace!("points:{}", poly_points_str);
 
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)

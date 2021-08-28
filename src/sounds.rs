@@ -14,7 +14,6 @@ pub fn play(audio: &HtmlAudioElement) {
 /// otherwise, create a new audio element and attach it to the document
 pub fn preload(sound_url: &str) -> HtmlAudioElement {
     if let Some(existing) = sauron::document().get_element_by_id(sound_url) {
-        log::trace!("existing: {:?}", existing);
         let audio: HtmlAudioElement = existing.unchecked_into();
         audio
     } else {

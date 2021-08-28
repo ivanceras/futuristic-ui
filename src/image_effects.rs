@@ -73,12 +73,10 @@ impl Component<Msg, ()> for ImageEffects {
                 effects.localize(Msg::AnimateListMsg)
             }
             Msg::AnimateListMsg(amsg) => {
-                log::trace!("Got some msg mean to AnimateList: {:?}", amsg);
                 let effects = self.animate_list.update(amsg);
                 effects.localize(Msg::AnimateListMsg)
             }
             Msg::AnimationDone => {
-                log::trace!("Animation is done...");
                 self.is_animating = false;
                 Effects::none()
             }
