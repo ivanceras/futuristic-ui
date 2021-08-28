@@ -71,7 +71,13 @@ pub struct App {
 }
 
 struct Context<COMP, MSG, CMSG> {
+    /// These are the stored Component in this context.
+    /// Each added component can be accessed by it's index
     components: Vec<COMP>,
+    /// We keep track of component pointer as components are added in the view call.
+    /// ISSUE: This will not be accurate if there are components that will be added via control
+    /// flow: if, loops
+    /// SOLUTION: assign a unique id for each of the component added
     component_pointer: usize,
     _phantom_msg: PhantomData<MSG>,
     _phantom_cmsg: PhantomData<CMSG>,
