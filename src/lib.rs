@@ -91,16 +91,16 @@ impl<MSG, CMSG> Context<MSG, CMSG> {
         view
     }
 
-    fn update<F>(
+    fn update_component_with_id<F>(
         &mut self,
-        f: F,
         comp_id: usize,
         cmsg: CMSG,
+        mapper: F,
     ) -> Effects<MSG, ()>
     where
         F: Fn(CMSG) -> MSG + 'static,
     {
-        self.components[comp_id].update(cmsg).localize(f)
+        self.components[comp_id].update(cmsg).localize(mapper)
     }
 }
 
@@ -210,10 +210,11 @@ impl Application<Msg> for App {
                 .measure()
             }
             Msg::FuiButtonMsg(btn_id, fui_btn_msg) => {
-                let effects = self.btn_context.borrow_mut().update(
-                    move |fui_btn_msg| Msg::FuiButtonMsg(btn_id, fui_btn_msg),
+                let mut context = self.btn_context.borrow_mut();
+                let effects = context.update_component_with_id(
                     btn_id,
                     fui_btn_msg,
+                    move |fui_btn_msg| Msg::FuiButtonMsg(btn_id, fui_btn_msg),
                 );
                 Cmd::from(effects).measure()
             }
@@ -285,19 +286,15 @@ impl Application<Msg> for App {
                     ],
                     //FIXME: this will have a performance penalty
                     //since this is called at every view call
-                    vec![btn_context.map_view(
-                        |btn_id, bmsg| Msg::FuiButtonMsg(btn_id, bmsg),
-                        {
-                            let mut fui_button =
-                                FuiButton::<Msg>::new_with_label("Welcome");
-                            fui_button.width(400);
-                            fui_button.height(100);
-                            fui_button
-                                .add_click_listener(|_| Msg::ReAnimateAll);
-                            fui_button.set_options(Options::full());
-                            fui_button
-                        },
-                    )],
+                    vec![btn_context.map_view(Msg::FuiButtonMsg, {
+                        let mut fui_button =
+                            FuiButton::<Msg>::new_with_label("Welcome");
+                        fui_button.width(400);
+                        fui_button.height(100);
+                        fui_button.add_click_listener(|_| Msg::ReAnimateAll);
+                        fui_button.set_options(Options::full());
+                        fui_button
+                    })],
                 ),
                 self.frame.view().map_msg(Msg::FrameMsg),
                 div(vec![class("futuristic-buttons-array")], {
