@@ -133,6 +133,10 @@ impl<PMSG> Frame<PMSG> {
     pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
         let base = &theme.controls;
         let border_width = 2;
+        let corner_expand_distance = 12;
+        let corner_width = 4;
+        let corner_length = 24;
+        let transition_time_ms = 250; //transition time for most effects on the button
 
         let css = jss_ns! {COMPONENT_NAME,
             ".": {
@@ -148,7 +152,7 @@ impl<PMSG> Frame<PMSG> {
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
-                transition: format!("all {}ms ease-in", 250),
+                transition: format!("all {}ms ease-in", transition_time_ms),
                 border_style: "solid",
             },
 
@@ -166,7 +170,7 @@ impl<PMSG> Frame<PMSG> {
                 left: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})",0, percent(-50)),
-                border_width: format!("{} {} {} {}",0, 0, 0, px(border_width)),
+                border_width: format!("{}",px([0, 0, 0, border_width])),
             },
 
             ".border-right": {
@@ -174,7 +178,7 @@ impl<PMSG> Frame<PMSG> {
                 right: 0,
                 height: percent(100),
                 transform: format!("translate({}, {})",0, percent(-50)),
-                border_width: format!("{} {} {} {}",0, 0, 0, px(border_width)),
+                border_width: format!("{}",px([0, 0, 0, border_width])),
             },
 
             ".border-top": {
@@ -182,7 +186,7 @@ impl<PMSG> Frame<PMSG> {
                 left: percent(50),
                 width: percent(100),
                 transform: format!("translate({}, {})", percent(-50), 0),
-                border_width: format!("{} {} {} {}",px(border_width), 0, 0, 0),
+                border_width: format!("{}",px([border_width, 0, 0, 0])),
             },
 
             ".border-bottom": {
@@ -190,18 +194,19 @@ impl<PMSG> Frame<PMSG> {
                 width: percent(100),
                 bottom: 0,
                 transform: format!("translate({}, {})",percent(-50), 0),
-                border_width: format!("{} {} {} {}", px(border_width), 0, 0, 0),
+                border_width: format!("{}", px([border_width, 0, 0, 0])),
             },
 
+            // CORNERS - the fancy divs which clips the button
             ".corner": {
-                width: px(24),
-                height: px(24),
+                width: px(corner_length),
+                height: px(corner_length),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("{} {} {} {} {}", 0, 0, px(4), px(-2), base.corner_shadow.clone()),
+                box_shadow: format!("{} {}",px([0, 0, 4, -corner_width]), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
-                transition: format!("all {}ms ease-in",250),
+                transition: format!("all {}ms ease-in",transition_time_ms),
                 border_style: "solid",
             },
 
@@ -212,27 +217,27 @@ impl<PMSG> Frame<PMSG> {
             },
 
             ".corner__top-left": {
-                left: px(-2),
-                top: px(-2),
-                border_width: format!("{} {} {} {}",px(2), 0, 0, px(2)),
+                left: px(-corner_width),
+                top: px(-corner_width),
+                border_width: px([corner_width, 0, 0, corner_width]),
             },
 
             ".corner__bottom-left": {
-                left: px(-2),
-                bottom: px(-2),
-                border_width: format!("{} {} {} {}",0, 0, px(2), px(2)),
+                left: px(-corner_width),
+                bottom: px(-corner_width),
+                border_width: px([0, 0, corner_width, corner_width]),
             },
 
             ".corner__top-right": {
-                right: px(-2),
-                top: px(-2),
-                border_width: format!("{} {} {} {}",px(2), px(2), 0, 0),
+                right: px(-corner_width),
+                top: px(-corner_width),
+                border_width: px([corner_width, corner_width, 0, 0]),
             },
 
             ".corner__bottom-right": {
-                right: px(-2),
-                bottom: px(-2),
-                border_width: format!("{} {} {} {}",0, px(2), px(2), 0),
+                right: px(-corner_width),
+                bottom: px(-corner_width),
+                border_width: px([0, corner_width, corner_width, 0]),
             },
 
             ".content": {
@@ -241,7 +246,7 @@ impl<PMSG> Frame<PMSG> {
                 display: "block",
                 position: "relative",
                 overflow: "hidden",
-                transition: format!("background-color {}ms ease-in", 250),
+                transition: format!("background-color {}ms ease-in", transition_time_ms),
             },
 
             ".hide .content": {
@@ -262,23 +267,23 @@ impl<PMSG> Frame<PMSG> {
         //
         let expand_corner_css = jss_ns! {COMPONENT_NAME,
             ".expand_corners.hovered .corner__top-left": {
-                left: px(-8),
-                top: px(-8),
+                left: px(-corner_expand_distance),
+                top: px(-corner_expand_distance),
             },
 
             ".expand_corners.hovered .corner__bottom-left": {
-                left: px(-8),
-                bottom: px(-8),
+                left: px(-corner_expand_distance),
+                bottom: px(-corner_expand_distance),
             },
 
             ".expand_corners.hovered .corner__top-right": {
-                right: px(-8),
-                top: px(-8),
+                right: px(-corner_expand_distance),
+                top: px(-corner_expand_distance),
             },
 
             ".expand_corners.hovered .corner__bottom-right": {
-                right: px(-8),
-                bottom: px(-8),
+                right: px(-corner_expand_distance),
+                bottom: px(-corner_expand_distance),
             },
         };
 

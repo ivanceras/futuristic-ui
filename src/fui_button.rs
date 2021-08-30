@@ -395,7 +395,7 @@ where
             // BORDERS these are styled divs wrapping the buttons
             ".border": {
                 border_color: base.border_color.clone(),
-                box_shadow: format!("{} {} {} {}",0, 0, px(4), base.border_shadow.clone()),
+                box_shadow: format!("{} {}",px([0,0,4]), base.border_shadow.clone()),
                 z_index: 1,
                 opacity: 1,
                 position: "absolute",
