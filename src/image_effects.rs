@@ -253,9 +253,6 @@ impl ImageEffects {
         let new_length = (anim_progress * self.content_len() as f64 / duration)
             .round() as usize;
 
-        self.frame
-            .set_content(self.properties.slice_view(Some(new_length)));
-
         let continue_animation = if is_in {
             new_length <= (self.content_len() - 1)
         } else {
@@ -263,6 +260,8 @@ impl ImageEffects {
         };
 
         if continue_animation {
+            self.frame
+                .set_content(self.properties.slice_view(Some(new_length)));
             vec![Msg::NextAnimation(is_in, start, duration)]
         } else {
             vec![Msg::StopAnimation]
