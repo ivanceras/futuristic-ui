@@ -104,8 +104,8 @@ where
     fn view_chipped_button(&self) -> Node<Msg> {
         let width = DEFAULT_CHIPPED_BUTTON_WIDTH;
         let height = DEFAULT_CHIPPED_BUTTON_HEIGHT;
-        let chip_width = 15;
-        let chip_height = 15;
+        let (chip_width, chip_height) = (20, 20);
+        let (gap_x, gap_y) = (4, 4);
         let top_left = (0, 0);
         let top_right = (width, 0);
         let bottom_left = (0, height);
@@ -114,7 +114,18 @@ where
 
         let poly_points = [bottom_left, chip1, chip2, top_right, top_left];
 
+        let bottom_right = (width, height);
+        let tri_edge1 = (width - chip_width + gap_x, height);
+        let tri_edge2 = (width, height - chip_height + gap_y);
+        let triangle = [tri_edge1, tri_edge2, bottom_right];
+
         let poly_points_str = poly_points
+            .iter()
+            .map(|p| format!("{},{}", p.0, p.1))
+            .collect::<Vec<_>>()
+            .join(" ");
+
+        let triangle_points = triangle
             .iter()
             .map(|p| format!("{},{}", p.0, p.1))
             .collect::<Vec<_>>()
@@ -133,14 +144,20 @@ where
                         class_ns("chipped"),
                         viewBox([0, 0, width, height]),
                     ],
-                    vec![polygon(
-                        vec![
-                            class_ns("chipped_polygon"),
-                            points(poly_points_str),
-                            on_transitionend(|_| Msg::HighlightEnd),
-                        ],
-                        vec![],
-                    )],
+                    vec![
+                        polygon(
+                            vec![
+                                class_ns("chipped_polygon"),
+                                points(poly_points_str),
+                                on_transitionend(|_| Msg::HighlightEnd),
+                            ],
+                            vec![],
+                        ),
+                        polygon(
+                            vec![class_ns("triangle"), points(triangle_points)],
+                            vec![],
+                        ),
+                    ],
                 ),
                 button(
                     vec![
@@ -508,6 +525,11 @@ where
                 fill: base.content_background_color.clone(),
                 vector_effect: "non-scaling-stroke",
                 transition: format!("all {}ms ease-out", highlight_transition),
+            },
+            ".triangle": {
+                stroke_width: px(2),
+                stroke: base.border_color.clone(),
+                fill: base.border_color.clone(),
             },
 
             ".click_highlights.clicked .chipped_polygon": {
