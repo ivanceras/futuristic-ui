@@ -28,7 +28,7 @@ impl<PMSG> AnimateList<PMSG>
 where
     PMSG: Clone,
 {
-    pub fn new_with_content(children: Node<PMSG>) -> Self {
+    pub fn with_content(children: Node<PMSG>) -> Self {
         let content_len = children.node_count();
         AnimateList {
             audio: sounds::preload("sounds/typing.mp3"),

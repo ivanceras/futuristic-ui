@@ -161,12 +161,12 @@ impl Default for App {
         animate_paragraph_btn.add_click_listener(|_| Msg::ReAnimateParagraph);
 
         App {
-            frame: Frame::new_with_content(frame_content),
-            nav_header: NavHeader::new_with_content("Navigation Header"),
+            frame: Frame::with_content(frame_content),
+            nav_header: NavHeader::with_content("Navigation Header"),
             paragraph: Paragraph::new_with_markdown(MARKDOWN_EXAMPLE),
             fui_button,
             spinner: Spinner::new(),
-            animate_list: AnimateList::new_with_content(
+            animate_list: AnimateList::with_content(
                 Self::animate_list_content(),
             ),
             animate_image_btn,

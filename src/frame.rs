@@ -27,7 +27,7 @@ pub struct Frame<PMSG> {
 }
 
 impl<PMSG> Frame<PMSG> {
-    pub fn new_with_content(content: Node<PMSG>) -> Self {
+    pub fn with_content(content: Node<PMSG>) -> Self {
         Frame {
             audio: sounds::preload("sounds/deploy.mp3"),
             hide: false,

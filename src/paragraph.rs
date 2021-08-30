@@ -18,7 +18,9 @@ where
 {
     pub fn new_with_markdown(md: &str) -> Self {
         Paragraph {
-            animated_list: AnimateList::new_with_content(sauron_markdown::markdown(md)),
+            animated_list: AnimateList::with_content(
+                sauron_markdown::markdown(md),
+            ),
         }
     }
 }
@@ -30,7 +32,8 @@ where
     fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
             Msg::AnimateIn => {
-                let effects = self.animated_list.update(animate_list::Msg::AnimateIn);
+                let effects =
+                    self.animated_list.update(animate_list::Msg::AnimateIn);
                 effects.map_msg(Msg::AnimateListMsg)
             }
             Msg::AnimateListMsg(amsg) => {

@@ -24,7 +24,7 @@ pub struct NavHeader {
 }
 
 impl NavHeader {
-    pub fn new_with_content(content: &str) -> Self {
+    pub fn with_content(content: &str) -> Self {
         NavHeader {
             audio: sounds::preload("sounds/deploy.mp3"),
             hide: false,

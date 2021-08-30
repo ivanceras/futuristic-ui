@@ -49,7 +49,7 @@ impl ImageEffects {
             url: url.to_string(),
         };
 
-        let mut frame = Frame::new_with_content(properties.slice_view(None));
+        let mut frame = Frame::with_content(properties.slice_view(None));
 
         ImageEffects {
             audio: sounds::preload("sounds/typing.mp3"),
