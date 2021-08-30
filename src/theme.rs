@@ -13,6 +13,31 @@ pub struct Theme {
     pub controls: Controls,
 }
 
+/// Issue how to derive pallet from primary?
+/// Maybe mix the pallet color with the primary color
+#[derive(PartialEq, Debug)]
+pub struct Pallete {
+    /// color for error, default is red
+    pub error: RGBA,
+    /// color for success, default is green
+    pub success: RGBA,
+    /// color for info, default is blue
+    pub info: RGBA,
+    /// color for warning, default is yellow
+    pub warning: RGBA,
+}
+
+impl Default for Pallete {
+    fn default() -> Self {
+        Self {
+            error: rgba(255, 0, 0, 1.0),
+            success: rgba(0, 255, 0, 1.0),
+            info: rgba(0, 0, 255, 1.0),
+            warning: rgba(255, 255, 0, 1.0),
+        }
+    }
+}
+
 /// colors to controls
 /// such as buttons, navigation links, frames
 #[derive(PartialEq, Debug)]
