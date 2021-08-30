@@ -1,10 +1,11 @@
-use crate::{animate_list, frame, AnimateList, Frame};
+use crate::{animate_list, frame, sounds, AnimateList, Frame};
 use sauron::{
     html::{attributes, div},
     jss::jss_ns,
     prelude::*,
     Node,
 };
+use web_sys::HtmlAudioElement;
 
 const COMPONENT_NAME: &str = "image_effects";
 
@@ -13,6 +14,8 @@ pub enum Msg {
     AnimateIn,
     FrameMsg(Box<frame::Msg<Msg>>),
     AnimationDone,
+    StopAnimation,
+    NextAnimation(bool, f64, f64),
 }
 
 pub struct Properties {
@@ -25,6 +28,7 @@ pub struct Properties {
 }
 
 pub struct ImageEffects {
+    audio: HtmlAudioElement,
     frame: Frame<Msg>,
     properties: Properties,
     is_animating: bool,
@@ -45,9 +49,10 @@ impl ImageEffects {
             url: url.to_string(),
         };
 
-        let mut frame = Frame::new_with_content(properties.slice_view());
+        let mut frame = Frame::new_with_content(properties.slice_view(None));
 
         ImageEffects {
+            audio: sounds::preload("sounds/typing.mp3"),
             frame,
             properties,
             is_animating: false,
@@ -66,8 +71,7 @@ impl Component<Msg, ()> for ImageEffects {
         match msg {
             Msg::AnimateIn => {
                 self.is_animating = true;
-                let effects = self.frame.update(frame::Msg::AnimateIn);
-                effects.localize(|fmsg| Msg::FrameMsg(Box::new(fmsg)))
+                Effects::with_local(self.animate_in())
             }
             Msg::FrameMsg(fmsg) => {
                 let effects = self.frame.update(*fmsg);
@@ -77,13 +81,18 @@ impl Component<Msg, ()> for ImageEffects {
                 self.is_animating = false;
                 Effects::none()
             }
+            Msg::StopAnimation => {
+                self.stop_animation();
+                Effects::none()
+            }
+            Msg::NextAnimation(is_in, start, duration) => {
+                let follow_ups = self.next_animation(is_in, start, duration);
+                Effects::with_local(follow_ups)
+            }
         }
     }
 
     fn view(&self) -> Node<Msg> {
-        let class_ns = |class_names| {
-            attributes::class_namespaced(COMPONENT_NAME, class_names)
-        };
         let classes_ns_flag = |class_name_flags| {
             attributes::classes_flag_namespaced(
                 COMPONENT_NAME,
@@ -96,12 +105,10 @@ impl Component<Msg, ()> for ImageEffects {
                 classes_ns_flag([("animating", self.is_animating)]),
                 //on_mouseout(|_| Msg::AnimateIn),
             ],
-            vec![
-                self.frame
-                    .view()
-                    .map_msg(|fmsg| Msg::FrameMsg(Box::new(fmsg))),
-                div(vec![class_ns("img")], vec![]),
-            ],
+            vec![self
+                .frame
+                .view()
+                .map_msg(|fmsg| Msg::FrameMsg(Box::new(fmsg)))],
         )
     }
 }
@@ -115,28 +122,39 @@ impl Properties {
         )
     }
 
-    fn slice_view(&self) -> Node<Msg> {
+    fn content_len(&self) -> usize {
+        let (w, h) = self.slices();
+        w * h
+    }
+
+    fn slice_view(&self, limit: Option<usize>) -> Node<Msg> {
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
         let mut cells = vec![];
         let (slice_x, slice_y) = self.slices();
+        let max = slice_x * slice_y;
+        let limit = if let Some(limit) = limit { limit } else { max };
+        let mut index = 0;
         for y in 0..slice_y {
             let top = (self.slice_size + self.gap) * y as f32;
             for x in 0..slice_x {
-                let left = (self.slice_size + self.gap) * x as f32;
-                let cell = div(
-                    vec![
-                        class_ns("slice"),
-                        style! {
-                            left: px(left),
-                            top: px(top),
-                            background_position: format!("{} {}", px(-left), px(-top)),
-                        },
-                    ],
-                    vec![],
-                );
-                cells.push(cell);
+                if index < limit {
+                    let left = (self.slice_size + self.gap) * x as f32;
+                    let cell = div(
+                        vec![
+                            class_ns("slice"),
+                            style! {
+                                left: px(left),
+                                top: px(top),
+                                background_position: format!("{} {}", px(-left), px(-top)),
+                            },
+                        ],
+                        vec![],
+                    );
+                    cells.push(cell);
+                }
+                index += 1;
             }
         }
         div(vec![class_ns("effects_slices")], cells)
@@ -159,7 +177,7 @@ impl Properties {
             ".img": {
                 width: px(self.width),
                 height: px(self.height),
-                position: "absolute",
+                position: "relative",
                 opacity: 1,
                 background_size: format!("{} {}", px(self.width), px(self.height)),
                 background_image: format!("linear-gradient({} 0, {} 25%, {} 75%, {} 100%), url({})"
@@ -180,6 +198,74 @@ impl Properties {
                   background_attachment: "local, local",
                   background_blend_mode: "color",
             }
+        }
+    }
+}
+
+impl ImageEffects {
+    pub fn animate_in(&mut self) -> Vec<Msg> {
+        sounds::play(&self.audio);
+        self.start_animation(true)
+    }
+
+    fn stop_animation(&mut self) -> Vec<Msg> {
+        self.is_animating = false;
+        let class_ns = |class_names| {
+            attributes::class_namespaced(COMPONENT_NAME, class_names)
+        };
+        self.frame.set_content(div(vec![class_ns("img")], vec![]));
+        vec![]
+    }
+
+    fn content_len(&self) -> usize {
+        self.properties.content_len()
+    }
+
+    fn start_animation(&mut self, is_in: bool) -> Vec<Msg> {
+        if self.content_len() == 0 {
+            return vec![];
+        }
+
+        let interval = 1_000.0 / 60.0;
+        let real_duration = interval * self.content_len() as f64;
+        let timeout = 500.0;
+        let duration = real_duration.min(timeout);
+        let start = crate::dom::now();
+
+        self.is_animating = true;
+
+        vec![Msg::NextAnimation(is_in, start, duration)]
+    }
+
+    fn next_animation(
+        &mut self,
+        is_in: bool,
+        start: f64,
+        duration: f64,
+    ) -> Vec<Msg> {
+        let timestamp = crate::dom::now();
+
+        let mut anim_progress = (timestamp - start).max(0.0);
+        if !is_in {
+            anim_progress = duration - anim_progress;
+        }
+
+        let new_length = (anim_progress * self.content_len() as f64 / duration)
+            .round() as usize;
+
+        self.frame
+            .set_content(self.properties.slice_view(Some(new_length)));
+
+        let continue_animation = if is_in {
+            new_length <= (self.content_len() - 1)
+        } else {
+            new_length > 0
+        };
+
+        if continue_animation {
+            vec![Msg::NextAnimation(is_in, start, duration)]
+        } else {
+            vec![Msg::StopAnimation]
         }
     }
 }

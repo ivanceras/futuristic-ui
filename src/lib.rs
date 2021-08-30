@@ -3,7 +3,6 @@
 use animate_list::AnimateList;
 use frame::Frame;
 use fui_button::{FuiButton, Options};
-//use image::Image;
 use image_effects::ImageEffects;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
@@ -22,8 +21,6 @@ use theme::Theme;
 mod animate_list;
 mod frame;
 mod fui_button;
-//#[allow(unused)]
-//mod image;
 mod image_effects;
 mod nav_header;
 mod paragraph;
@@ -44,7 +41,6 @@ pub enum Msg {
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
-    //ImageMsg(image::Msg),
     ImageEffectsMsg(image_effects::Msg),
     AnimateImageBtnMsg(fui_button::Msg),
     AnimateParagraphBtnMsg(fui_button::Msg),
@@ -61,7 +57,6 @@ pub struct App {
     fui_button: FuiButton<Msg>,
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
-    //image: Image,
     animate_image_btn: FuiButton<Msg>,
     animate_paragraph_btn: FuiButton<Msg>,
     image_effects: ImageEffects,
@@ -177,12 +172,6 @@ impl Default for App {
             animate_image_btn,
             animate_paragraph_btn,
             image_effects: ImageEffects::new("img/space.jpg"),
-            /*
-            image: Image::new(
-                "img/space.jpg",
-                Some("Space as seen from space"),
-            ),
-            */
             theme: Theme::default(),
             btn_context: RefCell::new(Context::new()),
             measurements: None,
@@ -274,12 +263,6 @@ impl Application<Msg> for App {
                     self.image_effects.update(image_effects::Msg::AnimateIn);
                 Cmd::from(effects.map_msg(Msg::ImageEffectsMsg)).measure()
             }
-            /*
-            Msg::ImageMsg(image_msg) => {
-                let effects = self.image.update(image_msg);
-                Cmd::from(effects.map_msg(Msg::ImageMsg)).measure()
-            }
-            */
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
                 Cmd::from(effects.localize(Msg::ParagraphMsg)).measure()
@@ -359,7 +342,6 @@ impl Application<Msg> for App {
                     .view()
                     .map_msg(Msg::AnimateParagraphBtnMsg),
                 self.paragraph.view(),
-                //self.image.view().map_msg(Msg::ImageMsg),
                 footer(
                     vec![],
                     vec![a(
@@ -535,7 +517,6 @@ impl App {
             self.fui_button.style(&self.theme).join("\n"),
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
-            //self.image.style(&self.theme),
             self.image_effects.style(&self.theme),
         ]
     }

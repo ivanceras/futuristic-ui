@@ -108,6 +108,10 @@ where
 }
 
 impl<PMSG> Frame<PMSG> {
+    pub fn set_content(&mut self, content: Node<PMSG>) {
+        self.content = content;
+    }
+
     fn start_animation(&mut self) -> Vec<Msg<PMSG>> {
         let duration = 200.0;
         let start = crate::dom::now();
