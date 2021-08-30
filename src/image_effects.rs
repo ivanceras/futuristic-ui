@@ -1,4 +1,4 @@
-use crate::{animate_list, AnimateList};
+use crate::{animate_list, frame, AnimateList, Frame};
 use sauron::{
     html::{attributes, div},
     jss::jss_ns,
@@ -11,7 +11,7 @@ const COMPONENT_NAME: &str = "image_effects";
 #[derive(Clone, Debug)]
 pub enum Msg {
     AnimateIn,
-    AnimateListMsg(animate_list::Msg),
+    FrameMsg(Box<frame::Msg<Msg>>),
     AnimationDone,
 }
 
@@ -25,7 +25,7 @@ pub struct Properties {
 }
 
 pub struct ImageEffects {
-    animate_list: AnimateList<Msg>,
+    frame: Frame<Msg>,
     properties: Properties,
     is_animating: bool,
 }
@@ -45,12 +45,10 @@ impl ImageEffects {
             url: url.to_string(),
         };
 
-        let mut animate_list =
-            AnimateList::new_with_content(properties.slice_view());
-        animate_list.add_stop_animation_listener(|_| Msg::AnimationDone);
+        let mut frame = Frame::new_with_content(properties.slice_view());
 
         ImageEffects {
-            animate_list,
+            frame,
             properties,
             is_animating: false,
         }
@@ -68,13 +66,12 @@ impl Component<Msg, ()> for ImageEffects {
         match msg {
             Msg::AnimateIn => {
                 self.is_animating = true;
-                let effects =
-                    self.animate_list.update(animate_list::Msg::AnimateIn);
-                effects.localize(Msg::AnimateListMsg)
+                let effects = self.frame.update(frame::Msg::AnimateIn);
+                effects.localize(|fmsg| Msg::FrameMsg(Box::new(fmsg)))
             }
-            Msg::AnimateListMsg(amsg) => {
-                let effects = self.animate_list.update(amsg);
-                effects.localize(Msg::AnimateListMsg)
+            Msg::FrameMsg(fmsg) => {
+                let effects = self.frame.update(*fmsg);
+                effects.localize(|fmsg| Msg::FrameMsg(Box::new(fmsg)))
             }
             Msg::AnimationDone => {
                 self.is_animating = false;
@@ -97,10 +94,12 @@ impl Component<Msg, ()> for ImageEffects {
             vec![
                 class(COMPONENT_NAME),
                 classes_ns_flag([("animating", self.is_animating)]),
-                on_mouseout(|_| Msg::AnimateIn),
+                //on_mouseout(|_| Msg::AnimateIn),
             ],
             vec![
-                view_if(self.is_animating, self.animate_list.view()),
+                self.frame
+                    .view()
+                    .map_msg(|fmsg| Msg::FrameMsg(Box::new(fmsg))),
                 div(vec![class_ns("img")], vec![]),
             ],
         )

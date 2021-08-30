@@ -11,22 +11,23 @@ use web_sys::HtmlAudioElement;
 const COMPONENT_NAME: &str = "frame";
 
 #[derive(Clone, Debug)]
-pub enum Msg {
+pub enum Msg<PMSG> {
     AnimateIn,
     StopAnimation,
     HoverIn,
     HoverOut,
     NextAnimation(f64, f64),
+    External(PMSG),
 }
-pub struct Frame {
+pub struct Frame<PMSG> {
     audio: HtmlAudioElement,
     hide: bool,
     hover: bool,
-    content: Node<Msg>,
+    content: Node<PMSG>,
 }
 
-impl Frame {
-    pub fn new_with_content(content: Node<Msg>) -> Self {
+impl<PMSG> Frame<PMSG> {
+    pub fn new_with_content(content: Node<PMSG>) -> Self {
         Frame {
             audio: sounds::preload("sounds/deploy.mp3"),
             hide: false,
@@ -36,8 +37,11 @@ impl Frame {
     }
 }
 
-impl Component<Msg, ()> for Frame {
-    fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
+impl<PMSG> Component<Msg<PMSG>, PMSG> for Frame<PMSG>
+where
+    PMSG: 'static,
+{
+    fn update(&mut self, msg: Msg<PMSG>) -> Effects<Msg<PMSG>, PMSG> {
         match msg {
             Msg::AnimateIn => {
                 self.hide = true;
@@ -58,10 +62,11 @@ impl Component<Msg, ()> for Frame {
             Msg::NextAnimation(start, duration) => {
                 Effects::with_local(self.next_animation(start, duration))
             }
+            Msg::External(pmsg) => Effects::with_external(vec![pmsg]),
         }
     }
 
-    fn view(&self) -> Node<Msg> {
+    fn view(&self) -> Node<Msg<PMSG>> {
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
@@ -93,21 +98,24 @@ impl Component<Msg, ()> for Frame {
                 div(vec![class_ns("corner corner__bottom-left")], vec![]),
                 div(vec![class_ns("corner corner__top-right")], vec![]),
                 div(vec![class_ns("corner corner__bottom-right")], vec![]),
-                div(vec![class_ns("content")], vec![self.content.clone()]),
+                div(
+                    vec![class_ns("content")],
+                    vec![self.content.clone().map_msg(Msg::External)],
+                ),
             ],
         )
     }
 }
 
-impl Frame {
-    fn start_animation(&mut self) -> Vec<Msg> {
+impl<PMSG> Frame<PMSG> {
+    fn start_animation(&mut self) -> Vec<Msg<PMSG>> {
         let duration = 200.0;
         let start = crate::dom::now();
         sounds::play(&self.audio);
         vec![Msg::NextAnimation(start, duration)]
     }
 
-    fn next_animation(&mut self, start: f64, duration: f64) -> Vec<Msg> {
+    fn next_animation(&mut self, start: f64, duration: f64) -> Vec<Msg<PMSG>> {
         let timestamp = crate::dom::now();
         let elapsed = timestamp - start;
         let continue_animation = elapsed < duration;

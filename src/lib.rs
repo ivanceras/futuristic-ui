@@ -3,7 +3,7 @@
 use animate_list::AnimateList;
 use frame::Frame;
 use fui_button::{FuiButton, Options};
-use image::Image;
+//use image::Image;
 use image_effects::ImageEffects;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
@@ -22,8 +22,8 @@ use theme::Theme;
 mod animate_list;
 mod frame;
 mod fui_button;
-#[allow(unused)]
-mod image;
+//#[allow(unused)]
+//mod image;
 mod image_effects;
 mod nav_header;
 mod paragraph;
@@ -40,11 +40,11 @@ pub enum Msg {
     ReAnimateList,
     BtnMsg(usize, fui_button::Msg),
     FuiButtonMsg(fui_button::Msg),
-    FrameMsg(frame::Msg),
+    FrameMsg(Box<frame::Msg<Msg>>),
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
-    ImageMsg(image::Msg),
+    //ImageMsg(image::Msg),
     ImageEffectsMsg(image_effects::Msg),
     AnimateImageBtnMsg(fui_button::Msg),
     AnimateParagraphBtnMsg(fui_button::Msg),
@@ -56,12 +56,12 @@ pub enum Msg {
 
 pub struct App {
     nav_header: NavHeader,
-    frame: Frame,
+    frame: Frame<Msg>,
     paragraph: Paragraph<Msg>,
     fui_button: FuiButton<Msg>,
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
-    image: Image,
+    //image: Image,
     animate_image_btn: FuiButton<Msg>,
     animate_paragraph_btn: FuiButton<Msg>,
     image_effects: ImageEffects,
@@ -177,10 +177,12 @@ impl Default for App {
             animate_image_btn,
             animate_paragraph_btn,
             image_effects: ImageEffects::new("img/space.jpg"),
+            /*
             image: Image::new(
                 "img/space.jpg",
                 Some("Space as seen from space"),
             ),
+            */
             theme: Theme::default(),
             btn_context: RefCell::new(Context::new()),
             measurements: None,
@@ -213,11 +215,17 @@ impl Application<Msg> for App {
             }
             Msg::ReAnimateFrame => {
                 let effects = self.frame.update(frame::Msg::AnimateIn);
-                Cmd::from(effects.map_msg(Msg::FrameMsg)).measure()
+                Cmd::from(
+                    effects.localize(|fmsg| Msg::FrameMsg(Box::new(fmsg))),
+                )
+                .measure()
             }
             Msg::FrameMsg(frame_msg) => {
-                let effects = self.frame.update(frame_msg);
-                Cmd::from(effects.map_msg(Msg::FrameMsg)).measure()
+                let effects = self.frame.update(*frame_msg);
+                Cmd::from(
+                    effects.localize(|fmsg| Msg::FrameMsg(Box::new(fmsg))),
+                )
+                .measure()
             }
             Msg::BtnMsg(btn_id, btn_msg) => {
                 let mut btn_context = self.btn_context.borrow_mut();
@@ -266,10 +274,12 @@ impl Application<Msg> for App {
                     self.image_effects.update(image_effects::Msg::AnimateIn);
                 Cmd::from(effects.map_msg(Msg::ImageEffectsMsg)).measure()
             }
+            /*
             Msg::ImageMsg(image_msg) => {
                 let effects = self.image.update(image_msg);
                 Cmd::from(effects.map_msg(Msg::ImageMsg)).measure()
             }
+            */
             Msg::ReAnimateParagraph => {
                 let effects = self.paragraph.update(paragraph::Msg::AnimateIn);
                 Cmd::from(effects.localize(Msg::ParagraphMsg)).measure()
@@ -309,7 +319,9 @@ impl Application<Msg> for App {
                         .view()
                         .map_msg(move |btn_msg| Msg::FuiButtonMsg(btn_msg))],
                 ),
-                self.frame.view().map_msg(Msg::FrameMsg),
+                self.frame
+                    .view()
+                    .map_msg(|fmsg| Msg::FrameMsg(Box::new(fmsg))),
                 div(vec![class("futuristic-buttons-array")], {
                     let button_options = vec![
                         ("ReAnimate All", Options::full(), Msg::ReAnimateAll),
@@ -347,7 +359,7 @@ impl Application<Msg> for App {
                     .view()
                     .map_msg(Msg::AnimateParagraphBtnMsg),
                 self.paragraph.view(),
-                self.image.view().map_msg(Msg::ImageMsg),
+                //self.image.view().map_msg(Msg::ImageMsg),
                 footer(
                     vec![],
                     vec![a(
@@ -523,7 +535,7 @@ impl App {
             self.fui_button.style(&self.theme).join("\n"),
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
-            self.image.style(&self.theme),
+            //self.image.style(&self.theme),
             self.image_effects.style(&self.theme),
         ]
     }
