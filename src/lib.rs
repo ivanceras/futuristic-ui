@@ -38,14 +38,11 @@ pub enum Msg {
     ReAnimateParagraph,
     ReAnimateList,
     BtnMsg(Rc<RefCell<fui_button::FuiButton<Msg>>>, fui_button::Msg),
-    FuiButtonMsg(fui_button::Msg),
     FrameMsg(Box<frame::Msg<Msg>>),
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
     ImageEffectsMsg(image::Msg),
-    AnimateImageBtnMsg(fui_button::Msg),
-    AnimateParagraphBtnMsg(fui_button::Msg),
     SetMeasurements(Measurements),
     StartAnimateImageEffects,
     ReAnimateAll,
@@ -56,11 +53,8 @@ pub struct App {
     nav_header: NavHeader,
     frame: Frame<Msg>,
     paragraph: Paragraph<Msg>,
-    fui_button: FuiButton<Msg>,
     spinner: Spinner<Msg>,
     animate_list: AnimateList<Msg>,
-    animate_image_btn: FuiButton<Msg>,
-    animate_paragraph_btn: FuiButton<Msg>,
     image: Image,
     theme: Theme,
     btn_context: RefCell<Context<FuiButton<Msg>, Msg, fui_button::Msg>>,
@@ -88,6 +82,10 @@ where
     }
 
     /// simultaneously save the component into context for the duration until the next update loop
+    /// The comp_id is important such that the component is not re-created
+    /// at every view call. This should unique such that it can re-use the existing
+    /// component from previous view call. Don't use random unique, otherwise will be
+    /// re-crated at every view call.
     fn map_view<F>(
         &mut self,
         comp_id: impl ToString,
@@ -140,31 +138,14 @@ impl Default for App {
         )
         .add_children(vec![Self::show_color_selection()]);
 
-        let mut fui_button = FuiButton::<Msg>::new_with_label("Welcome");
-        fui_button.width(400);
-        fui_button.height(100);
-        fui_button.add_click_listener(|_| Msg::ReAnimateAll);
-        fui_button.set_options(Options::full());
-
-        let mut animate_image_btn =
-            FuiButton::<Msg>::new_with_label("Animate Image").chipped(true);
-        animate_image_btn.add_click_listener(|_| Msg::StartAnimateImageEffects);
-
-        let mut animate_paragraph_btn =
-            FuiButton::<Msg>::new_with_label("Animate Paragraph");
-        animate_paragraph_btn.add_click_listener(|_| Msg::ReAnimateParagraph);
-
         App {
             frame: Frame::with_content(frame_content),
             nav_header: NavHeader::with_content("Navigation Header"),
             paragraph: Paragraph::new_with_markdown(MARKDOWN_EXAMPLE),
-            fui_button,
             spinner: Spinner::new(),
             animate_list: AnimateList::with_content(
                 Self::animate_list_content(),
             ),
-            animate_image_btn,
-            animate_paragraph_btn,
             image: Image::new("img/space.jpg"),
             theme: Theme::default(),
             btn_context: RefCell::new(Context::new()),
@@ -218,13 +199,6 @@ impl Application<Msg> for App {
                 );
                 Cmd::from(effects)
             }
-            Msg::FuiButtonMsg(fui_btn_msg) => {
-                let effects = self
-                    .fui_button
-                    .update(fui_btn_msg)
-                    .localize(Msg::FuiButtonMsg);
-                Cmd::from(effects).measure()
-            }
             Msg::AnimateListMsg(animate_list_msg) => {
                 let effects = self.animate_list.update(animate_list_msg);
                 Cmd::from(effects.localize(Msg::AnimateListMsg)).measure()
@@ -237,15 +211,6 @@ impl Application<Msg> for App {
             Msg::ParagraphMsg(para_msg) => {
                 let effects = self.paragraph.update(para_msg);
                 Cmd::from(effects.localize(Msg::ParagraphMsg)).measure()
-            }
-            Msg::AnimateImageBtnMsg(btn_msg) => {
-                let effects = self.animate_image_btn.update(btn_msg);
-                Cmd::from(effects.localize(Msg::AnimateImageBtnMsg)).measure()
-            }
-            Msg::AnimateParagraphBtnMsg(btn_msg) => {
-                let effects = self.animate_paragraph_btn.update(btn_msg);
-                Cmd::from(effects.localize(Msg::AnimateParagraphBtnMsg))
-                    .measure()
             }
             Msg::ImageEffectsMsg(effects_msg) => {
                 let effects = self.image.update(effects_msg);
@@ -284,14 +249,22 @@ impl Application<Msg> for App {
                 ),
                 div(
                     vec![
-                        style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(self.fui_button.width.unwrap_or(0) / 2))},
+                        style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(400 / 2))},
                     ],
-                    //FIXME: this will have a performance penalty
-                    //since this is called at every view call
-                    vec![self
-                        .fui_button
-                        .view()
-                        .map_msg(move |btn_msg| Msg::FuiButtonMsg(btn_msg))],
+                    vec![btn_context.map_view(
+                        "fui_button",
+                        {
+                            let mut fui_button =
+                                FuiButton::<Msg>::new_with_label("Welcome");
+                            fui_button.width(400);
+                            fui_button.height(100);
+                            fui_button
+                                .add_click_listener(|_| Msg::ReAnimateAll);
+                            fui_button.set_options(Options::full());
+                            fui_button
+                        },
+                        Msg::BtnMsg,
+                    )],
                 ),
                 self.frame
                     .view()
@@ -331,15 +304,35 @@ impl Application<Msg> for App {
                         })
                         .collect()
                 }),
-                self.animate_image_btn
-                    .view()
-                    .map_msg(Msg::AnimateImageBtnMsg),
+                btn_context.map_view(
+                    "animate_image",
+                    {
+                        let mut animate_image_btn =
+                            FuiButton::<Msg>::new_with_label("Animate Image")
+                                .chipped(true);
+                        animate_image_btn.add_click_listener(|_| {
+                            Msg::StartAnimateImageEffects
+                        });
+                        animate_image_btn
+                    },
+                    Msg::BtnMsg,
+                ),
                 self.image.view().map_msg(Msg::ImageEffectsMsg),
                 p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
-                self.animate_paragraph_btn
-                    .view()
-                    .map_msg(Msg::AnimateParagraphBtnMsg),
+                btn_context.map_view(
+                    "animate_paragraph",
+                    {
+                        let mut animate_paragraph_btn =
+                            FuiButton::<Msg>::new_with_label(
+                                "Animate Paragraph",
+                            );
+                        animate_paragraph_btn
+                            .add_click_listener(|_| Msg::ReAnimateParagraph);
+                        animate_paragraph_btn
+                    },
+                    Msg::BtnMsg,
+                ),
                 self.paragraph.view(),
                 footer(
                     vec![],
@@ -514,7 +507,7 @@ impl App {
             container_css,
             self.nav_header.style(&self.theme).join("\n"),
             self.frame.style(&self.theme).join("\n"),
-            self.fui_button.style(&self.theme).join("\n"),
+            FuiButton::<Msg>::style(&self.theme).join("\n"),
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
             self.image.style(&self.theme),

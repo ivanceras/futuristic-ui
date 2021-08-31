@@ -346,7 +346,7 @@ where
         self
     }
 
-    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+    pub fn style(theme: &crate::Theme) -> Vec<String> {
         let base = &theme.controls;
         let transition_time_ms = 250; //transition time for most effects on the button
         let hover_transition_time = 100; // the transition of the lower highligh of the button when hovering
