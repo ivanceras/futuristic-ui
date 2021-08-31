@@ -1,4 +1,4 @@
-use crate::{animate_list, frame, sounds, AnimateList, Frame};
+use crate::{frame, sounds, Frame};
 use sauron::{
     html::{attributes, div},
     jss::jss_ns,
@@ -49,11 +49,9 @@ impl Image {
             url: url.to_string(),
         };
 
-        let mut frame = Frame::with_content(properties.slice_view(None));
-
         Image {
             audio: sounds::preload("sounds/typing.mp3"),
-            frame,
+            frame: Frame::with_content(properties.slice_view(None)),
             properties,
             is_animating: false,
         }

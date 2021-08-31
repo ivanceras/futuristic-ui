@@ -68,7 +68,7 @@ pub struct App {
 }
 
 pub struct Context<COMP, MSG, CMSG> {
-    components: BTreeMap<usize, Rc<RefCell<COMP>>>,
+    components: BTreeMap<String, Rc<RefCell<COMP>>>,
     _phantom_msg: PhantomData<MSG>,
     _phantom_cmsg: PhantomData<CMSG>,
 }
@@ -90,14 +90,14 @@ where
     /// simultaneously save the component into context for the duration until the next update loop
     fn map_view<F>(
         &mut self,
-        comp_id: usize,
+        comp_id: impl ToString,
         component: COMP,
         mapper: F,
     ) -> Node<MSG>
     where
         F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
     {
-        if let Some(component) = self.components.get(&comp_id) {
+        if let Some(component) = self.components.get(&comp_id.to_string()) {
             let component_clone = component.clone();
             component
                 .borrow()
@@ -110,7 +110,7 @@ where
                 .borrow()
                 .view()
                 .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg));
-            self.components.insert(comp_id, component);
+            self.components.insert(comp_id.to_string(), component);
             view
         }
     }
@@ -316,7 +316,7 @@ impl Application<Msg> for App {
                         .enumerate()
                         .map(|(i, (label, options, msg))| {
                             btn_context.map_view(
-                                i,
+                                format!("button_array_{}", i),
                                 {
                                     let mut btn =
                                         FuiButton::new_with_label(label);
