@@ -3,7 +3,7 @@
 use animate_list::AnimateList;
 use frame::Frame;
 use fui_button::{FuiButton, Options};
-use image_effects::ImageEffects;
+use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
 use sauron::jss::jss;
@@ -21,7 +21,7 @@ use theme::Theme;
 mod animate_list;
 mod frame;
 mod fui_button;
-mod image_effects;
+mod image;
 mod nav_header;
 mod paragraph;
 pub mod sounds;
@@ -41,7 +41,7 @@ pub enum Msg {
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
     AnimateListMsg(animate_list::Msg),
-    ImageEffectsMsg(image_effects::Msg),
+    ImageEffectsMsg(image::Msg),
     AnimateImageBtnMsg(fui_button::Msg),
     AnimateParagraphBtnMsg(fui_button::Msg),
     SetMeasurements(Measurements),
@@ -59,7 +59,7 @@ pub struct App {
     animate_list: AnimateList<Msg>,
     animate_image_btn: FuiButton<Msg>,
     animate_paragraph_btn: FuiButton<Msg>,
-    image_effects: ImageEffects,
+    image: Image,
     theme: Theme,
     btn_context: RefCell<Context<FuiButton<Msg>, Msg, fui_button::Msg>>,
     measurements: Option<Measurements>,
@@ -171,7 +171,7 @@ impl Default for App {
             ),
             animate_image_btn,
             animate_paragraph_btn,
-            image_effects: ImageEffects::new("img/space.jpg"),
+            image: Image::new("img/space.jpg"),
             theme: Theme::default(),
             btn_context: RefCell::new(Context::new()),
             measurements: None,
@@ -255,12 +255,11 @@ impl Application<Msg> for App {
                     .measure()
             }
             Msg::ImageEffectsMsg(effects_msg) => {
-                let effects = self.image_effects.update(effects_msg);
+                let effects = self.image.update(effects_msg);
                 Cmd::from(effects.map_msg(Msg::ImageEffectsMsg)).measure()
             }
             Msg::StartAnimateImageEffects => {
-                let effects =
-                    self.image_effects.update(image_effects::Msg::AnimateIn);
+                let effects = self.image.update(image::Msg::AnimateIn);
                 Cmd::from(effects.map_msg(Msg::ImageEffectsMsg)).measure()
             }
             Msg::ReAnimateParagraph => {
@@ -335,7 +334,7 @@ impl Application<Msg> for App {
                 self.animate_image_btn
                     .view()
                     .map_msg(Msg::AnimateImageBtnMsg),
-                self.image_effects.view().map_msg(Msg::ImageEffectsMsg),
+                self.image.view().map_msg(Msg::ImageEffectsMsg),
                 p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
                 self.animate_paragraph_btn
@@ -381,6 +380,7 @@ impl App {
     fn restyle(&mut self, hash: &str) {
         self.theme = Self::calculate_theme_from_url_hash(hash);
         let styles = self.style();
+        Self::remove_style();
         Self::inject_style(&styles.join("\n"));
     }
 
@@ -517,13 +517,12 @@ impl App {
             self.fui_button.style(&self.theme).join("\n"),
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
-            self.image_effects.style(&self.theme),
+            self.image.style(&self.theme),
         ]
     }
 
     fn inject_style(style: &str) {
         use sauron::wasm_bindgen::JsCast;
-        Self::remove_style();
         let document = crate::document();
         let html_style = document
             .create_element("style")

@@ -27,14 +27,14 @@ pub struct Properties {
     gap: f32,
 }
 
-pub struct ImageEffects {
+pub struct Image {
     audio: HtmlAudioElement,
     frame: Frame<Msg>,
     properties: Properties,
     is_animating: bool,
 }
 
-impl ImageEffects {
+impl Image {
     pub fn new(url: impl ToString) -> Self {
         let width = 1000.0;
         let height = 600.0;
@@ -51,7 +51,7 @@ impl ImageEffects {
 
         let mut frame = Frame::with_content(properties.slice_view(None));
 
-        ImageEffects {
+        Image {
             audio: sounds::preload("sounds/typing.mp3"),
             frame,
             properties,
@@ -66,7 +66,7 @@ impl ImageEffects {
 
 ///TODO: create a copy of AnimateList effects here, so we can customize it specific to the image.
 /// Wrap this with frame as well
-impl Component<Msg, ()> for ImageEffects {
+impl Component<Msg, ()> for Image {
     fn update(&mut self, msg: Msg) -> Effects<Msg, ()> {
         match msg {
             Msg::AnimateIn => {
@@ -202,7 +202,7 @@ impl Properties {
     }
 }
 
-impl ImageEffects {
+impl Image {
     pub fn animate_in(&mut self) -> Vec<Msg> {
         sounds::play(&self.audio);
         self.start_animation(true)

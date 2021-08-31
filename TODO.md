@@ -26,6 +26,9 @@
         - [X] cut out/chipped button links
     - [ ] Table and animation
     - [ ] Figure image
+    - [ ] Rounded buttons
+    - [ ] Text input
+    - [ ] List
 - [ ] use css-colors crate to manipulate colors in theme
     - Issue, crate `css-colors` can't parse hex colors, will need to add crate `css-color` to do that
     - crate `color_processing` seems to have both parsing and process of colors https://crates.io/crates/color_processing
