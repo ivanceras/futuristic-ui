@@ -39,10 +39,10 @@ impl<MSG> View<MSG> for Spinner<MSG> {
 }
 
 impl<MSG> Spinner<MSG> {
-    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+    pub fn style(theme: &crate::Theme) -> String {
         let base = &theme.controls;
 
-        let base_css = jss_ns! {COMPONENT_NAME,
+        jss_ns! {COMPONENT_NAME,
             ".": {
                 top: 0,
                 left: 0,
@@ -115,8 +115,6 @@ impl<MSG> Spinner<MSG> {
               },
             },
 
-        };
-
-        vec![base_css]
+        }
     }
 }

@@ -130,7 +130,7 @@ impl<PMSG> Frame<PMSG> {
         }
     }
 
-    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+    pub fn style(theme: &crate::Theme) -> String {
         let base = &theme.controls;
         let border_width = 2;
         let corner_expand_distance = 12;
@@ -138,7 +138,7 @@ impl<PMSG> Frame<PMSG> {
         let corner_length = 24;
         let transition_time_ms = 250; //transition time for most effects on the button
 
-        let css = jss_ns! {COMPONENT_NAME,
+        jss_ns! {COMPONENT_NAME,
             ".": {
                 display: "block",
                 padding: px(1),
@@ -253,19 +253,17 @@ impl<PMSG> Frame<PMSG> {
                 background_color: "transparent",
             },
 
-        };
 
-        // if expand_corners is enabled
-        // the fui_button corners will EXPAND when hovered.
-        //
-        // CSS Notes:
-        // - `.class1.class2 child` means if both class1 and class2 is specified in the
-        // parent, the properties will be applied to this child element
-        //
-        //  - `.class1,.class2 child` means either if either class1 or class2 is specified in the
-        // parent, the properties will be applied to this child element
-        //
-        let expand_corner_css = jss_ns! {COMPONENT_NAME,
+            // if expand_corners is enabled
+            // the fui_button corners will EXPAND when hovered.
+            //
+            // CSS Notes:
+            // - `.class1.class2 child` means if both class1 and class2 is specified in the
+            // parent, the properties will be applied to this child element
+            //
+            //  - `.class1,.class2 child` means either if either class1 or class2 is specified in the
+            // parent, the properties will be applied to this child element
+            //
             ".expand_corners.hovered .corner__top-left": {
                 left: px(-corner_expand_distance),
                 top: px(-corner_expand_distance),
@@ -285,8 +283,6 @@ impl<PMSG> Frame<PMSG> {
                 right: px(-corner_expand_distance),
                 bottom: px(-corner_expand_distance),
             },
-        };
-
-        vec![css, expand_corner_css]
+        }
     }
 }

@@ -424,11 +424,11 @@ impl App {
         vec![
             body_css,
             container_css,
-            self.nav_header.style(&self.theme).join("\n"),
-            self.frame.style(&self.theme).join("\n"),
-            Button::<Msg>::style(&self.theme).join("\n"),
-            self.animate_list.style(&self.theme).join("\n"),
-            self.spinner.style(&self.theme).join("\n"),
+            NavHeader::style(&self.theme),
+            Frame::<Msg>::style(&self.theme),
+            Button::<Msg>::style(&self.theme),
+            AnimateList::<Msg>::style(&self.theme),
+            Spinner::<Msg>::style(&self.theme),
             self.image.style(&self.theme),
         ]
     }

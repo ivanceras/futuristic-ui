@@ -115,9 +115,9 @@ impl NavHeader {
         }
     }
 
-    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
+    pub fn style(theme: &crate::Theme) -> String {
         let base = &theme;
-        let css = jss_ns! {COMPONENT_NAME,
+        jss_ns! {COMPONENT_NAME,
             ".": {
                 display: "block",
                 padding: "1px",
@@ -191,8 +191,6 @@ impl NavHeader {
                 white_space: "nowrap",
             }
 
-        };
-
-        vec![css]
+        }
     }
 }

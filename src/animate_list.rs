@@ -107,6 +107,7 @@ where
 {
     pub fn animate_in(&mut self) -> Vec<Msg> {
         sounds::play(&self.audio);
+        self.stop_animation();
         self.start_animation(true)
     }
 
@@ -259,8 +260,8 @@ where
         }
     }
 
-    pub fn style(&self, theme: &crate::Theme) -> Vec<String> {
-        vec![jss! {
+    pub fn style(theme: &crate::Theme) -> String {
+        jss! {
 
             "hr": {
                 color: theme.primary_color.clone(),
@@ -311,6 +312,6 @@ where
                   color: "inherit",
                 },
             },
-        }]
+        }
     }
 }

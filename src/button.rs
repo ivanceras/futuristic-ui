@@ -350,7 +350,7 @@ where
         self
     }
 
-    pub fn style(theme: &crate::Theme) -> Vec<String> {
+    pub fn style(theme: &crate::Theme) -> String {
         let base = &theme.controls;
         let transition_time_ms = 250; //transition time for most effects on the button
         let hover_transition_time = 100; // the transition of the lower highligh of the button when hovering
@@ -360,7 +360,7 @@ where
         let corner_expand_distance = 6; // distance that clips at the corner expands when the button is hovered
         let border_width = 1; // the width of the border for each side of the button
 
-        let base_css = jss_ns! {COMPONENT_NAME,
+        jss_ns! {COMPONENT_NAME,
 
             // the ROOT component style
             ".": {
@@ -559,9 +559,6 @@ where
                 opacity: 1,
             },
 
-        };
-
-        let skewed_css = jss_ns! {COMPONENT_NAME,
             ".skewed": {
                 transform: format!("skewX({}deg)", -45),
                 transform_origin: "bottom left",
@@ -571,19 +568,16 @@ where
                 transform: format!("skewX({}deg)", 45),
             },
 
-        };
-
-        // if expand_corners is enabled
-        // the fui_button corners will EXPAND when hovered.
-        //
-        // CSS Notes:
-        // - `.class1.class2 child` means if both class1 and class2 is specified in the
-        // parent, the properties will be applied to this child element
-        //
-        //  - `.class1,.class2 child` means either if either class1 or class2 is specified in the
-        // parent, the properties will be applied to this child element
-        //
-        let expand_corner_css = jss_ns! {COMPONENT_NAME,
+            // if expand_corners is enabled
+            // the fui_button corners will EXPAND when hovered.
+            //
+            // CSS Notes:
+            // - `.class1.class2 child` means if both class1 and class2 is specified in the
+            // parent, the properties will be applied to this child element
+            //
+            //  - `.class1,.class2 child` means either if either class1 or class2 is specified in the
+            // parent, the properties will be applied to this child element
+            //
             ".expand_corners.hovered .corner__top-left": {
                 left: px(-corner_expand_distance),
                 top: px(-corner_expand_distance),
@@ -603,9 +597,7 @@ where
                 right: px(-corner_expand_distance),
                 bottom: px(-corner_expand_distance),
             },
-        };
-
-        vec![base_css, skewed_css, expand_corner_css]
+        }
     }
 }
 

@@ -248,18 +248,18 @@ impl Image {
             anim_progress = duration - anim_progress;
         }
 
-        let new_length = (anim_progress * self.content_len() as f64 / duration)
+        let limit = (anim_progress * self.content_len() as f64 / duration)
             .round() as usize;
 
         let continue_animation = if is_in {
-            new_length <= (self.content_len() - 1)
+            limit <= (self.content_len() - 1)
         } else {
-            new_length > 0
+            limit > 0
         };
 
         if continue_animation {
             self.frame
-                .set_content(self.properties.slice_view(Some(new_length)));
+                .set_content(self.properties.slice_view(Some(limit)));
             vec![Msg::NextAnimation(is_in, start, duration)]
         } else {
             vec![Msg::StopAnimation]
