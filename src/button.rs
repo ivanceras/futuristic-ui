@@ -189,7 +189,16 @@ where
                             vec![],
                         ),
                         polygon(
-                            vec![class_ns("triangle"), points(triangle_points)],
+                            vec![
+                                class_ns("triangle"),
+                                if let Some(ref pallete) = self.options.pallete
+                                {
+                                    class_ns(pallete.class_name())
+                                } else {
+                                    empty_attr()
+                                },
+                                points(triangle_points),
+                            ],
                             vec![],
                         ),
                     ],
@@ -607,30 +616,46 @@ where
                 transition: format!("all {}ms ease-out", highlight_transition),
             },
 
-            ".chipped_polygon.error": {
-                fill: theme.pallete.error.to_css(),
-            },
-
-            ".chipped_polygon.success": {
-                fill: theme.pallete.success.to_css(),
-            },
-
-            ".chipped_polygon.info": {
-                fill: theme.pallete.info.to_css(),
-            },
-
-            ".chipped_polygon.warning": {
-                fill: theme.pallete.warning.to_css(),
-            },
-
             ".triangle": {
                 stroke_width: px(2),
                 stroke: base.border_color.clone(),
                 fill: base.border_color.clone(),
             },
 
+            ".triangle.error": {
+                fill: theme.pallete.error.to_css(),
+            },
+
+            ".triangle.success": {
+                fill: theme.pallete.success.to_css(),
+            },
+
+            ".triangle.info": {
+                fill: theme.pallete.info.to_css(),
+            },
+
+            ".triangle.warning": {
+                fill: theme.pallete.warning.to_css(),
+            },
+
             ".click_highlights.clicked .chipped_polygon": {
                 fill: base.highlight_color.clone(),
+            },
+
+            ".click_highlights.clicked .chipped_polygon.error": {
+                fill: theme.pallete.error.to_css(),
+            },
+
+            ".click_highlights.clicked .chipped_polygon.success": {
+                fill: theme.pallete.success.to_css(),
+            },
+
+            ".click_highlights.clicked .chipped_polygon.info": {
+                fill: theme.pallete.info.to_css(),
+            },
+
+            ".click_highlights.clicked .chipped_polygon.warning": {
+                fill: theme.pallete.warning.to_css(),
             },
 
             // highlight when clicked and fades out shortly
