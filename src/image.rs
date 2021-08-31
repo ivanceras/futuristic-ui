@@ -7,7 +7,7 @@ use sauron::{
 };
 use web_sys::HtmlAudioElement;
 
-const COMPONENT_NAME: &str = "image_effects";
+const COMPONENT_NAME: &str = "fui-image";
 
 #[derive(Clone, Debug)]
 pub enum Msg {

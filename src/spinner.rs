@@ -7,7 +7,7 @@ use sauron::{
 };
 use std::marker::PhantomData;
 
-const COMPONENT_NAME: &str = "spinner";
+const COMPONENT_NAME: &str = "fui-spinner";
 
 #[derive(Clone)]
 pub struct Spinner<MSG> {

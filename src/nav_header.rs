@@ -8,7 +8,7 @@ use sauron::{
 };
 use web_sys::HtmlAudioElement;
 
-const COMPONENT_NAME: &str = "nav_header";
+const COMPONENT_NAME: &str = "fui-navheader";
 
 #[derive(Clone, Debug)]
 pub enum Msg {

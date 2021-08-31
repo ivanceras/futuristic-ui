@@ -8,7 +8,7 @@ use sauron::{
 };
 use web_sys::HtmlAudioElement;
 
-const COMPONENT_NAME: &str = "frame";
+const COMPONENT_NAME: &str = "fui-frame";
 
 #[derive(Clone, Debug)]
 pub enum Msg<PMSG> {

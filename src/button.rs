@@ -10,7 +10,7 @@ use sauron::{
 use web_sys::HtmlAudioElement;
 use web_sys::MouseEvent;
 
-const COMPONENT_NAME: &str = "fui_button";
+const COMPONENT_NAME: &str = "fui-button";
 const DEFAULT_CHIPPED_BUTTON_WIDTH: usize = 200;
 const DEFAULT_CHIPPED_BUTTON_HEIGHT: usize = 40;
 
