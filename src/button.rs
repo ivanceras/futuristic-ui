@@ -170,7 +170,7 @@ where
                     vec![
                         xmlns("http://www.w3.org/2000/svg"),
                         preserveAspectRatio("none"),
-                        class_ns("chipped"),
+                        class_ns("chipped_svg"),
                         viewBox([0, 0, width, height]),
                     ],
                     vec![
@@ -257,6 +257,7 @@ where
                     ("has_hover", self.options.has_hover),
                     ("hovered", self.hover),
                     ("skewed", self.options.skewed),
+                    ("chipped", self.options.chipped),
                     // setting this will also disable the div, therefore will not activate the
                     // events on it
                     ("disabled", self.options.disabled),
@@ -399,7 +400,7 @@ where
 
     pub fn chipped(mut self) -> Self {
         self.options.chipped = true;
-        self.options.has_hover = false;
+        self.options.has_hover = true;
         self.options.has_borders = false;
         self.options.has_corners = true;
         self.options.expand_corners = true;
@@ -444,6 +445,12 @@ where
 
             ".has_hover.hovered .hover": {
                 width: percent(96),
+            },
+
+            ".has_hover.hovered.chipped .hover": {
+                width: percent(80),
+                transform: format!("skewX({}deg) translate({}, {})", -45, percent(-57), 0),
+                transform_origin: "bottom left",
             },
 
             ".hover-bottom": {
@@ -644,7 +651,7 @@ where
             },
 
             // the svg of the chipped button
-            ".chipped": {
+            ".chipped_svg": {
                 width: px(DEFAULT_CHIPPED_BUTTON_WIDTH),
                 height: px(DEFAULT_CHIPPED_BUTTON_HEIGHT),
                 position: "absolute",
@@ -707,6 +714,40 @@ where
                 stroke: theme.pallete.warning.to_css(),
             },
 
+
+            // highlight when clicked and fades out shortly
+            ".click_highlights .highlight": {
+                  z_index: 1,
+                  position: "absolute",
+                  left: 0,
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  background_color: base.highlight_color.clone(),
+                  opacity: 0,
+                  transition: format!("all {}ms ease-out", highlight_transition),
+            },
+
+            ".click_highlights.clicked .highlight": {
+                opacity: 1,
+            },
+
+            ".click_highlights.clicked.error .highlight": {
+                background_color: theme.pallete.error.to_css(),
+            },
+
+            ".click_highlights.clicked.success .highlight": {
+                background_color: theme.pallete.success.to_css(),
+            },
+
+            ".click_highlights.clicked.info .highlight": {
+                background_color: theme.pallete.info.to_css(),
+            },
+
+            ".click_highlights.clicked.warning .highlight": {
+                background_color: theme.pallete.warning.to_css(),
+            },
+
             ".click_highlights.clicked .chipped_polygon": {
                 fill: base.highlight_color.clone(),
             },
@@ -725,23 +766,6 @@ where
 
             ".click_highlights.clicked.warning .chipped_polygon": {
                 fill: theme.pallete.warning.to_css(),
-            },
-
-            // highlight when clicked and fades out shortly
-            ".click_highlights .highlight": {
-                  z_index: 1,
-                  position: "absolute",
-                  left: 0,
-                  right: 0,
-                  top: 0,
-                  bottom: 0,
-                  background_color: base.highlight_color.clone(),
-                  opacity: 0,
-                  transition: format!("all {}ms ease-out", highlight_transition),
-            },
-
-            ".click_highlights.clicked .highlight": {
-                opacity: 1,
             },
 
             ".skewed": {
@@ -814,40 +838,6 @@ impl Options {
             sound: true,
             click_highlights: true,
             skewed: false,
-            has_corners: true,
-            has_borders: true,
-            expand_corners: true,
-            has_hover: true,
-            disabled: false,
-            hidden: false,
-            chipped: false,
-            pallete: None,
-        }
-    }
-
-    #[allow(unused)]
-    pub fn chipped() -> Self {
-        Options {
-            sound: true,
-            click_highlights: true,
-            skewed: false,
-            has_corners: true,
-            has_borders: false,
-            expand_corners: true,
-            has_hover: true,
-            disabled: false,
-            hidden: false,
-            chipped: true,
-            pallete: None,
-        }
-    }
-
-    #[allow(unused)]
-    pub fn skewed() -> Self {
-        Options {
-            sound: true,
-            click_highlights: true,
-            skewed: true,
             has_corners: true,
             has_borders: true,
             expand_corners: true,
