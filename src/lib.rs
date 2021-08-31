@@ -203,39 +203,27 @@ impl Application<Msg> for App {
                 self.frame
                     .view()
                     .map_msg(|fmsg| Msg::FrameMsg(Box::new(fmsg))),
-                div(vec![class("futuristic-buttons-array")], {
-                    let button_options = vec![
-                        ("ReAnimate All", Options::full(), Msg::ReAnimateAll),
-                        ("Animate List", Options::full(), Msg::ReAnimateList),
-                        (
-                            "Animate Frame",
-                            Options::skewed(),
-                            Msg::ReAnimateFrame,
+                div(
+                    vec![class("futuristic-buttons")],
+                    vec![
+                        btn_context.map_view(
+                            "reanimate",
+                            {
+                                FuiButton::with_label("Re-Animate All")
+                                    .add_click_listener(|_| Msg::ReAnimateAll)
+                            },
+                            Msg::BtnMsg,
                         ),
-                        ("Spacer", Options::disabled().hidden(true), Msg::NoOp),
-                        ("Click", Options::regular(), Msg::NoOp),
-                        ("Disabled", Options::disabled(), Msg::NoOp),
-                        ("Muted", Options::muted(), Msg::NoOp),
-                    ];
-
-                    button_options
-                        .into_iter()
-                        .enumerate()
-                        .map(|(i, (label, options, msg))| {
-                            btn_context.map_view(
-                                format!("button_array_{}", i),
-                                {
-                                    FuiButton::with_label(label)
-                                        .with_options(options)
-                                        .add_click_listener(move |_| {
-                                            msg.clone()
-                                        })
-                                },
-                                Msg::BtnMsg,
-                            )
-                        })
-                        .collect()
-                }),
+                        btn_context.map_view(
+                            "animate_frame",
+                            {
+                                FuiButton::with_label("Animate Frame")
+                                    .add_click_listener(|_| Msg::ReAnimateFrame)
+                            },
+                            Msg::BtnMsg,
+                        ),
+                    ],
+                ),
                 btn_context.map_view(
                     "animate_image",
                     {
@@ -248,6 +236,12 @@ impl Application<Msg> for App {
                     Msg::BtnMsg,
                 ),
                 self.image.view().map_msg(Msg::ImageEffectsMsg),
+                btn_context.map_view(
+                    "animate_list",
+                    FuiButton::<Msg>::with_label("Animate List")
+                        .add_click_listener(|_| Msg::ReAnimateList),
+                    Msg::BtnMsg,
+                ),
                 p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
                 btn_context.map_view(
@@ -482,21 +476,6 @@ impl App {
         div(
             vec![],
             vec![
-                p(vec![], vec![
-                    text("This is an experimental demo showcasing usage of sauron[0] Application lifecycle to work alongside
-                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.
-                    Sauron is a light-weight web framework designed to have you write least amount of code possible."),
-                    a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
-                ]),
-                li(vec![], vec![text(long_txt)]),
-                li(vec![], vec![text("List 2")]),
-                ul(
-                    vec![],
-                    vec![
-                        li(vec![], vec![text("SubList 3")]),
-                        li(vec![], vec![text("Not too long txt here... trying to see if it is correctly animated")]),
-                    ],
-                ),
                 div(vec![],vec![
                     table(vec![],vec![
                         thead(vec![],vec![
@@ -528,7 +507,22 @@ impl App {
                             ]),
                         ]),
                     ]),
-                ])
+                ]),
+                p(vec![], vec![
+                    text("This is an experimental demo showcasing usage of sauron[0] Application lifecycle to work alongside
+                    css transition, animation and timed DOM manipulation. This is also an exploration on how to add theming to the web framework.
+                    Sauron is a light-weight web framework designed to have you write least amount of code possible."),
+                    a(vec![href("https://github.com/ivanceras/sauron")], vec![text("Link here")]),
+                ]),
+                li(vec![], vec![text(long_txt)]),
+                li(vec![], vec![text("List 2")]),
+                ul(
+                    vec![],
+                    vec![
+                        li(vec![], vec![text("SubList 3")]),
+                        li(vec![], vec![text("Not too long txt here... trying to see if it is correctly animated")]),
+                    ],
+                ),
             ],
         )
     }
