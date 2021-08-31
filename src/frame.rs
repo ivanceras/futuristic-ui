@@ -202,7 +202,7 @@ impl<PMSG> Frame<PMSG> {
                 width: px(corner_length),
                 height: px(corner_length),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("{} {}",px([0, 0, 4, -corner_width]), base.corner_shadow.clone()),
+                box_shadow: format!("{} {}",px([0, 0, 4]), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",

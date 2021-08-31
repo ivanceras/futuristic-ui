@@ -8,7 +8,7 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
-sauron = { version = "0.42", features = [] }
+sauron = { version = "0.43", features = [] }
 sauron-markdown = "0.42"
 log = "0.4"
 console_log = { version = "0.2", features = ["color"] }
@@ -22,8 +22,6 @@ css-color = "0.1.1" #for parsing hex color into rgb, don't get mix with css-colo
 [dev-dependencies]
 color_processing = "0.6.0"
 
-[features]
-with-measure = ["sauron/with-measure"]
 
 [profile.release]
 # https://doc.rust-lang.org/cargo/reference/profiles.html
@@ -37,3 +35,4 @@ panic = "abort"
 [patch.crates-io]
 #sauron = { git = "https://github.com/ivanceras/sauron", branch = "master" }
 sauron = { path = "../sauron" }
+sauron-markdown = { path = "../sauron-markdown" }

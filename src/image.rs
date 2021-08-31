@@ -101,6 +101,7 @@ impl Component<Msg, ()> for Image {
             vec![
                 class(COMPONENT_NAME),
                 classes_ns_flag([("animating", self.is_animating)]),
+                on_click(|_| Msg::AnimateIn),
                 //on_mouseout(|_| Msg::AnimateIn),
             ],
             vec![self

@@ -177,35 +177,20 @@ where
                         polygon(
                             vec![
                                 class_ns("chipped_polygon"),
-                                if let Some(ref pallete) = self.options.pallete
-                                {
-                                    class_ns(pallete.class_name())
-                                } else {
-                                    empty_attr()
-                                },
                                 points(poly_points_str),
                                 on_transitionend(|_| Msg::HighlightEnd),
                             ],
                             vec![],
                         ),
                         polygon(
-                            vec![
-                                class_ns("triangle"),
-                                if let Some(ref pallete) = self.options.pallete
-                                {
-                                    class_ns(pallete.class_name())
-                                } else {
-                                    empty_attr()
-                                },
-                                points(triangle_points),
-                            ],
+                            vec![class_ns("triangle"), points(triangle_points)],
                             vec![],
                         ),
                     ],
                 ),
                 button(
                     vec![
-                        class_ns("button"),
+                        class_ns("chipped_button"),
                         disabled(self.options.disabled),
                         style! {width: px(width)},
                         style! {height: px(height)},
@@ -277,6 +262,11 @@ where
                     ("disabled", self.options.disabled),
                     ("hidden", self.options.hidden),
                 ]),
+                if let Some(ref pallete) = self.options.pallete {
+                    class_ns(pallete.class_name())
+                } else {
+                    empty_attr()
+                },
                 // normally click should be attached to the actual button element
                 on_click(Msg::Click),
                 // the mouseover events are attached here since the hover element z-index is
@@ -444,7 +434,7 @@ where
             // HOVER at the lower  part of the button
             ".hover": {
                 border_color: base.hover_color.clone(),
-                box_shadow: format!("{} {} {} {} {}", 0, px(-2), px(4), 0, base.hover_shadow.clone()),
+                box_shadow: format!("{} {}", px([0,-2, 4]), base.hover_shadow.clone()),
                 z_index: 4,
                 opacity: 1,
                 position: "absolute",
@@ -464,6 +454,26 @@ where
                 border_width: px([4, 0, 0, 0]),
             },
 
+            ".error .hover": {
+                border_color: theme.pallete.error.to_css(),
+                box_shadow: format!("{} {}",px([0, -2, 4]), theme.pallete.error.to_css()),
+            },
+
+            ".success .hover": {
+                border_color: theme.pallete.success.to_css(),
+                box_shadow: format!("{} {}",px([0, -2, 4]), theme.pallete.success.to_css()),
+            },
+
+            ".info .hover": {
+                border_color: theme.pallete.info.to_css(),
+                box_shadow: format!("{} {}",px([0, -2, 4]), theme.pallete.info.to_css()),
+            },
+
+            ".warning .hover": {
+                border_color: theme.pallete.warning.to_css(),
+                box_shadow: format!("{} {}",px([0, -2, 4]), theme.pallete.warning.to_css()),
+            },
+
 
             // BORDERS these are styled divs wrapping the buttons
             ".border": {
@@ -474,6 +484,26 @@ where
                 position: "absolute",
                 transition: format!("all {}ms ease-in",transition_time_ms),
                 border_style: "solid",
+            },
+
+            ".error .border": {
+                border_color: theme.pallete.error.to_css(),
+                box_shadow: format!("{} {}",px([0, 0, 4]), theme.pallete.error.to_css()),
+            },
+
+            ".success .border": {
+                border_color: theme.pallete.success.to_css(),
+                box_shadow: format!("{} {}",px([0, 0, 4]), theme.pallete.success.to_css()),
+            },
+
+            ".info .border": {
+                border_color: theme.pallete.info.to_css(),
+                box_shadow: format!("{} {}",px([0, 0, 4]), theme.pallete.info.to_css()),
+            },
+
+            ".warning .border": {
+                border_color: theme.pallete.warning.to_css(),
+                box_shadow: format!("{} {}",px([0, 0, 4]), theme.pallete.warning.to_css()),
             },
 
 
@@ -514,13 +544,30 @@ where
                 width: px(corner_length),
                 height: px(corner_length),
                 border_color: base.corner_color.clone(),
-                box_shadow: format!("{} {}",px([0, 0, 4, -corner_width]), base.corner_shadow.clone()),
+                //box_shadow: format!("{} {}",px([0, 0, 4]), base.corner_shadow.clone()),
                 z_index: 2,
                 opacity: 1,
                 position: "absolute",
                 transition: format!("all {}ms ease-in",transition_time_ms),
                 border_style: "solid",
             },
+
+            ".error .corner": {
+                border_color: theme.pallete.error.to_css(),
+            },
+
+            ".success .corner": {
+                border_color: theme.pallete.success.to_css(),
+            },
+
+            ".info .corner": {
+                border_color: theme.pallete.info.to_css(),
+            },
+
+            ".warning .corner": {
+                border_color: theme.pallete.warning.to_css(),
+            },
+
 
             ".corner__top-left": {
                 left: px(-corner_width),
@@ -574,20 +621,20 @@ where
                 vertical_align: "middle",
             },
 
-            ".button.error": {
-                background_color: theme.pallete.error.to_css(),
+            ".error .button": {
+                border_color: theme.pallete.error.to_css(),
             },
 
-            ".button.success": {
-                background_color: theme.pallete.success.to_css(),
+            ".success .button": {
+                border_color: theme.pallete.success.to_css(),
             },
 
-            ".button.info": {
-                background_color: theme.pallete.info.to_css(),
+            ".info .button": {
+                border_color: theme.pallete.info.to_css(),
             },
 
-            ".button.warning": {
-                background_color: theme.pallete.warning.to_css(),
+            ".warning .button": {
+                border_color: theme.pallete.warning.to_css(),
             },
 
             ".chipped_wrapper": {
@@ -603,9 +650,10 @@ where
                 position: "absolute",
             },
 
-            ".chipped_wrapper button": {
+            ".chipped_wrapper .chipped_button": {
                 position: "absolute",
                 background_color: "transparent",
+                border: 0,
             },
 
             ".chipped_polygon": {
@@ -618,43 +666,64 @@ where
 
             ".triangle": {
                 stroke_width: px(2),
-                stroke: base.border_color.clone(),
                 fill: base.border_color.clone(),
+                stroke: base.border_color.clone(),
             },
 
-            ".triangle.error": {
+            ".error .chipped_polygon": {
+                stroke: theme.pallete.error.to_css(),
+            },
+
+            ".success .chipped_polygon": {
+                stroke: theme.pallete.success.to_css(),
+            },
+
+            ".info .chipped_polygon": {
+                stroke: theme.pallete.info.to_css(),
+            },
+
+            ".warning .chipped_polygon": {
+                stroke: theme.pallete.warning.to_css(),
+            },
+
+
+            ".error .triangle": {
                 fill: theme.pallete.error.to_css(),
+                stroke: theme.pallete.error.to_css(),
             },
 
-            ".triangle.success": {
+            ".success .triangle": {
                 fill: theme.pallete.success.to_css(),
+                stroke: theme.pallete.success.to_css(),
             },
 
-            ".triangle.info": {
+            ".info .triangle": {
                 fill: theme.pallete.info.to_css(),
+                stroke: theme.pallete.info.to_css(),
             },
 
-            ".triangle.warning": {
+            ".warning .triangle": {
                 fill: theme.pallete.warning.to_css(),
+                stroke: theme.pallete.warning.to_css(),
             },
 
             ".click_highlights.clicked .chipped_polygon": {
                 fill: base.highlight_color.clone(),
             },
 
-            ".click_highlights.clicked .chipped_polygon.error": {
+            ".click_highlights.clicked.error .chipped_polygon": {
                 fill: theme.pallete.error.to_css(),
             },
 
-            ".click_highlights.clicked .chipped_polygon.success": {
+            ".click_highlights.clicked.success .chipped_polygon": {
                 fill: theme.pallete.success.to_css(),
             },
 
-            ".click_highlights.clicked .chipped_polygon.info": {
+            ".click_highlights.clicked.info .chipped_polygon": {
                 fill: theme.pallete.info.to_css(),
             },
 
-            ".click_highlights.clicked .chipped_polygon.warning": {
+            ".click_highlights.clicked.warning .chipped_polygon": {
                 fill: theme.pallete.warning.to_css(),
             },
 
