@@ -254,14 +254,11 @@ impl Application<Msg> for App {
                     vec![btn_context.map_view(
                         "fui_button",
                         {
-                            let mut fui_button =
-                                FuiButton::<Msg>::new_with_label("Welcome");
-                            fui_button.width(400);
-                            fui_button.height(100);
-                            fui_button
-                                .add_click_listener(|_| Msg::ReAnimateAll);
-                            fui_button.set_options(Options::full());
-                            fui_button
+                            FuiButton::<Msg>::with_label("Welcome")
+                                .width(400)
+                                .height(100)
+                                .add_click_listener(|_| Msg::ReAnimateAll)
+                                .with_options(Options::full())
                         },
                         Msg::BtnMsg,
                     )],
@@ -291,13 +288,11 @@ impl Application<Msg> for App {
                             btn_context.map_view(
                                 format!("button_array_{}", i),
                                 {
-                                    let mut btn =
-                                        FuiButton::new_with_label(label);
-                                    btn.set_options(options);
-                                    btn.add_click_listener(move |_| {
-                                        msg.clone()
-                                    });
-                                    btn
+                                    FuiButton::with_label(label)
+                                        .with_options(options)
+                                        .add_click_listener(move |_| {
+                                            msg.clone()
+                                        })
                                 },
                                 Msg::BtnMsg,
                             )
@@ -307,13 +302,11 @@ impl Application<Msg> for App {
                 btn_context.map_view(
                     "animate_image",
                     {
-                        let mut animate_image_btn =
-                            FuiButton::<Msg>::new_with_label("Animate Image")
-                                .chipped(true);
-                        animate_image_btn.add_click_listener(|_| {
-                            Msg::StartAnimateImageEffects
-                        });
-                        animate_image_btn
+                        FuiButton::<Msg>::with_label("Animate Image")
+                            .chipped(true)
+                            .add_click_listener(|_| {
+                                Msg::StartAnimateImageEffects
+                            })
                     },
                     Msg::BtnMsg,
                 ),
@@ -323,13 +316,8 @@ impl Application<Msg> for App {
                 btn_context.map_view(
                     "animate_paragraph",
                     {
-                        let mut animate_paragraph_btn =
-                            FuiButton::<Msg>::new_with_label(
-                                "Animate Paragraph",
-                            );
-                        animate_paragraph_btn
-                            .add_click_listener(|_| Msg::ReAnimateParagraph);
-                        animate_paragraph_btn
+                        FuiButton::<Msg>::with_label("Animate Paragraph")
+                            .add_click_listener(|_| Msg::ReAnimateParagraph)
                     },
                     Msg::BtnMsg,
                 ),

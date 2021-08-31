@@ -62,7 +62,7 @@ impl<PMSG> FuiButton<PMSG>
 where
     PMSG: 'static,
 {
-    pub fn new_with_label(label: &str) -> Self {
+    pub fn with_label(label: &str) -> Self {
         let options = Options::regular();
         FuiButton {
             audio: sounds::preload("sounds/click.mp3"),
@@ -316,24 +316,28 @@ impl<PMSG> FuiButton<PMSG>
 where
     PMSG: 'static,
 {
-    pub fn set_options(&mut self, options: Options) {
+    pub fn with_options(mut self, options: Options) -> Self {
         self.options = options;
+        self
     }
 
-    pub fn width(&mut self, width: usize) {
+    pub fn width(mut self, width: usize) -> Self {
         self.width = Some(width);
+        self
     }
 
-    pub fn height(&mut self, height: usize) {
+    pub fn height(mut self, height: usize) -> Self {
         self.height = Some(height);
+        self
     }
 
-    pub fn add_click_listener<F>(&mut self, f: F)
+    pub fn add_click_listener<F>(mut self, f: F) -> Self
     where
         F: Fn(MouseEvent) -> PMSG + 'static,
     {
         let cb = Callback::from(f);
         self.click_listeners.push(cb);
+        self
     }
 
     pub fn chipped(mut self, chipped: bool) -> Self {
