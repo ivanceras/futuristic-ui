@@ -1,4 +1,5 @@
 use crate::sounds;
+use css_colors::Color;
 use sauron::jss::jss_ns;
 use sauron::{
     dom::Callback,
@@ -35,6 +36,25 @@ pub struct Button<PMSG> {
 }
 
 #[derive(Debug)]
+enum Pallete {
+    Error,
+    Success,
+    Info,
+    Warning,
+}
+
+impl Pallete {
+    fn class_name(&self) -> &'static str {
+        match self {
+            Pallete::Error => "error",
+            Pallete::Success => "success",
+            Pallete::Info => "info",
+            Pallete::Warning => "warning",
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Options {
     pub hidden: bool,
     /// enable sound
@@ -56,6 +76,8 @@ pub struct Options {
     pub disabled: bool,
     /// the bottom right of the button is chipped
     pub chipped: bool,
+    /// the pallete color of the button
+    pallete: Option<Pallete>,
 }
 
 impl<PMSG> Button<PMSG>
@@ -87,6 +109,11 @@ where
         button(
             vec![
                 class_ns("button"),
+                if let Some(ref pallete) = self.options.pallete {
+                    class_ns(pallete.class_name())
+                } else {
+                    empty_attr()
+                },
                 disabled(self.options.disabled),
                 if let Some(width) = width {
                     style! {width: px(width)}
@@ -150,6 +177,12 @@ where
                         polygon(
                             vec![
                                 class_ns("chipped_polygon"),
+                                if let Some(ref pallete) = self.options.pallete
+                                {
+                                    class_ns(pallete.class_name())
+                                } else {
+                                    empty_attr()
+                                },
                                 points(poly_points_str),
                                 on_transitionend(|_| Msg::HighlightEnd),
                             ],
@@ -331,6 +364,26 @@ where
         self
     }
 
+    pub fn error(mut self) -> Self {
+        self.options.pallete = Some(Pallete::Error);
+        self
+    }
+
+    pub fn success(mut self) -> Self {
+        self.options.pallete = Some(Pallete::Success);
+        self
+    }
+
+    pub fn info(mut self) -> Self {
+        self.options.pallete = Some(Pallete::Info);
+        self
+    }
+
+    pub fn warning(mut self) -> Self {
+        self.options.pallete = Some(Pallete::Warning);
+        self
+    }
+
     pub fn add_click_listener<F>(mut self, f: F) -> Self
     where
         F: Fn(MouseEvent) -> PMSG + 'static,
@@ -340,8 +393,13 @@ where
         self
     }
 
-    pub fn chipped(mut self, chipped: bool) -> Self {
-        self.options.chipped = chipped;
+    pub fn skewed(mut self) -> Self {
+        self.options.skewed = true;
+        self
+    }
+
+    pub fn chipped(mut self) -> Self {
+        self.options.chipped = true;
         self.options.has_hover = false;
         self.options.has_borders = false;
         self.options.has_corners = true;
@@ -507,6 +565,22 @@ where
                 vertical_align: "middle",
             },
 
+            ".button.error": {
+                background_color: theme.pallete.error.to_css(),
+            },
+
+            ".button.success": {
+                background_color: theme.pallete.success.to_css(),
+            },
+
+            ".button.info": {
+                background_color: theme.pallete.info.to_css(),
+            },
+
+            ".button.warning": {
+                background_color: theme.pallete.warning.to_css(),
+            },
+
             ".chipped_wrapper": {
                 position: "relative",
                 width: px(DEFAULT_CHIPPED_BUTTON_WIDTH),
@@ -532,6 +606,23 @@ where
                 vector_effect: "non-scaling-stroke",
                 transition: format!("all {}ms ease-out", highlight_transition),
             },
+
+            ".chipped_polygon.error": {
+                fill: theme.pallete.error.to_css(),
+            },
+
+            ".chipped_polygon.success": {
+                fill: theme.pallete.success.to_css(),
+            },
+
+            ".chipped_polygon.info": {
+                fill: theme.pallete.info.to_css(),
+            },
+
+            ".chipped_polygon.warning": {
+                fill: theme.pallete.warning.to_css(),
+            },
+
             ".triangle": {
                 stroke_width: px(2),
                 stroke: base.border_color.clone(),
@@ -562,6 +653,7 @@ where
             ".skewed": {
                 transform: format!("skewX({}deg)", -45),
                 transform_origin: "bottom left",
+                margin: px([0, 40, 0, 10]),
             },
 
             ".skewed .button": {
@@ -617,6 +709,7 @@ impl Options {
             disabled: false,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
     }
 
@@ -634,6 +727,7 @@ impl Options {
             disabled: false,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
     }
 
@@ -650,6 +744,7 @@ impl Options {
             disabled: false,
             hidden: false,
             chipped: true,
+            pallete: None,
         }
     }
 
@@ -666,6 +761,7 @@ impl Options {
             disabled: false,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
     }
 
@@ -679,11 +775,12 @@ impl Options {
             skewed: false,
             has_corners: true,
             has_borders: true,
-            expand_corners: false,
+            expand_corners: true,
             has_hover: true,
             disabled: false,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
     }
 
@@ -702,6 +799,7 @@ impl Options {
             disabled: false,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
     }
 
@@ -719,6 +817,7 @@ impl Options {
             disabled: false,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
     }
 
@@ -736,11 +835,7 @@ impl Options {
             disabled: true,
             hidden: false,
             chipped: false,
+            pallete: None,
         }
-    }
-
-    pub fn hidden(mut self, hidden: bool) -> Self {
-        self.hidden = hidden;
-        self
     }
 }

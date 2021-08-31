@@ -218,8 +218,29 @@ impl Application<Msg> for App {
                             "animate_frame",
                             {
                                 Button::with_label("Animate Frame")
+                                    .skewed()
                                     .add_click_listener(|_| Msg::ReAnimateFrame)
                             },
+                            Msg::ButtonMsg,
+                        ),
+                        btn_context.map_view(
+                            "error",
+                            Button::with_label("Error").error(),
+                            Msg::ButtonMsg,
+                        ),
+                        btn_context.map_view(
+                            "success",
+                            Button::with_label("Success").success(),
+                            Msg::ButtonMsg,
+                        ),
+                        btn_context.map_view(
+                            "info",
+                            Button::with_label("Info").info(),
+                            Msg::ButtonMsg,
+                        ),
+                        btn_context.map_view(
+                            "warning",
+                            Button::with_label("Warning").warning(),
                             Msg::ButtonMsg,
                         ),
                     ],
@@ -228,11 +249,31 @@ impl Application<Msg> for App {
                     "animate_image",
                     {
                         Button::<Msg>::with_label("Animate Image")
-                            .chipped(true)
+                            .chipped()
                             .add_click_listener(|_| {
                                 Msg::StartAnimateImageEffects
                             })
                     },
+                    Msg::ButtonMsg,
+                ),
+                btn_context.map_view(
+                    "chip_error",
+                    Button::with_label("Error").chipped().error(),
+                    Msg::ButtonMsg,
+                ),
+                btn_context.map_view(
+                    "chip_success",
+                    Button::with_label("Success").chipped().success(),
+                    Msg::ButtonMsg,
+                ),
+                btn_context.map_view(
+                    "chip_info",
+                    Button::with_label("Info").chipped().info(),
+                    Msg::ButtonMsg,
+                ),
+                btn_context.map_view(
+                    "chip_warning",
+                    Button::with_label("Warning").chipped().warning(),
                     Msg::ButtonMsg,
                 ),
                 self.image.view().map_msg(Msg::ImageEffectsMsg),

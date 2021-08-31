@@ -135,7 +135,7 @@ impl<PMSG> Frame<PMSG> {
         let border_width = 2;
         let corner_expand_distance = 12;
         let corner_width = 4;
-        let corner_length = 24;
+        let corner_length = 16;
         let transition_time_ms = 250; //transition time for most effects on the button
 
         jss_ns! {COMPONENT_NAME,

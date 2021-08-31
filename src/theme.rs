@@ -10,6 +10,7 @@ pub struct Theme {
     pub accent_shadow: String,
     pub primary_font: String,
     pub secondary_font: String,
+    pub pallete: Pallete,
     pub controls: Controls,
 }
 
@@ -69,37 +70,49 @@ impl Theme {
         let background = hex_to_real_rgba(background);
         log::debug!("parsing primary: {:?}", primary);
         log::debug!("parsing background: {:?}", background);
-        Ok(Self::calculate_theme(primary?, background?))
+        Ok(Self::calculate_theme(
+            primary?,
+            background?,
+            Pallete::default(),
+        ))
     }
     // base theme using a bluish base color #029dbb
     #[allow(unused)]
     fn bondi_blue_on_dark() -> Self {
         let primary = rgba(2, 157, 187, 1.0); // main theme
         let background = rgba(0, 0, 0, 1.0);
-        Self::calculate_theme(primary, background)
+        Self::calculate_theme(primary, background, Pallete::default())
     }
 
     #[allow(unused)]
     fn white_on_dark() -> Self {
         let primary = rgba(255, 255, 255, 1.0);
         let background = rgba(0, 0, 0, 1.0);
-        Self::calculate_theme(primary, background)
+        Self::calculate_theme(primary, background, Pallete::default())
     }
 
     #[allow(unused)]
     fn green_on_black() -> Self {
         let primary = rgba(0, 255, 0, 1.0);
         let background = rgba(0, 0, 0, 1.0);
-        Self::calculate_theme(primary, background)
+        Self::calculate_theme(primary, background, Pallete::default())
     }
 
     #[allow(unused)]
     fn black_on_white() -> Self {
-        Self::calculate_theme(rgba(0, 0, 0, 1.0), rgba(255, 255, 255, 1.0))
+        Self::calculate_theme(
+            rgba(0, 0, 0, 1.0),
+            rgba(255, 255, 255, 1.0),
+            Pallete::default(),
+        )
     }
 
     /// light: if background is light and foreground is dark
-    pub fn calculate_theme(foreground: RGBA, background: RGBA) -> Self {
+    pub fn calculate_theme(
+        foreground: RGBA,
+        background: RGBA,
+        pallete: Pallete,
+    ) -> Self {
         let primary_font = "\"Titillium Web\", \"sans-serif\"".to_string();
         let secondary_font = "\"Electrolize\", \"sans-serif\"".to_string();
 
@@ -149,6 +162,54 @@ impl Theme {
             primary.mix(background, percent(15)).fadeout(percent(35))
         };
 
+        let pallete = if light {
+            let error = pallete
+                .error
+                .mix(background, percent(80))
+                .fadein(percent(20));
+            let success = pallete
+                .success
+                .mix(background, percent(80))
+                .fadein(percent(20));
+            let info = pallete
+                .info
+                .mix(background, percent(80))
+                .fadein(percent(20));
+            let warning = pallete
+                .warning
+                .mix(background, percent(80))
+                .fadein(percent(20));
+            Pallete {
+                error,
+                success,
+                info,
+                warning,
+            }
+        } else {
+            let error = pallete
+                .error
+                .mix(background, percent(80))
+                .fadeout(percent(20));
+            let success = pallete
+                .success
+                .mix(background, percent(80))
+                .fadeout(percent(20));
+            let info = pallete
+                .info
+                .mix(background, percent(80))
+                .fadeout(percent(20));
+            let warning = pallete
+                .warning
+                .mix(background, percent(80))
+                .fadeout(percent(20));
+            Pallete {
+                error,
+                success,
+                info,
+                warning,
+            }
+        };
+
         Theme {
             primary_color: primary.to_css(),
             secondary_color: secondary.to_css(),
@@ -157,6 +218,7 @@ impl Theme {
             accent_shadow: accent_shadow.to_css(),
             primary_font,
             secondary_font,
+            pallete,
 
             controls: Controls {
                 hover_shadow: primary.to_css(),
