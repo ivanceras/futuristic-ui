@@ -15,7 +15,9 @@ use sauron::{
 };
 use spinner::Spinner;
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::marker::PhantomData;
+use std::rc::Rc;
 use theme::Theme;
 
 mod animate_list;
@@ -35,7 +37,7 @@ pub enum Msg {
     ReAnimateHeader,
     ReAnimateParagraph,
     ReAnimateList,
-    BtnMsg(usize, fui_button::Msg),
+    BtnMsg(Rc<RefCell<fui_button::FuiButton<Msg>>>, fui_button::Msg),
     FuiButtonMsg(fui_button::Msg),
     FrameMsg(Box<frame::Msg<Msg>>),
     NavHeaderMsg(nav_header::Msg),
@@ -65,15 +67,8 @@ pub struct App {
     measurements: Option<Measurements>,
 }
 
-struct Context<COMP, MSG, CMSG> {
-    /// These are the stored Component in this context.
-    /// Each added component can be accessed by it's index
-    components: Vec<COMP>,
-    /// We keep track of component pointer as components are added in the view call.
-    /// ISSUE: This will not be accurate if there are components that will be added via control
-    /// flow: if, loops
-    /// SOLUTION: assign a unique id for each of the component added
-    component_pointer: usize,
+pub struct Context<COMP, MSG, CMSG> {
+    components: BTreeMap<usize, Rc<RefCell<COMP>>>,
     _phantom_msg: PhantomData<MSG>,
     _phantom_cmsg: PhantomData<CMSG>,
 }
@@ -86,55 +81,54 @@ where
 {
     fn new() -> Self {
         Self {
-            components: vec![],
-            component_pointer: 0,
+            components: BTreeMap::new(),
             _phantom_msg: PhantomData,
             _phantom_cmsg: PhantomData,
         }
     }
-    fn map_view<F>(&mut self, mapper: F, component: COMP) -> Node<MSG>
+
+    /// simultaneously save the component into context for the duration until the next update loop
+    fn map_view<F>(
+        &mut self,
+        comp_id: usize,
+        component: COMP,
+        mapper: F,
+    ) -> Node<MSG>
     where
-        F: Fn(usize, CMSG) -> MSG + 'static,
+        F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
     {
-        if let Some(existing) = self.components.get(self.component_pointer) {
-            log::trace!("this is an existing component.. reusing..");
-            let component_pointer = self.component_pointer;
-            let view = existing
+        if let Some(component) = self.components.get(&comp_id) {
+            let component_clone = component.clone();
+            component
+                .borrow()
                 .view()
-                .map_msg(move |cmsg| mapper(component_pointer, cmsg));
-            self.component_pointer += 1;
-            view
+                .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg))
         } else {
-            log::trace!(
-                "this is a new component encountered in the view.. adding"
-            );
-            let comp_id = self.components.len();
-            self.component_pointer += 1;
-            let view =
-                component.view().map_msg(move |cmsg| mapper(comp_id, cmsg));
-            self.components.push(component);
+            let component = Rc::new(RefCell::new(component));
+            let component_clone = component.clone();
+            let view = component
+                .borrow()
+                .view()
+                .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg));
+            self.components.insert(comp_id, component);
             view
         }
     }
 
-    fn update_component_with_id<F>(
+    fn update_component<F>(
         &mut self,
-        comp_id: usize,
-        cmsg: CMSG,
+        component: Rc<RefCell<COMP>>,
+        dmsg: CMSG,
         mapper: F,
     ) -> Effects<MSG, ()>
     where
-        F: Fn(CMSG) -> MSG + 'static,
+        F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
     {
-        self.components[comp_id].update(cmsg).localize(mapper)
-    }
-
-    fn start_view(&mut self) {
-        log::trace!(
-            "starting a new view.. total number of components: {}",
-            self.components.len()
-        );
-        self.component_pointer = 0;
+        let component_clone = component.clone();
+        component
+            .borrow_mut()
+            .update(dmsg)
+            .localize(move |dmsg| mapper(component_clone.clone(), dmsg))
     }
 }
 
@@ -216,12 +210,11 @@ impl Application<Msg> for App {
                 )
                 .measure()
             }
-            Msg::BtnMsg(btn_id, btn_msg) => {
-                let mut btn_context = self.btn_context.borrow_mut();
-                let effects = btn_context.update_component_with_id(
-                    btn_id,
+            Msg::BtnMsg(btn, btn_msg) => {
+                let effects = self.btn_context.borrow_mut().update_component(
+                    btn,
                     btn_msg,
-                    move |btn_msg| Msg::BtnMsg(btn_id, btn_msg),
+                    Msg::BtnMsg,
                 );
                 Cmd::from(effects)
             }
@@ -277,7 +270,6 @@ impl Application<Msg> for App {
 
     fn view(&self) -> Node<Msg> {
         let mut btn_context = self.btn_context.borrow_mut();
-        btn_context.start_view();
         div(
             vec![class("container")],
             vec![
@@ -321,13 +313,21 @@ impl Application<Msg> for App {
 
                     button_options
                         .into_iter()
-                        .map(|(label, options, msg)| {
-                            btn_context.map_view(Msg::BtnMsg, {
-                                let mut btn = FuiButton::new_with_label(label);
-                                btn.set_options(options);
-                                btn.add_click_listener(move |_| msg.clone());
-                                btn
-                            })
+                        .enumerate()
+                        .map(|(i, (label, options, msg))| {
+                            btn_context.map_view(
+                                i,
+                                {
+                                    let mut btn =
+                                        FuiButton::new_with_label(label);
+                                    btn.set_options(options);
+                                    btn.add_click_listener(move |_| {
+                                        msg.clone()
+                                    });
+                                    btn
+                                },
+                                Msg::BtnMsg,
+                            )
                         })
                         .collect()
                 }),

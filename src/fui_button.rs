@@ -22,6 +22,7 @@ pub enum Msg {
     HighlightEnd,
 }
 
+#[derive(Debug)]
 pub struct FuiButton<PMSG> {
     audio: HtmlAudioElement,
     options: Options,
@@ -33,6 +34,7 @@ pub struct FuiButton<PMSG> {
     pub height: Option<usize>,
 }
 
+#[derive(Debug)]
 pub struct Options {
     pub hidden: bool,
     /// enable sound
