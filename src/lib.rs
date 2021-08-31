@@ -67,69 +67,6 @@ pub struct Context<COMP, MSG, CMSG> {
     _phantom_cmsg: PhantomData<CMSG>,
 }
 
-impl<COMP, MSG, CMSG> Context<COMP, MSG, CMSG>
-where
-    COMP: Component<CMSG, MSG> + 'static,
-    MSG: 'static,
-    CMSG: 'static,
-{
-    fn new() -> Self {
-        Self {
-            components: BTreeMap::new(),
-            _phantom_msg: PhantomData,
-            _phantom_cmsg: PhantomData,
-        }
-    }
-
-    /// simultaneously save the component into context for the duration until the next update loop
-    /// The comp_id is important such that the component is not re-created
-    /// at every view call. This should unique such that it can re-use the existing
-    /// component from previous view call. Don't use random unique, otherwise will be
-    /// re-crated at every view call.
-    fn map_view<F>(
-        &mut self,
-        comp_id: impl ToString,
-        component: COMP,
-        mapper: F,
-    ) -> Node<MSG>
-    where
-        F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
-    {
-        if let Some(component) = self.components.get(&comp_id.to_string()) {
-            let component_clone = component.clone();
-            component
-                .borrow()
-                .view()
-                .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg))
-        } else {
-            let component = Rc::new(RefCell::new(component));
-            let component_clone = component.clone();
-            let view = component
-                .borrow()
-                .view()
-                .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg));
-            self.components.insert(comp_id.to_string(), component);
-            view
-        }
-    }
-
-    fn update_component<F>(
-        &mut self,
-        component: Rc<RefCell<COMP>>,
-        dmsg: CMSG,
-        mapper: F,
-    ) -> Effects<MSG, ()>
-    where
-        F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
-    {
-        let component_clone = component.clone();
-        component
-            .borrow_mut()
-            .update(dmsg)
-            .localize(move |dmsg| mapper(component_clone.clone(), dmsg))
-    }
-}
-
 impl Default for App {
     fn default() -> Self {
         let frame_content = div(
@@ -605,6 +542,69 @@ impl App {
             Msg::StartAnimateImageEffects,
         ]))
         .measure()
+    }
+}
+
+impl<COMP, MSG, CMSG> Context<COMP, MSG, CMSG>
+where
+    COMP: Component<CMSG, MSG> + 'static,
+    MSG: 'static,
+    CMSG: 'static,
+{
+    fn new() -> Self {
+        Self {
+            components: BTreeMap::new(),
+            _phantom_msg: PhantomData,
+            _phantom_cmsg: PhantomData,
+        }
+    }
+
+    /// simultaneously save the component into context for the duration until the next update loop
+    /// The comp_id is important such that the component is not re-created
+    /// at every view call. This should unique such that it can re-use the existing
+    /// component from previous view call. Don't use random unique, otherwise will be
+    /// re-crated at every view call.
+    fn map_view<F>(
+        &mut self,
+        comp_id: impl ToString,
+        component: COMP,
+        mapper: F,
+    ) -> Node<MSG>
+    where
+        F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
+    {
+        if let Some(component) = self.components.get(&comp_id.to_string()) {
+            let component_clone = component.clone();
+            component
+                .borrow()
+                .view()
+                .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg))
+        } else {
+            let component = Rc::new(RefCell::new(component));
+            let component_clone = component.clone();
+            let view = component
+                .borrow()
+                .view()
+                .map_msg(move |cmsg| mapper(component_clone.clone(), cmsg));
+            self.components.insert(comp_id.to_string(), component);
+            view
+        }
+    }
+
+    fn update_component<F>(
+        &mut self,
+        component: Rc<RefCell<COMP>>,
+        dmsg: CMSG,
+        mapper: F,
+    ) -> Effects<MSG, ()>
+    where
+        F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
+    {
+        let component_clone = component.clone();
+        component
+            .borrow_mut()
+            .update(dmsg)
+            .localize(move |dmsg| mapper(component_clone.clone(), dmsg))
     }
 }
 
