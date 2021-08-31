@@ -23,7 +23,7 @@ pub enum Msg {
 }
 
 #[derive(Debug)]
-pub struct FuiButton<PMSG> {
+pub struct Button<PMSG> {
     audio: HtmlAudioElement,
     options: Options,
     label: String,
@@ -58,13 +58,13 @@ pub struct Options {
     pub chipped: bool,
 }
 
-impl<PMSG> FuiButton<PMSG>
+impl<PMSG> Button<PMSG>
 where
     PMSG: 'static,
 {
     pub fn with_label(label: &str) -> Self {
         let options = Options::regular();
-        FuiButton {
+        Button {
             audio: sounds::preload("sounds/click.mp3"),
             options,
             click: false,
@@ -175,7 +175,7 @@ where
     }
 }
 
-impl<PMSG> Component<Msg, PMSG> for FuiButton<PMSG>
+impl<PMSG> Component<Msg, PMSG> for Button<PMSG>
 where
     PMSG: 'static,
 {
@@ -312,7 +312,7 @@ where
     }
 }
 
-impl<PMSG> FuiButton<PMSG>
+impl<PMSG> Button<PMSG>
 where
     PMSG: 'static,
 {

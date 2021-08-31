@@ -1,8 +1,8 @@
 //#![deny(warnings)]
 #![recursion_limit = "256"]
 use animate_list::AnimateList;
+use button::{Button, Options};
 use frame::Frame;
-use fui_button::{FuiButton, Options};
 use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
@@ -21,8 +21,8 @@ use std::rc::Rc;
 use theme::Theme;
 
 mod animate_list;
+mod button;
 mod frame;
-mod fui_button;
 mod image;
 mod nav_header;
 mod paragraph;
@@ -37,7 +37,7 @@ pub enum Msg {
     ReAnimateHeader,
     ReAnimateParagraph,
     ReAnimateList,
-    BtnMsg(Rc<RefCell<fui_button::FuiButton<Msg>>>, fui_button::Msg),
+    ButtonMsg(Rc<RefCell<button::Button<Msg>>>, button::Msg),
     FrameMsg(Box<frame::Msg<Msg>>),
     NavHeaderMsg(nav_header::Msg),
     ParagraphMsg(paragraph::Msg),
@@ -57,7 +57,7 @@ pub struct App {
     animate_list: AnimateList<Msg>,
     image: Image,
     theme: Theme,
-    btn_context: RefCell<Context<FuiButton<Msg>, Msg, fui_button::Msg>>,
+    btn_context: RefCell<Context<Button<Msg>, Msg, button::Msg>>,
     measurements: Option<Measurements>,
 }
 
@@ -128,11 +128,11 @@ impl Application<Msg> for App {
                 )
                 .measure()
             }
-            Msg::BtnMsg(btn, btn_msg) => {
+            Msg::ButtonMsg(btn, btn_msg) => {
                 let effects = self.btn_context.borrow_mut().update_component(
                     btn,
                     btn_msg,
-                    Msg::BtnMsg,
+                    Msg::ButtonMsg,
                 );
                 Cmd::from(effects)
             }
@@ -189,15 +189,15 @@ impl Application<Msg> for App {
                         style! {"padding":px(20), "position": "relative", "left": format!("calc({} - {})", percent(50), px(400 / 2))},
                     ],
                     vec![btn_context.map_view(
-                        "fui_button",
+                        "button",
                         {
-                            FuiButton::<Msg>::with_label("Welcome")
+                            Button::<Msg>::with_label("Welcome")
                                 .width(400)
                                 .height(100)
                                 .add_click_listener(|_| Msg::ReAnimateAll)
                                 .with_options(Options::full())
                         },
-                        Msg::BtnMsg,
+                        Msg::ButtonMsg,
                     )],
                 ),
                 self.frame
@@ -209,48 +209,48 @@ impl Application<Msg> for App {
                         btn_context.map_view(
                             "reanimate",
                             {
-                                FuiButton::with_label("Re-Animate All")
+                                Button::with_label("Re-Animate All")
                                     .add_click_listener(|_| Msg::ReAnimateAll)
                             },
-                            Msg::BtnMsg,
+                            Msg::ButtonMsg,
                         ),
                         btn_context.map_view(
                             "animate_frame",
                             {
-                                FuiButton::with_label("Animate Frame")
+                                Button::with_label("Animate Frame")
                                     .add_click_listener(|_| Msg::ReAnimateFrame)
                             },
-                            Msg::BtnMsg,
+                            Msg::ButtonMsg,
                         ),
                     ],
                 ),
                 btn_context.map_view(
                     "animate_image",
                     {
-                        FuiButton::<Msg>::with_label("Animate Image")
+                        Button::<Msg>::with_label("Animate Image")
                             .chipped(true)
                             .add_click_listener(|_| {
                                 Msg::StartAnimateImageEffects
                             })
                     },
-                    Msg::BtnMsg,
+                    Msg::ButtonMsg,
                 ),
                 self.image.view().map_msg(Msg::ImageEffectsMsg),
                 btn_context.map_view(
                     "animate_list",
-                    FuiButton::<Msg>::with_label("Animate List")
+                    Button::<Msg>::with_label("Animate List")
                         .add_click_listener(|_| Msg::ReAnimateList),
-                    Msg::BtnMsg,
+                    Msg::ButtonMsg,
                 ),
                 p(vec![], vec![self.animate_list.view()]),
                 self.spinner.view(),
                 btn_context.map_view(
                     "animate_paragraph",
                     {
-                        FuiButton::<Msg>::with_label("Animate Paragraph")
+                        Button::<Msg>::with_label("Animate Paragraph")
                             .add_click_listener(|_| Msg::ReAnimateParagraph)
                     },
-                    Msg::BtnMsg,
+                    Msg::ButtonMsg,
                 ),
                 self.paragraph.view(),
                 footer(
@@ -426,7 +426,7 @@ impl App {
             container_css,
             self.nav_header.style(&self.theme).join("\n"),
             self.frame.style(&self.theme).join("\n"),
-            FuiButton::<Msg>::style(&self.theme).join("\n"),
+            Button::<Msg>::style(&self.theme).join("\n"),
             self.animate_list.style(&self.theme).join("\n"),
             self.spinner.style(&self.theme).join("\n"),
             self.image.style(&self.theme),
