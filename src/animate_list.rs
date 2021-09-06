@@ -212,7 +212,7 @@ where
 
                 if truncate_len > 0 {
                     let truncated_txt = &txt.text[0..truncate_len];
-                    let text_node = Node::Text(Text::new(truncated_txt));
+                    let text_node = text(truncated_txt);
                     dest.add_children_ref_mut(vec![text_node]);
                     // we append the blinking character to the end of the text
                     // here, and only when this node has not yet finish animating..
@@ -222,6 +222,10 @@ where
                     }
                 }
                 *current_cnt += truncate_len;
+            }
+            Node::Comment(txt) => {
+                dest.add_children_ref_mut(vec![comment(txt)]);
+                *current_cnt += 1;
             }
         }
     }
