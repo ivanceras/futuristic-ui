@@ -508,7 +508,7 @@ impl App {
                 a(vec![class("colors"), href(format!("#/{}/{}",primary,background))], vec![
                     div(vec![class("pick"), style!{background_color: primary, border_color: background}], vec![]),
                 ])
-            }).collect()
+            })
         )
     }
 

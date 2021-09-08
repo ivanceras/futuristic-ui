@@ -8,13 +8,13 @@ pub enum Msg {
 }
 
 /// accepts a markdown and animate the content
-pub struct Paragraph<PMSG> {
-    animated_list: AnimateList<PMSG>,
+pub struct Paragraph<XMSG> {
+    animated_list: AnimateList<XMSG>,
 }
 
-impl<PMSG> Paragraph<PMSG>
+impl<XMSG> Paragraph<XMSG>
 where
-    PMSG: Clone,
+    XMSG: Clone,
 {
     pub fn new_with_markdown(md: &str) -> Self {
         Paragraph {
@@ -25,11 +25,11 @@ where
     }
 }
 
-impl<PMSG> Container<Msg, PMSG> for Paragraph<PMSG>
+impl<XMSG> Container<Msg, XMSG> for Paragraph<XMSG>
 where
-    PMSG: Clone,
+    XMSG: Clone,
 {
-    fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, XMSG> {
         match msg {
             Msg::AnimateIn => {
                 let effects =
@@ -43,7 +43,7 @@ where
         }
     }
 
-    fn view(&self) -> Node<PMSG> {
+    fn view(&self) -> Node<XMSG> {
         p(vec![], vec![self.animated_list.view()])
     }
 }

@@ -11,23 +11,23 @@ use web_sys::HtmlAudioElement;
 const COMPONENT_NAME: &str = "fui-frame";
 
 #[derive(Clone, Debug)]
-pub enum Msg<PMSG> {
+pub enum Msg<XMSG> {
     AnimateIn,
     StopAnimation,
     HoverIn,
     HoverOut,
     NextAnimation(f64, f64),
-    External(PMSG),
+    External(XMSG),
 }
-pub struct Frame<PMSG> {
+pub struct Frame<XMSG> {
     audio: HtmlAudioElement,
     hide: bool,
     hover: bool,
-    content: Node<PMSG>,
+    content: Node<XMSG>,
 }
 
-impl<PMSG> Frame<PMSG> {
-    pub fn with_content(content: Node<PMSG>) -> Self {
+impl<XMSG> Frame<XMSG> {
+    pub fn with_content(content: Node<XMSG>) -> Self {
         Frame {
             audio: sounds::preload("sounds/deploy.mp3"),
             hide: false,
@@ -37,11 +37,11 @@ impl<PMSG> Frame<PMSG> {
     }
 }
 
-impl<PMSG> Component<Msg<PMSG>, PMSG> for Frame<PMSG>
+impl<XMSG> Component<Msg<XMSG>, XMSG> for Frame<XMSG>
 where
-    PMSG: 'static,
+    XMSG: 'static,
 {
-    fn update(&mut self, msg: Msg<PMSG>) -> Effects<Msg<PMSG>, PMSG> {
+    fn update(&mut self, msg: Msg<XMSG>) -> Effects<Msg<XMSG>, XMSG> {
         match msg {
             Msg::AnimateIn => {
                 self.hide = true;
@@ -66,7 +66,7 @@ where
         }
     }
 
-    fn view(&self) -> Node<Msg<PMSG>> {
+    fn view(&self) -> Node<Msg<XMSG>> {
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
@@ -107,19 +107,19 @@ where
     }
 }
 
-impl<PMSG> Frame<PMSG> {
-    pub fn set_content(&mut self, content: Node<PMSG>) {
+impl<XMSG> Frame<XMSG> {
+    pub fn set_content(&mut self, content: Node<XMSG>) {
         self.content = content;
     }
 
-    fn start_animation(&mut self) -> Vec<Msg<PMSG>> {
+    fn start_animation(&mut self) -> Vec<Msg<XMSG>> {
         let duration = 200.0;
         let start = crate::dom::now();
         sounds::play(&self.audio);
         vec![Msg::NextAnimation(start, duration)]
     }
 
-    fn next_animation(&mut self, start: f64, duration: f64) -> Vec<Msg<PMSG>> {
+    fn next_animation(&mut self, start: f64, duration: f64) -> Vec<Msg<XMSG>> {
         let timestamp = crate::dom::now();
         let elapsed = timestamp - start;
         let continue_animation = elapsed < duration;

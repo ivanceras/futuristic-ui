@@ -14,21 +14,21 @@ pub enum Msg {
     NextAnimation(bool, f64, f64),
 }
 
-pub struct AnimateList<PMSG> {
+pub struct AnimateList<XMSG> {
     audio: HtmlAudioElement,
-    animated_layer: Option<Node<PMSG>>,
-    children: Node<PMSG>,
+    animated_layer: Option<Node<XMSG>>,
+    children: Node<XMSG>,
     animating: bool,
     content_len: usize,
     /// these are listeners that will be called when the anination is done
-    on_stop_animation: Vec<Callback<(), PMSG>>,
+    on_stop_animation: Vec<Callback<(), XMSG>>,
 }
 
-impl<PMSG> AnimateList<PMSG>
+impl<XMSG> AnimateList<XMSG>
 where
-    PMSG: Clone,
+    XMSG: Clone,
 {
-    pub fn with_content(children: Node<PMSG>) -> Self {
+    pub fn with_content(children: Node<XMSG>) -> Self {
         let content_len = children.node_count();
         AnimateList {
             audio: sounds::preload("sounds/typing.mp3"),
@@ -41,11 +41,11 @@ where
     }
 }
 
-impl<PMSG> Container<Msg, PMSG> for AnimateList<PMSG>
+impl<XMSG> Container<Msg, XMSG> for AnimateList<XMSG>
 where
-    PMSG: Clone,
+    XMSG: Clone,
 {
-    fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
+    fn update(&mut self, msg: Msg) -> Effects<Msg, XMSG> {
         match msg {
             Msg::AnimateIn => Effects::with_local(self.animate_in()),
             Msg::StopAnimation => {
@@ -53,8 +53,7 @@ where
                 let pmsg_list = self
                     .on_stop_animation
                     .iter()
-                    .map(|listener| listener.emit(()))
-                    .collect();
+                    .map(|listener| listener.emit(()));
                 Effects::with_external(pmsg_list)
             }
             Msg::NextAnimation(is_in, start, duration) => {
@@ -66,7 +65,7 @@ where
 
     // Note: opacity: 0 on span will have no effect on webkit browser
     // however, it has an effect on firefox
-    fn view(&self) -> Node<PMSG> {
+    fn view(&self) -> Node<XMSG> {
         div(
             vec![],
             vec![div(
@@ -101,9 +100,9 @@ where
     }
 }
 
-impl<PMSG> AnimateList<PMSG>
+impl<XMSG> AnimateList<XMSG>
 where
-    PMSG: Clone,
+    XMSG: Clone,
 {
     pub fn animate_in(&mut self) -> Vec<Msg> {
         sounds::play(&self.audio);
@@ -116,9 +115,10 @@ where
         vec![]
     }
 
+    #[allow(unused)]
     pub fn add_stop_animation_listener<F>(&mut self, f: F)
     where
-        F: Fn(()) -> PMSG + 'static,
+        F: Fn(()) -> XMSG + 'static,
     {
         let cb = Callback::from(f);
         self.on_stop_animation.push(cb);
@@ -146,8 +146,8 @@ where
     /// include the the element from the src to dest
     /// as long as its current_cnt is less than the chars_limit
     fn include_node(
-        dest: &mut Node<PMSG>,
-        src: &Node<PMSG>,
+        dest: &mut Node<XMSG>,
+        src: &Node<XMSG>,
         chars_limit: usize,
     ) {
         let mut current_cnt = 0;
@@ -157,8 +157,8 @@ where
     /// recursively include the element from src to dest
     /// until all of the current_cnt that is lesser than chars_limit is added.
     fn include_node_recursive(
-        dest: &mut Node<PMSG>,
-        src: &Node<PMSG>,
+        dest: &mut Node<XMSG>,
+        src: &Node<XMSG>,
         chars_limit: usize,
         current_cnt: &mut usize,
     ) {
@@ -246,7 +246,7 @@ where
         let new_length = (anim_progress * self.content_len as f64 / duration)
             .round() as usize;
 
-        let mut dest: Node<PMSG> = div(vec![], vec![]);
+        let mut dest: Node<XMSG> = div(vec![], vec![]);
 
         Self::include_node(&mut dest, &self.children, new_length);
         self.animated_layer = Some(dest);

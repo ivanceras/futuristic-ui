@@ -216,8 +216,7 @@ where
                 let pmsg_list = self
                     .click_listeners
                     .iter()
-                    .map(|listener| listener.emit(mouse_event.clone()))
-                    .collect();
+                    .map(|listener| listener.emit(mouse_event.clone()));
                 Effects::with_external(pmsg_list)
             }
             Msg::HoverIn => {
