@@ -29,10 +29,10 @@ impl<MSG> View<MSG> for Spinner<MSG> {
         };
 
         div(
-            vec![class(COMPONENT_NAME)],
-            vec![
-                div(vec![class_ns("circle circle1")], vec![]),
-                div(vec![class_ns("circle circle2")], vec![]),
+            [class(COMPONENT_NAME)],
+            [
+                div([class_ns("circle circle1")], []),
+                div([class_ns("circle circle2")], []),
             ],
         )
     }

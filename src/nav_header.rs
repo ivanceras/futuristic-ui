@@ -62,28 +62,25 @@ impl Component<Msg, ()> for NavHeader {
             )
         };
         header(
-            vec![
+            [
                 class(COMPONENT_NAME),
                 classes_ns_flag([("hide", self.hide)]),
             ],
-            vec![div(
-                vec![class_ns("content_and_relief")],
-                vec![
+            [div(
+                [class_ns("content_and_relief")],
+                [
                     div(
-                        vec![class_ns("text text-anim")],
-                        vec![
+                        [class_ns("text text-anim")],
+                        [
                             self.child(),
-                            div(vec![class_ns("border border-bottom")], vec![]),
+                            div([class_ns("border border-bottom")], []),
                         ],
                     ),
                     div(
-                        vec![class_ns("link_content")],
-                        vec![div(
-                            vec![class_ns("link")],
-                            vec![a(
-                                vec![href("#readmore")],
-                                vec![text("Read more..")],
-                            )],
+                        [class_ns("link_content")],
+                        [div(
+                            [class_ns("link")],
+                            [a([href("#readmore")], [text("Read more..")])],
                         )],
                     ),
                 ],
@@ -94,7 +91,7 @@ impl Component<Msg, ()> for NavHeader {
 
 impl NavHeader {
     fn child(&self) -> Node<Msg> {
-        div(vec![], vec![text(&self.content)])
+        div([], [text(&self.content)])
     }
 
     fn start_animation(&mut self) -> Vec<Msg> {

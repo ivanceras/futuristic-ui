@@ -98,13 +98,13 @@ impl Component<Msg, ()> for Image {
             )
         };
         div(
-            vec![
+            [
                 class(COMPONENT_NAME),
                 classes_ns_flag([("animating", self.is_animating)]),
                 on_click(|_| Msg::AnimateIn),
                 //on_mouseout(|_| Msg::AnimateIn),
             ],
-            vec![self
+            [self
                 .frame
                 .view()
                 .map_msg(|fmsg| Msg::FrameMsg(Box::new(fmsg)))],
@@ -141,7 +141,7 @@ impl Properties {
                 if index < limit {
                     let left = (self.slice_size + self.gap) * x as f32;
                     let cell = div(
-                        vec![
+                        [
                             class_ns("slice"),
                             style! {
                                 left: px(left),
@@ -149,14 +149,14 @@ impl Properties {
                                 background_position: format!("{} {}", px(-left), px(-top)),
                             },
                         ],
-                        vec![],
+                        [],
                     );
                     cells.push(cell);
                 }
                 index += 1;
             }
         }
-        div(vec![class_ns("effects_slices")], cells)
+        div([class_ns("effects_slices")], cells)
     }
 
     fn style(&self, theme: &crate::Theme) -> String {
@@ -212,7 +212,7 @@ impl Image {
         let class_ns = |class_names| {
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
-        self.frame.set_content(div(vec![class_ns("img")], vec![]));
+        self.frame.set_content(div([class_ns("img")], []));
         vec![]
     }
 

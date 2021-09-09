@@ -107,7 +107,7 @@ where
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
         button(
-            vec![
+            [
                 class_ns("button"),
                 if let Some(ref pallete) = self.options.pallete {
                     class_ns(pallete.class_name())
@@ -126,7 +126,7 @@ where
                     empty_attr()
                 },
             ],
-            vec![text(&self.label)],
+            [text(&self.label)],
         )
     }
 
@@ -164,38 +164,38 @@ where
             attributes::class_namespaced(COMPONENT_NAME, class_names)
         };
         div(
-            vec![class_ns("chipped_wrapper")],
-            vec![
+            [class_ns("chipped_wrapper")],
+            [
                 svg(
-                    vec![
+                    [
                         xmlns("http://www.w3.org/2000/svg"),
                         preserveAspectRatio("none"),
                         class_ns("chipped_svg"),
                         viewBox([0, 0, width, height]),
                     ],
-                    vec![
+                    [
                         polygon(
-                            vec![
+                            [
                                 class_ns("chipped_polygon"),
                                 points(poly_points_str),
                                 on_transitionend(|_| Msg::HighlightEnd),
                             ],
-                            vec![],
+                            [],
                         ),
                         polygon(
-                            vec![class_ns("triangle"), points(triangle_points)],
-                            vec![],
+                            [class_ns("triangle"), points(triangle_points)],
+                            [],
                         ),
                     ],
                 ),
                 button(
-                    vec![
+                    [
                         class_ns("chipped_button"),
                         disabled(self.options.disabled),
                         style! {width: px(width)},
                         style! {height: px(height)},
                     ],
-                    vec![text(&self.label)],
+                    [text(&self.label)],
                 ),
             ],
         )
@@ -247,7 +247,7 @@ where
         };
 
         div(
-            vec![
+            [
                 class(COMPONENT_NAME),
                 classes_ns_flag([
                     ("clicked", self.click),
@@ -276,65 +276,65 @@ where
                 on_mouseover(|_| Msg::HoverIn),
                 on_mouseout(|_| Msg::HoverOut),
             ],
-            vec![
+            [
                 // hover
                 view_if(
                     self.options.has_hover,
-                    div(vec![class_ns("hover hover-bottom")], vec![]),
+                    div([class_ns("hover hover-bottom")], []),
                 ),
                 //borders
                 view_if(
                     self.options.has_borders,
-                    div(vec![class_ns("border border-left")], vec![]),
+                    div([class_ns("border border-left")], []),
                 ),
                 view_if(
                     self.options.has_borders,
-                    div(vec![class_ns("border border-right")], vec![]),
+                    div([class_ns("border border-right")], []),
                 ),
                 view_if(
                     self.options.has_borders,
-                    div(vec![class_ns("border border-top")], vec![]),
+                    div([class_ns("border border-top")], []),
                 ),
                 view_if(
                     self.options.has_borders,
-                    div(vec![class_ns("border border-bottom")], vec![]),
+                    div([class_ns("border border-bottom")], []),
                 ),
                 // corners
                 view_if(
                     self.options.has_corners,
-                    div(vec![class_ns("corner corner__top-left")], vec![]),
+                    div([class_ns("corner corner__top-left")], []),
                 ),
                 view_if(
                     self.options.has_corners,
-                    div(vec![class_ns("corner corner__bottom-left")], vec![]),
+                    div([class_ns("corner corner__bottom-left")], []),
                 ),
                 view_if(
                     self.options.has_corners,
-                    div(vec![class_ns("corner corner__top-right")], vec![]),
+                    div([class_ns("corner corner__top-right")], []),
                 ),
                 view_if(
                     self.options.has_corners,
-                    div(vec![class_ns("corner corner__bottom-right")], vec![]),
+                    div([class_ns("corner corner__bottom-right")], []),
                 ),
                 if self.options.chipped {
                     self.view_chipped_button()
                 } else {
                     div(
-                        vec![],
-                        vec![
+                        [],
+                        [
                             div(
-                                vec![class_ns("button_wrap")],
-                                vec![self.view_actual_button(
+                                [class_ns("button_wrap")],
+                                [self.view_actual_button(
                                     self.width,
                                     self.height,
                                 )],
                             ),
                             div(
-                                vec![
+                                [
                                     class_ns("highlight"),
                                     on_transitionend(|_| Msg::HighlightEnd),
                                 ],
-                                vec![],
+                                [],
                             ),
                         ],
                     )

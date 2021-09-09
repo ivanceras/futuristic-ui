@@ -62,7 +62,7 @@ where
             Msg::NextAnimation(start, duration) => {
                 Effects::with_local(self.next_animation(start, duration))
             }
-            Msg::External(pmsg) => Effects::with_external(vec![pmsg]),
+            Msg::External(pmsg) => Effects::with_external([pmsg]),
         }
     }
 
@@ -79,7 +79,7 @@ where
         };
 
         div(
-            vec![
+            [
                 class(COMPONENT_NAME),
                 classes_ns_flag([
                     ("hide", self.hide),
@@ -89,18 +89,18 @@ where
                 on_mouseover(|_| Msg::HoverIn),
                 on_mouseout(|_| Msg::HoverOut),
             ],
-            vec![
-                div(vec![class_ns("border border-left")], vec![]),
-                div(vec![class_ns("border border-right")], vec![]),
-                div(vec![class_ns("border border-top")], vec![]),
-                div(vec![class_ns("border border-bottom")], vec![]),
-                div(vec![class_ns("corner corner__top-left")], vec![]),
-                div(vec![class_ns("corner corner__bottom-left")], vec![]),
-                div(vec![class_ns("corner corner__top-right")], vec![]),
-                div(vec![class_ns("corner corner__bottom-right")], vec![]),
+            [
+                div([class_ns("border border-left")], []),
+                div([class_ns("border border-right")], []),
+                div([class_ns("border border-top")], []),
+                div([class_ns("border border-bottom")], []),
+                div([class_ns("corner corner__top-left")], []),
+                div([class_ns("corner corner__bottom-left")], []),
+                div([class_ns("corner corner__top-right")], []),
+                div([class_ns("corner corner__bottom-right")], []),
                 div(
-                    vec![class_ns("content")],
-                    vec![self.content.clone().map_msg(Msg::External)],
+                    [class_ns("content")],
+                    [self.content.clone().map_msg(Msg::External)],
                 ),
             ],
         )

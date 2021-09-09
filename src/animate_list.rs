@@ -67,23 +67,23 @@ where
     // however, it has an effect on firefox
     fn view(&self) -> Node<XMSG> {
         div(
-            vec![],
-            vec![div(
-                vec![
+            [],
+            [div(
+                [
                     class("animate_list"),
                     classes_flag([("animating", self.animating)]),
                 ],
-                vec![
+                [
                     div(
-                        vec![class("animate_list_children")],
-                        vec![self.children.clone()],
+                        [class("animate_list_children")],
+                        [self.children.clone()],
                     ),
                     view_if(
                         self.animating,
                         div(
-                            vec![class("animated_layer_wrapper")],
-                            vec![div(
-                                vec![class("animated_layer")],
+                            [class("animated_layer_wrapper")],
+                            [div(
+                                [class("animated_layer")],
                                 if let Some(animated_layer) =
                                     &self.animated_layer
                                 {
@@ -170,7 +170,7 @@ where
                         element.attrs.clone(),
                         vec![],
                     );
-                    dest.add_children_ref_mut(vec![shallow_src]);
+                    dest.add_children_ref_mut([shallow_src]);
                     let children_len = element.children.len();
                     let truncate_len = if chars_limit > *current_cnt {
                         std::cmp::min(children_len, chars_limit - *current_cnt)
@@ -213,18 +213,18 @@ where
                 if truncate_len > 0 {
                     let truncated_txt = &txt.text[0..truncate_len];
                     let text_node = text(truncated_txt);
-                    dest.add_children_ref_mut(vec![text_node]);
+                    dest.add_children_ref_mut([text_node]);
                     // we append the blinking character to the end of the text
                     // here, and only when this node has not yet finish animating..
                     if truncate_len < txt_len {
-                        let blink = span(vec![class("blink")], vec![text("█")]);
-                        dest.add_children_ref_mut(vec![blink]);
+                        let blink = span([class("blink")], [text("█")]);
+                        dest.add_children_ref_mut([blink]);
                     }
                 }
                 *current_cnt += truncate_len;
             }
             Node::Comment(txt) => {
-                dest.add_children_ref_mut(vec![comment(txt)]);
+                dest.add_children_ref_mut([comment(txt)]);
                 *current_cnt += 1;
             }
         }
@@ -246,7 +246,7 @@ where
         let new_length = (anim_progress * self.content_len as f64 / duration)
             .round() as usize;
 
-        let mut dest: Node<XMSG> = div(vec![], vec![]);
+        let mut dest: Node<XMSG> = div([], []);
 
         Self::include_node(&mut dest, &self.children, new_length);
         self.animated_layer = Some(dest);

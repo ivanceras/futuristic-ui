@@ -44,6 +44,6 @@ where
     }
 
     fn view(&self) -> Node<XMSG> {
-        p(vec![], vec![self.animated_list.view()])
+        p([], [self.animated_list.view()])
     }
 }
