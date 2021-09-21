@@ -34,5 +34,5 @@ panic = "abort"
 
 [patch.crates-io]
 #sauron = { git = "https://github.com/ivanceras/sauron", branch = "master" }
-sauron = { path = "../sauron" }
-sauron-markdown = { path = "../sauron-markdown" }
+#sauron = { path = "../sauron" }
+#sauron-markdown = { path = "../sauron-markdown" }
