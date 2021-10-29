@@ -582,7 +582,7 @@ impl App {
 
 impl<COMP, MSG, CMSG> Context<COMP, MSG, CMSG>
 where
-    COMP: Component<CMSG, MSG> + 'static,
+    COMP: Component<CMSG, MSG> + std::fmt::Debug + 'static,
     MSG: 'static,
     CMSG: 'static,
 {
@@ -608,6 +608,11 @@ where
     where
         F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
     {
+        log::trace!(
+            "{} component_id: {:?}",
+            comp_id.to_string(),
+            component.get_component_id(),
+        );
         if let Some(component) = self.components.get(&comp_id.to_string()) {
             let component_clone = component.clone();
             component
@@ -636,6 +641,10 @@ where
         F: Fn(Rc<RefCell<COMP>>, CMSG) -> MSG + 'static,
     {
         let component_clone = component.clone();
+        log::trace!(
+            "component_id: {:?}",
+            component.borrow().get_component_id()
+        );
         component
             .borrow_mut()
             .update(dmsg)

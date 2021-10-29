@@ -1,6 +1,7 @@
 use crate::sounds;
 use css_colors::Color;
 use sauron::jss::jss_ns;
+use sauron::wasm_bindgen::JsCast;
 use sauron::{
     dom::Callback,
     html::attributes,
@@ -21,6 +22,7 @@ pub enum Msg {
     HoverIn,
     HoverOut,
     HighlightEnd,
+    Mounted(MountEvent),
 }
 
 #[derive(Debug)]
@@ -33,6 +35,7 @@ pub struct Button<PMSG> {
     click_listeners: Vec<Callback<MouseEvent, PMSG>>,
     pub width: Option<usize>,
     pub height: Option<usize>,
+    component_id: Option<String>,
 }
 
 #[derive(Debug)]
@@ -95,6 +98,7 @@ where
             click_listeners: vec![],
             width: None,
             height: None,
+            component_id: None,
         }
     }
 
@@ -206,6 +210,10 @@ impl<PMSG> Component<Msg, PMSG> for Button<PMSG>
 where
     PMSG: 'static,
 {
+    fn get_component_id(&self) -> Option<&String> {
+        self.component_id.as_ref()
+    }
+
     fn update(&mut self, msg: Msg) -> Effects<Msg, PMSG> {
         match msg {
             Msg::Click(mouse_event) => {
@@ -229,6 +237,19 @@ where
             }
             Msg::HighlightEnd => {
                 self.click = false;
+                Effects::none()
+            }
+            Msg::Mounted(me) => {
+                log::debug!("mounted...");
+                log::info!("mounted: {:?}", me);
+                let target_node = me.target_node;
+                let target_elm: &web_sys::Element =
+                    target_node.dyn_ref().expect("must cast");
+                if let Some(vdom_id) = target_elm.get_attribute("data-vdom-id")
+                {
+                    log::trace!("mounted: {}", vdom_id);
+                    self.component_id = Some(vdom_id);
+                }
                 Effects::none()
             }
         }
@@ -275,6 +296,7 @@ where
                 // layer effect
                 on_mouseover(|_| Msg::HoverIn),
                 on_mouseout(|_| Msg::HoverOut),
+                on_mount(|e| Msg::Mounted(e)),
             ],
             [
                 // hover
