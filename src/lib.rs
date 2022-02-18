@@ -22,6 +22,7 @@ use theme::Theme;
 
 mod animate_list;
 mod button;
+mod common;
 mod frame;
 mod image;
 mod nav_header;
@@ -332,9 +333,11 @@ impl App {
 
     fn restyle(&mut self, hash: &str) {
         self.theme = Self::calculate_theme_from_url_hash(hash);
-        let styles = self.style();
         Self::remove_style();
-        Self::inject_style(&styles.join("\n"));
+        let styles = self.style();
+        let mut all_styles = common::style(&self.theme);
+        all_styles += &format!("\n{}", styles.join("\n"));
+        Self::inject_style(&all_styles);
     }
 
     fn remove_style() {
