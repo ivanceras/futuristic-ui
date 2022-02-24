@@ -6,7 +6,7 @@ use frame::Frame;
 use image::Image;
 use nav_header::NavHeader;
 use paragraph::Paragraph;
-use sauron::jss::jss;
+use sauron::jss;
 use sauron::{
     html::units::em,
     html::{attributes::class, div, text},

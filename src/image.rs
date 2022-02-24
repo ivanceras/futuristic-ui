@@ -1,7 +1,7 @@
 use crate::{frame, sounds, Frame};
 use sauron::{
     html::{attributes, div},
-    jss::jss_ns,
+    jss_ns,
     prelude::*,
     Node,
 };

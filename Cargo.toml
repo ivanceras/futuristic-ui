@@ -8,9 +8,10 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-sauron = { version = "0.44", features = ["with-measure"] }
-#sauron = { version = "0.43", features = ["with-measure"], path ="../sauron" }
-sauron-markdown = "0.44.1"
+sauron = { version = "0.45.1", features = ["with-measure"] }
+#sauron = { version = "0.45.1", features = ["with-measure"], path ="../sauron" }
+sauron-markdown = "0.45.0"
+#sauron-markdown = { version = "0.45.0", path = "../sauron-markdown" }
 log = "0.4"
 console_log = { version = "0.2", features = ["color"] }
 web-sys = { version = "0.3", features = ["HtmlAudioElement"] }
@@ -26,10 +27,6 @@ color_processing = "0.6.0"
 
 
 [profile.release]
-# https://doc.rust-lang.org/cargo/reference/profiles.html
-# optimize for binary size
-#opt-level = "s"
-# optimize for binary size, but also turn off loop vectorization.
 opt-level = "z"
 lto = true
 panic = "abort"

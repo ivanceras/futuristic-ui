@@ -1,7 +1,7 @@
 use crate::sounds;
 use sauron::{
     html::{attributes::class, div, text},
-    jss::jss,
+    jss,
     prelude::*,
     Node,
 };
@@ -166,9 +166,11 @@ where
             Node::Element(element) => {
                 if *current_cnt < chars_limit {
                     let shallow_src = html_element(
+                        None,
                         element.tag,
                         element.attrs.clone(),
                         vec![],
+                        false,
                     );
                     dest.add_children_ref_mut([shallow_src]);
                     let children_len = element.children.len();
@@ -202,8 +204,8 @@ where
                     *current_cnt += truncate_len;
                 }
             }
-            Node::Text(txt) => {
-                let txt_len = txt.text.len();
+            Node::Leaf(Leaf::Text(txt)) => {
+                let txt_len = txt.len();
                 let truncate_len = if chars_limit > *current_cnt {
                     std::cmp::min(txt_len, chars_limit - *current_cnt)
                 } else {
@@ -211,7 +213,7 @@ where
                 };
 
                 if truncate_len > 0 {
-                    let truncated_txt = &txt.text[0..truncate_len];
+                    let truncated_txt = &txt[0..truncate_len];
                     let text_node = text(truncated_txt);
                     dest.add_children_ref_mut([text_node]);
                     // we append the blinking character to the end of the text
@@ -223,8 +225,12 @@ where
                 }
                 *current_cnt += truncate_len;
             }
-            Node::Comment(txt) => {
+            Node::Leaf(Leaf::Comment(txt)) => {
                 dest.add_children_ref_mut([comment(txt)]);
+                *current_cnt += 1;
+            }
+            Node::Leaf(Leaf::SafeHtml(html_text)) => {
+                dest.add_children_ref_mut([safe_html(html_text)]);
                 *current_cnt += 1;
             }
         }

@@ -1,6 +1,6 @@
 use crate::sounds;
 use css_colors::Color;
-use sauron::jss::jss_ns;
+use sauron::jss_ns;
 use sauron::wasm_bindgen::JsCast;
 use sauron::{
     dom::Callback,

@@ -1,4 +1,4 @@
-use sauron::jss::jss_ns;
+use sauron::jss_ns;
 use sauron::{
     html::attributes,
     html::{attributes::class, div},

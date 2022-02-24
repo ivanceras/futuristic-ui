@@ -1,7 +1,7 @@
 use crate::Theme;
-use sauron::jss::jss;
-use sauron::jss::units::px;
+use sauron::jss;
 use sauron::prelude::*;
+use sauron::units::px;
 
 pub(crate) fn style(theme: &Theme) -> String {
     jss! (
