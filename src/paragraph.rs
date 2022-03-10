@@ -18,9 +18,7 @@ where
 {
     pub fn new_with_markdown(md: &str) -> Self {
         Paragraph {
-            animated_list: AnimateList::with_content(
-                sauron_markdown::markdown(md),
-            ),
+            animated_list: AnimateList::with_content(text(md)),
         }
     }
 }

@@ -8,10 +8,8 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-sauron = { version = "0.45.1", features = ["with-measure"] }
-#sauron = { version = "0.45.1", features = ["with-measure"], path ="../sauron" }
-sauron-markdown = "0.45.0"
-#sauron-markdown = { version = "0.45.0", path = "../sauron-markdown" }
+sauron = { version = "0.49.2", features = ["with-measure"] }
+#sauron = { path ="../sauron", features = ["with-measure"]}
 log = "0.4"
 console_log = { version = "0.2", features = ["color"] }
 web-sys = { version = "0.3", features = ["HtmlAudioElement"] }
